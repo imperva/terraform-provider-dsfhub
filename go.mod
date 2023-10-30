@@ -1,4 +1,4 @@
-module github.com/terraform-providers/terraform-provider-dsfhub
+module github.com/imperva/terraform-provider-dsfhub
 
 go 1.19
 
