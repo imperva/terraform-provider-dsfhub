@@ -1,0 +1,1584 @@
+package dsfhub
+
+var ignoreDataSourceParamsByServerType = map[string]map[string]bool{
+	"AWS ATHENA":                        {"arn": true, "asset_display_name": true},
+	"AWS DOCUMENTDB CLUSTER":            {"arn": true, "asset_display_name": true},
+	"AWS DOCUMENTDB":                    {"arn": true, "asset_display_name": true},
+	"AWS DYNAMODB":                      {"arn": true, "asset_display_name": true},
+	"AWS GLUE":                          {"arn": true, "asset_display_name": true},
+	"AWS LAKE FORMATION":                {"arn": true, "asset_display_name": true},
+	"AWS NEPTUNE CLUSTER":               {"arn": true, "asset_display_name": true},
+	"AWS NEPTUNE":                       {"arn": true, "asset_display_name": true},
+	"AWS RDS AURORA MYSQL CLUSTER":      {"arn": true, "asset_display_name": true},
+	"AWS RDS AURORA MYSQL":              {"arn": true, "asset_display_name": true},
+	"AWS RDS AURORA POSTGRESQL CLUSTER": {"arn": true, "asset_display_name": true},
+	"AWS RDS AURORA POSTGRESQL":         {"arn": true, "asset_display_name": true},
+	"AWS RDS MARIADB":                   {"arn": true, "asset_display_name": true},
+	"AWS RDS MS SQL SERVER":             {"arn": true, "asset_display_name": true},
+	"AWS RDS MYSQL":                     {"arn": true, "asset_display_name": true},
+	"AWS RDS ORACLE":                    {"arn": true, "asset_display_name": true},
+	"AWS RDS POSTGRESQL":                {"arn": true, "asset_display_name": true},
+	"AWS REDSHIFT":                      {"arn": true, "asset_display_name": true},
+	"AWS S3":                            {"arn": true, "asset_display_name": true},
+	"AZURE COSMOSDB MONGO":              {"arn": true, "asset_display_name": true},
+	"AZURE COSMOSDB TABLE":              {"arn": true, "asset_display_name": true},
+	"AZURE COSMOSDB":                    {"arn": true, "asset_display_name": true},
+	"AZURE MARIADB":                     {"arn": true, "asset_display_name": true},
+	"AZURE MS SQL SERVER":               {"arn": true, "asset_display_name": true},
+	"AZURE MYSQL":                       {"arn": true, "asset_display_name": true},
+	"AZURE POSTGRESQL":                  {"arn": true, "asset_display_name": true},
+	"AZURE SQL MANAGED INSTANCE":        {"arn": true, "asset_display_name": true},
+	"AZURE STORAGE ACCOUNT":             {"arn": true, "asset_display_name": true},
+}
+
+//var ignoreDataSourceConnectionFields = map[string]bool{
+//	"access_key":               true,
+//	"access_method":            true,
+//	"application_id":           true,
+//	"aws_iam_server_id":        true,
+//	"azure_storage_account":    true,
+//	"azure_storage_container":  true,
+//	"azure_storage_secret_key": true,
+//	"base_dn":                  true,
+//	"credential_expiry":        true,
+//	"directory_id":             true,
+//	"eventhub_access_key":      true,
+//	"eventhub_access_policy":   true,
+//	"eventhub_name":            true,
+//	"eventhub_namespace":       true,
+//	"format":                   true,
+//	"nonce":                    true,
+//	"ntlm":                     true,
+//	"page_size":                true,
+//	"port":                     true,
+//	"protocol":                 true,
+//	"query":                    true,
+//	"secure_connection":        true,
+//	"store_aws_credentials":    true,
+//	"url":                      true,
+//	"v2_key_engine":            true,
+//}
+
+var requiredDataSourceFieldsJson = `{
+    "ServerTypes": {
+        "AEROSPIKE": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "ALIBABA APSARA MONGODB": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason",
+                    "server_port"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "ALIBABA APSARA RDS MYSQL": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason",
+                    "server_port"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "ALIBABA APSARA RDS POSTGRESQL": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason",
+                    "server_port"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "ALIBABA MAX COMPUTE": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "ALIBABA OSS": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "AMBARI": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "AWS ATHENA": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "admin_email"
+            ]
+        },
+        "AWS DOCUMENTDB": {
+            "auth_mechanisms": {
+                "key_file": [
+                    "reason",
+                    "username",
+                    "key_file"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "arn",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "AWS DOCUMENTDB CLUSTER": {
+            "auth_mechanisms": {
+                "key_file": [
+                    "reason",
+                    "username",
+                    "key_file"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "arn",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "AWS DYNAMODB": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ],
+                "iam_role": [
+                    "reason"
+                ],
+                "key": [
+                    "reason",
+                    "access_id",
+                    "secret_key"
+                ],
+                "profile": [
+                    "reason",
+                    "username"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "arn",
+                "admin_email",
+                "region"
+            ]
+        },
+        "AWS GLUE": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "AWS LAKE FORMATION": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "AWS NEPTUNE": {
+            "auth_mechanisms": {
+                "ec2": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "admin_email"
+            ]
+        },
+        "AWS NEPTUNE CLUSTER": {
+            "auth_mechanisms": {
+                "ec2": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "admin_email"
+            ]
+        },
+        "AWS RDS AURORA MYSQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "admin_email"
+            ]
+        },
+        "AWS RDS AURORA MYSQL CLUSTER": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "admin_email"
+            ]
+        },
+        "AWS RDS AURORA POSTGRESQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "admin_email"
+            ]
+        },
+        "AWS RDS AURORA POSTGRESQL CLUSTER": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "admin_email"
+            ]
+        },
+        "AWS RDS MARIADB": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "admin_email"
+            ]
+        },
+        "AWS RDS MS SQL SERVER": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "admin_email"
+            ]
+        },
+        "AWS RDS MYSQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "admin_email"
+            ]
+        },
+        "AWS RDS ORACLE": {
+            "auth_mechanisms": {
+                "oracle_wallet": [
+                    "reason",
+                    "username",
+                    "password",
+                    "dsn",
+                    "wallet_dir"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "admin_email"
+            ]
+        },
+        "AWS RDS POSTGRESQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "admin_email"
+            ]
+        },
+        "AWS REDSHIFT": {
+            "auth_mechanisms": {
+                "aws_credentials": [
+                    "reason",
+                    "username",
+                    "database_name",
+                    "access_id",
+                    "aws_connection_id"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "AWS S3": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "admin_email"
+            ]
+        },
+        "AZURE COSMOSDB": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "AZURE COSMOSDB MONGO": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "AZURE COSMOSDB TABLE": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "AZURE MARIADB": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password",
+                    "database_name"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "admin_email",
+                "location"
+            ]
+        },
+        "AZURE MS SQL SERVER": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email",
+                "location"
+            ]
+        },
+        "AZURE MYSQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "admin_email",
+                "location"
+            ]
+        },
+        "AZURE POSTGRESQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "admin_email",
+                "location"
+            ]
+        },
+        "AZURE SQL MANAGED INSTANCE": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email",
+                "location"
+            ]
+        },
+        "AZURE STORAGE ACCOUNT": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "CASSANDRA": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "CLOUDANT": {
+            "auth_mechanisms": {
+                "iam_role": [
+                    "reason",
+                    "region",
+                    "account_name",
+                    "api_key",
+                    "crn",
+                    "service_key"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password",
+                    "region",
+                    "crn",
+                    "service_key"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "CLOUDANT LOCAL": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "CLOUDERA": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "COCKROACHDB": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "COUCHBASE": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "DATASTAX": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "DB2": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password",
+                    "database_name"
+                ],
+                "ssl": [
+                    "reason",
+                    "database_name",
+                    "ssl_server_cert"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "EDB POSTGRESQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "ELASTICSEARCH": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "ELOQUENCE": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "EMR": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "GCP BIGQUERY": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ],
+                "service_account": [
+                    "reason",
+                    "key_file"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "GCP BIGTABLE": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ],
+                "service_account": [
+                    "reason",
+                    "key_file"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "GCP MS SQL SERVER": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "GCP MYSQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "GCP POSTGRESQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "GCP SPANNER": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "HBASE": {
+            "auth_mechanisms": {
+                "kerberos": [
+                    "reason"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "HDFS": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "HIVE": {
+            "auth_mechanisms": {
+                "kerberos": [
+                    "reason",
+                    "database_name"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password",
+                    "database_name"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "HORTONWORKS": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "IMPALA": {
+            "auth_mechanisms": {
+                "key_file": [
+                    "reason",
+                    "username",
+                    "key_file"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "INFORMIX": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password",
+                    "database_name"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "IRIS": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "KINETICA": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "KNOX GATEWAY": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "MARIADB": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "MARKLOGIC": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "MONGODB": {
+            "auth_mechanisms": {
+                "key_file": [
+                    "reason",
+                    "username",
+                    "key_file"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "MONGODB ATLAS": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason",
+                    "access_id",
+                    "secret_key"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email",
+                "database_name"
+            ]
+        },
+        "MS SQL SERVER": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "MYSQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "NEO4J": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "NETEZZA": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password",
+                    "database_name"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "ORACLE": {
+            "auth_mechanisms": {
+                "kerberos": [
+                    "reason"
+                ],
+                "oracle_wallet": [
+                    "reason",
+                    "username",
+                    "password",
+                    "dsn",
+                    "wallet_dir"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "service_name",
+                "admin_email"
+            ]
+        },
+        "PERCONA MONGODB": {
+            "auth_mechanisms": {
+                "key_file": [
+                    "reason",
+                    "username",
+                    "key_file"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email",
+                "database_name"
+            ]
+        },
+        "PERCONA MYSQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "POSTGRESQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "PROGRESS OPENEDGE": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password",
+                    "database_name"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "REDIS": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "SAP HANA": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "SCYLLADB": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "SNOWFLAKE": {
+            "auth_mechanisms": {
+                "oauth": [
+                    "reason",
+                    "username",
+                    "access_id",
+                    "token"
+                ],
+                "oauth-azure-ad": [
+                    "reason",
+                    "password",
+                    "client_secret",
+                    "access_id",
+                    "client_id",
+                    "principal",
+                    "resource_id",
+                    "snowflake_role",
+                    "tenant_id"
+                ],
+                "oauth2": [
+                    "reason",
+                    "access_id",
+                    "oauth_parameters",
+                    "principal",
+                    "snowflake_role",
+                    "token_endpoint"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password",
+                    "access_id"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "SPLUNK": {
+            "auth_mechanisms": {
+                "key": [
+                    "reason",
+                    "access_id",
+                    "secret_key"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "SYBASE": {
+            "auth_mechanisms": {
+                "kerberos": [
+                    "reason"
+                ],
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "TERADATA": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password",
+                    "database_name"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "YARN": {
+            "auth_mechanisms": {
+                "default": [
+                    "reason"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "YUGABYTE CQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "YUGABYTE SQL": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        }
+    }
+}`

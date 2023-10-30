@@ -1,0 +1,10 @@
+.DS_Store
+.idea/*
+*.terraform
+*.terraform/*
+*.terraform*
+*terraform.tfstate*
+*terraform.tfstate/*
+*terraform.tfstate.backup
+examples-dev/*
+.vscode/
