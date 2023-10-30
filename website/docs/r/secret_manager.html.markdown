@@ -46,7 +46,7 @@ resource "dsfhub_secret_manager" "example_secret_manager_aws_log_group" {
 </ul>
 
 
-## Schema
+## Argument Reference
 
 ### Required
 

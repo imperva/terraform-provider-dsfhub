@@ -130,7 +130,7 @@ resource "dsfhub_secret_manager" "example_hashicorp" {
 </ul>
 
 
-## Schema
+## Argument Reference
 
 ### Required
 

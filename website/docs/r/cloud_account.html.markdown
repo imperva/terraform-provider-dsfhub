@@ -40,7 +40,7 @@ resource "dsfhub_cloud_account" "example_aws_cloud_account" {
 	<li><a href="/docs/providers/dsfhub/r/cloud_accounts/azure.html">Azure</a></li>
 </ul>
 
-## Schema
+## Argument Reference
 
 ### Required
 

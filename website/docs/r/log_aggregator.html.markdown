@@ -49,7 +49,7 @@ resource "dsfhub_log_aggregator" "example_aws_log_group" {
 </ul>
 
 
-## Schema
+## Argument Reference
 
 ### Required
 
