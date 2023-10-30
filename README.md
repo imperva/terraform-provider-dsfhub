@@ -5,7 +5,7 @@ Terraform `DSFHUB` Provider
 - [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
 - Mailing list: [Google Groups](http://groups.google.com/group/terraform-tool)
 
-<img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Terraform_Logo.svg/768px-Terraform_Logo.svg.png" width="600px">
 
 Maintainers
 -----------
@@ -21,7 +21,7 @@ Requirements
 Building The Provider
 ---------------------
 
-Clone repository to: `$GOPATH/src/github.com/terraform-providers/terraform-provider-dsf`
+Clone repository to: `$GOPATH/src/github.com/terraform-providers/terraform-provider-dsfhub`
 
 ```sh
 git clone git@github.com:imperva/terraform-provider-dsfhub.git $GOPATH/src/github.com/terraform-providers/terraform-provider-dsfhub
