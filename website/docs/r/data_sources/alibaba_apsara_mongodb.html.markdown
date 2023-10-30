@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for ALIBABA APSARA MONGODBresource "dsfhub_data_source" "example_alibaba_apsara_mongodb" {
+# ### Resource example for ALIBABA APSARA MONGODB ###
+resource "dsfhub_data_source" "example_alibaba_apsara_mongodb" {
 	server_type = "ALIBABA APSARA MONGODB"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

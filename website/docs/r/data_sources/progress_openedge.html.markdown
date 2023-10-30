@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for PROGRESS OPENEDGEresource "dsfhub_data_source" "example_progress_openedge" {
+# ### Resource example for PROGRESS OPENEDGE ###
+resource "dsfhub_data_source" "example_progress_openedge" {
 	server_type = "PROGRESS OPENEDGE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

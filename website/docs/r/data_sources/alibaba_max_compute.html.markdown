@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for ALIBABA MAX COMPUTEresource "dsfhub_data_source" "example_alibaba_max_compute" {
+# ### Resource example for ALIBABA MAX COMPUTE ###
+resource "dsfhub_data_source" "example_alibaba_max_compute" {
 	server_type = "ALIBABA MAX COMPUTE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

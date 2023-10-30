@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for GCP SPANNERresource "dsfhub_data_source" "example_gcp_spanner" {
+# ### Resource example for GCP SPANNER ###
+resource "dsfhub_data_source" "example_gcp_spanner" {
 	server_type = "GCP SPANNER"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

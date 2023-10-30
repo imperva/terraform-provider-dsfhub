@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for SAP HANAresource "dsfhub_data_source" "example_sap_hana" {
+# ### Resource example for SAP HANA ###
+resource "dsfhub_data_source" "example_sap_hana" {
 	server_type = "SAP HANA"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

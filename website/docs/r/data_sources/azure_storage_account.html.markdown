@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AZURE STORAGE ACCOUNTresource "dsfhub_data_source" "example_azure_storage_account" {
+# ### Resource example for AZURE STORAGE ACCOUNT ###
+resource "dsfhub_data_source" "example_azure_storage_account" {
 	server_type = "AZURE STORAGE ACCOUNT"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

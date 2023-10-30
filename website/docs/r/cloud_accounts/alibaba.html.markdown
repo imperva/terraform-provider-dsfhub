@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for ALIBABAresource "dsfhub_cloud_account" "example_alibaba" {
+# ### Resource example for ALIBABA ###
+resource "dsfhub_cloud_account" "example_alibaba" {
 	server_type = "ALIBABA"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

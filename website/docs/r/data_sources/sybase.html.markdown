@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for SYBASEresource "dsfhub_data_source" "example_sybase" {
+# ### Resource example for SYBASE ###
+resource "dsfhub_data_source" "example_sybase" {
 	server_type = "SYBASE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

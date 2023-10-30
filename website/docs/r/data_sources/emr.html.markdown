@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for EMRresource "dsfhub_data_source" "example_emr" {
+# ### Resource example for EMR ###
+resource "dsfhub_data_source" "example_emr" {
 	server_type = "EMR"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

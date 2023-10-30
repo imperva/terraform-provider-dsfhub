@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for KNOX GATEWAYresource "dsfhub_data_source" "example_knox_gateway" {
+# ### Resource example for KNOX GATEWAY ###
+resource "dsfhub_data_source" "example_knox_gateway" {
 	server_type = "KNOX GATEWAY"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

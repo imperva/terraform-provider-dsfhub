@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for SSHresource "dsfhub_log_aggregator" "example_ssh" {
+# ### Resource example for SSH ###
+resource "dsfhub_log_aggregator" "example_ssh" {
 	server_type = "SSH"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

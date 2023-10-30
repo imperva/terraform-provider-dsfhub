@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for GCP BIGQUERYresource "dsfhub_data_source" "example_gcp_bigquery" {
+# ### Resource example for GCP BIGQUERY ###
+resource "dsfhub_data_source" "example_gcp_bigquery" {
 	server_type = "GCP BIGQUERY"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

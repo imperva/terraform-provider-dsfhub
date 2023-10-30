@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for COCKROACHDBresource "dsfhub_data_source" "example_cockroachdb" {
+# ### Resource example for COCKROACHDB ###
+resource "dsfhub_data_source" "example_cockroachdb" {
 	server_type = "COCKROACHDB"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AZURE COSMOSDBresource "dsfhub_data_source" "example_azure_cosmosdb" {
+# ### Resource example for AZURE COSMOSDB ###
+resource "dsfhub_data_source" "example_azure_cosmosdb" {
 	server_type = "AZURE COSMOSDB"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for MONGODBresource "dsfhub_data_source" "example_mongodb" {
+# ### Resource example for MONGODB ###
+resource "dsfhub_data_source" "example_mongodb" {
 	server_type = "MONGODB"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

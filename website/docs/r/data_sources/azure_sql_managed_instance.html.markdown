@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AZURE SQL MANAGED INSTANCEresource "dsfhub_data_source" "example_azure_sql_managed_instance" {
+# ### Resource example for AZURE SQL MANAGED INSTANCE ###
+resource "dsfhub_data_source" "example_azure_sql_managed_instance" {
 	server_type = "AZURE SQL MANAGED INSTANCE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

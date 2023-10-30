@@ -20,11 +20,11 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AWS DYNAMODBresource "dsfhub_data_source" "example_aws_dynamodb" {
+# ### Resource example for AWS DYNAMODB ###
+resource "dsfhub_data_source" "example_aws_dynamodb" {
 	server_type = "AWS DYNAMODB"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset
-	arn = var.arn	# Amazon Resource Name - format is arn:partition:service:region:account-id
 	asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
 	asset_id = var.asset_id	# Asset ID
 	gateway_id = var.gateway_id	# Gateway ID

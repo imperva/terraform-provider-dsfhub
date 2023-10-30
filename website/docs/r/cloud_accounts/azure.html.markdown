@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AZUREresource "dsfhub_cloud_account" "example_azure" {
+# ### Resource example for AZURE ###
+resource "dsfhub_cloud_account" "example_azure" {
 	server_type = "AZURE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

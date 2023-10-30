@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for YUGABYTE SQLresource "dsfhub_data_source" "example_yugabyte_sql" {
+# ### Resource example for YUGABYTE SQL ###
+resource "dsfhub_data_source" "example_yugabyte_sql" {
 	server_type = "YUGABYTE SQL"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

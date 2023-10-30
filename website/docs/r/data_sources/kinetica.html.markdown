@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for KINETICAresource "dsfhub_data_source" "example_kinetica" {
+# ### Resource example for KINETICA ###
+resource "dsfhub_data_source" "example_kinetica" {
 	server_type = "KINETICA"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

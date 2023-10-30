@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for CLOUDANT LOCALresource "dsfhub_data_source" "example_cloudant_local" {
+# ### Resource example for CLOUDANT LOCAL ###
+resource "dsfhub_data_source" "example_cloudant_local" {
 	server_type = "CLOUDANT LOCAL"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

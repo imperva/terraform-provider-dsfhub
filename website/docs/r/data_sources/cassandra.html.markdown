@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for CASSANDRAresource "dsfhub_data_source" "example_cassandra" {
+# ### Resource example for CASSANDRA ###
+resource "dsfhub_data_source" "example_cassandra" {
 	server_type = "CASSANDRA"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

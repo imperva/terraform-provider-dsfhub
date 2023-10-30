@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for NEO4Jresource "dsfhub_data_source" "example_neo4j" {
+# ### Resource example for NEO4J ###
+resource "dsfhub_data_source" "example_neo4j" {
 	server_type = "NEO4J"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

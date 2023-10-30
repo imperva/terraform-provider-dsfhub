@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for HDFSresource "dsfhub_data_source" "example_hdfs" {
+# ### Resource example for HDFS ###
+resource "dsfhub_data_source" "example_hdfs" {
 	server_type = "HDFS"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for GCPresource "dsfhub_cloud_account" "example_gcp" {
+# ### Resource example for GCP ###
+resource "dsfhub_cloud_account" "example_gcp" {
 	server_type = "GCP"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

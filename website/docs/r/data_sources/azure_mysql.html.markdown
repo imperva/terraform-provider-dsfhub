@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AZURE MYSQLresource "dsfhub_data_source" "example_azure_mysql" {
+# ### Resource example for AZURE MYSQL ###
+resource "dsfhub_data_source" "example_azure_mysql" {
 	server_type = "AZURE MYSQL"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

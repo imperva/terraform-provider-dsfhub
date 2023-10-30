@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for DATASTAXresource "dsfhub_data_source" "example_datastax" {
+# ### Resource example for DATASTAX ###
+resource "dsfhub_data_source" "example_datastax" {
 	server_type = "DATASTAX"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

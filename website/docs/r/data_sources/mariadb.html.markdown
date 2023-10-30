@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for MARIADBresource "dsfhub_data_source" "example_mariadb" {
+# ### Resource example for MARIADB ###
+resource "dsfhub_data_source" "example_mariadb" {
 	server_type = "MARIADB"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

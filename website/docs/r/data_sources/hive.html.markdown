@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for HIVEresource "dsfhub_data_source" "example_hive" {
+# ### Resource example for HIVE ###
+resource "dsfhub_data_source" "example_hive" {
 	server_type = "HIVE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

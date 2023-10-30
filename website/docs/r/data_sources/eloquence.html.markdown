@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for ELOQUENCEresource "dsfhub_data_source" "example_eloquence" {
+# ### Resource example for ELOQUENCE ###
+resource "dsfhub_data_source" "example_eloquence" {
 	server_type = "ELOQUENCE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

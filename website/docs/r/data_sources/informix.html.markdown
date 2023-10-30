@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for INFORMIXresource "dsfhub_data_source" "example_informix" {
+# ### Resource example for INFORMIX ###
+resource "dsfhub_data_source" "example_informix" {
 	server_type = "INFORMIX"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

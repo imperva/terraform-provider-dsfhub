@@ -15,6 +15,23 @@ The `dsf_cloud_account` resource contains the configuration parameters necessary
 Documentation for the underlying API used in this resource can be found at
 [Cloud Account API Definition page](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/84552.htm).
 
+## Example Usage
+
+```hcl
+resource "dsfhub_cloud_account" "example_aws_cloud_account" {
+  server_type = "AWS"
+  admin_email = "your@email.com"
+  asset_display_name = "arn:partition:service:region:account-id" # User-friendly name of the asset
+  asset_id = "arn:partition:service:region:account-id" # Also populates arn field for aws
+  gateway_id = "12345-abcde-12345-abcde-12345-abcde"
+  asset_connection {
+    auth_mechanism = "iam_role"
+    reason = "default"
+    region = "us-east-1"
+  }
+}
+```
+
 ## Cloud Account Types:
 <ul>
 	<li><a href="/docs/providers/dsfhub/r/cloud_accounts/alibaba.html">Alibaba Cloud Account</a></li>
@@ -126,7 +143,6 @@ Optional:
 - `secret_name` (String) HashiCorp secret mane
 
 
-
 <a id="nestedblock--aws_proxy_config"></a>
 ### Nested Schema for `aws_proxy_config`
 
@@ -142,3 +158,11 @@ Optional:
 Optional:
 
 - `logs` (String) The log endpoint for a given service
+
+## Import
+
+Cloud Account can be imported using the `asset_id`, e.g.:
+
+```
+$ terraform import dsf_cloud_account.example_aws_cloud_account "arn:partition:service:region:account-id"
+```

@@ -20,11 +20,11 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AWS S3resource "dsfhub_data_source" "example_aws_s3" {
+# ### Resource example for AWS S3 ###
+resource "dsfhub_data_source" "example_aws_s3" {
 	server_type = "AWS S3"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset
-	arn = var.arn	# Amazon Resource Name - format is arn:partition:service:region:account-id and used as the asset_id
 	asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
 	asset_id = var.asset_id	# Asset ID
 	gateway_id = var.gateway_id	# Gateway ID

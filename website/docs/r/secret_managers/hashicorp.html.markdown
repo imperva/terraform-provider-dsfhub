@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for HASHICORPresource "dsfhub_secret_manager" "example_hashicorp" {
+# ### Resource example for HASHICORP ###
+resource "dsfhub_secret_manager" "example_hashicorp" {
 	server_type = "HASHICORP"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AZURE COSMOSDB MONGOresource "dsfhub_data_source" "example_azure_cosmosdb_mongo" {
+# ### Resource example for AZURE COSMOSDB MONGO ###
+resource "dsfhub_data_source" "example_azure_cosmosdb_mongo" {
 	server_type = "AZURE COSMOSDB MONGO"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for MYSQLresource "dsfhub_data_source" "example_mysql" {
+# ### Resource example for MYSQL ###
+resource "dsfhub_data_source" "example_mysql" {
 	server_type = "MYSQL"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

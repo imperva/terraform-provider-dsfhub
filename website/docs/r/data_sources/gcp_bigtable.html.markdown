@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for GCP BIGTABLEresource "dsfhub_data_source" "example_gcp_bigtable" {
+# ### Resource example for GCP BIGTABLE ###
+resource "dsfhub_data_source" "example_gcp_bigtable" {
 	server_type = "GCP BIGTABLE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

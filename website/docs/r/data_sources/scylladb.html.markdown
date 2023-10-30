@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for SCYLLADBresource "dsfhub_data_source" "example_scylladb" {
+# ### Resource example for SCYLLADB ###
+resource "dsfhub_data_source" "example_scylladb" {
 	server_type = "SCYLLADB"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

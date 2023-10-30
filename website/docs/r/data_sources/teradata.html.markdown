@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for TERADATAresource "dsfhub_data_source" "example_teradata" {
+# ### Resource example for TERADATA ###
+resource "dsfhub_data_source" "example_teradata" {
 	server_type = "TERADATA"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

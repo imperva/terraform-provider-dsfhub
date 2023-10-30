@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for IMPALAresource "dsfhub_data_source" "example_impala" {
+# ### Resource example for IMPALA ###
+resource "dsfhub_data_source" "example_impala" {
 	server_type = "IMPALA"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

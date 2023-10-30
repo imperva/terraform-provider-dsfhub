@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for SPLUNKresource "dsfhub_data_source" "example_splunk" {
+# ### Resource example for SPLUNK ###
+resource "dsfhub_data_source" "example_splunk" {
 	server_type = "SPLUNK"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

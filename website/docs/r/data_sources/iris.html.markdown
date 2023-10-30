@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for IRISresource "dsfhub_data_source" "example_iris" {
+# ### Resource example for IRIS ###
+resource "dsfhub_data_source" "example_iris" {
 	server_type = "IRIS"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

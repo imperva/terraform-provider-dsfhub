@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for YUGABYTE CQLresource "dsfhub_data_source" "example_yugabyte_cql" {
+# ### Resource example for YUGABYTE CQL ###
+resource "dsfhub_data_source" "example_yugabyte_cql" {
 	server_type = "YUGABYTE CQL"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

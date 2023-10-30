@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AZURE POSTGRESQLresource "dsfhub_data_source" "example_azure_postgresql" {
+# ### Resource example for AZURE POSTGRESQL ###
+resource "dsfhub_data_source" "example_azure_postgresql" {
 	server_type = "AZURE POSTGRESQL"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

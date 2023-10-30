@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for COUCHBASEresource "dsfhub_data_source" "example_couchbase" {
+# ### Resource example for COUCHBASE ###
+resource "dsfhub_data_source" "example_couchbase" {
 	server_type = "COUCHBASE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

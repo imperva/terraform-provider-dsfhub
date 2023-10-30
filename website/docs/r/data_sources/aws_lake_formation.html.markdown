@@ -20,11 +20,11 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AWS LAKE FORMATIONresource "dsfhub_data_source" "example_aws_lake_formation" {
+# ### Resource example for AWS LAKE FORMATION ###
+resource "dsfhub_data_source" "example_aws_lake_formation" {
 	server_type = "AWS LAKE FORMATION"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset
-	arn = var.arn	# Amazon Resource Name - format is arn:partition:service:region:account-id:resource-type:resource-id and used as the asset_id
 	asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
 	asset_id = var.asset_id	# Asset ID
 	gateway_id = var.gateway_id	# Gateway ID

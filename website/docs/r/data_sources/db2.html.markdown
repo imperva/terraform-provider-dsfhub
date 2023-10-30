@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for DB2resource "dsfhub_data_source" "example_db2" {
+# ### Resource example for DB2 ###
+resource "dsfhub_data_source" "example_db2" {
 	server_type = "DB2"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

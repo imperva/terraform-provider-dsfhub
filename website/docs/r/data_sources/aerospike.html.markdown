@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AEROSPIKEresource "dsfhub_data_source" "example_aerospike" {
+# ### Resource example for AEROSPIKE ###
+resource "dsfhub_data_source" "example_aerospike" {
 	server_type = "AEROSPIKE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

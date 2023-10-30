@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for ELASTICSEARCHresource "dsfhub_data_source" "example_elasticsearch" {
+# ### Resource example for ELASTICSEARCH ###
+resource "dsfhub_data_source" "example_elasticsearch" {
 	server_type = "ELASTICSEARCH"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

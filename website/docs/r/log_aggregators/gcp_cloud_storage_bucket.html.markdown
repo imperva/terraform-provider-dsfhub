@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for GCP CLOUD STORAGE BUCKETresource "dsfhub_log_aggregator" "example_gcp_cloud_storage_bucket" {
+# ### Resource example for GCP CLOUD STORAGE BUCKET ###
+resource "dsfhub_log_aggregator" "example_gcp_cloud_storage_bucket" {
 	server_type = "GCP CLOUD STORAGE BUCKET"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

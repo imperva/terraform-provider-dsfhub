@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for ORACLEresource "dsfhub_data_source" "example_oracle" {
+# ### Resource example for ORACLE ###
+resource "dsfhub_data_source" "example_oracle" {
 	server_type = "ORACLE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for EDB POSTGRESQLresource "dsfhub_data_source" "example_edb_postgresql" {
+# ### Resource example for EDB POSTGRESQL ###
+resource "dsfhub_data_source" "example_edb_postgresql" {
 	server_type = "EDB POSTGRESQL"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

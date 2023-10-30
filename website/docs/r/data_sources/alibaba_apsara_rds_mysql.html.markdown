@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for ALIBABA APSARA RDS MYSQLresource "dsfhub_data_source" "example_alibaba_apsara_rds_mysql" {
+# ### Resource example for ALIBABA APSARA RDS MYSQL ###
+resource "dsfhub_data_source" "example_alibaba_apsara_rds_mysql" {
 	server_type = "ALIBABA APSARA RDS MYSQL"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

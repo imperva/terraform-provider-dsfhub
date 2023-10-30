@@ -18,6 +18,26 @@ other secrets. If you use this option, certain configuration fields for a connec
 secret manager rather than from the configured fields in the asset itself.  Documentation for the underlying API used in 
 this resource can be found at [Secret Managers API Definition page](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/84552.htm).
 
+## Example Usage
+
+```hcl
+resource "dsfhub_secret_manager" "example_secret_manager_aws_log_group" {
+  server_type = "AWS LOG GROUP"
+  admin_email = "your@email.com"
+  asset_display_name = "arn:partition:service:region:account-id" # User-friendly name of the asset
+  asset_id = "arn:partition:service:region:account-id" # Use arn for aws resources
+  gateway_id = "12345-abcde-12345-abcde-12345-abcde"
+  server_host_name = "your-host-name-here"
+  server_ip = "1.2.3.4"	
+  server_port = "12345"
+  asset_connection {
+    auth_mechanism = "default"
+    reason = "default" 
+    region = "us-east-2"
+  }
+}
+```
+
 ## Secret Manager Types:
 <ul>
 	<li><a href="/docs/providers/dsfhub/r/secrets_managers/hashicorp.html">HashiCorp</a></li>
@@ -152,3 +172,11 @@ Optional:
 Optional:
 
 - `logs` (String) The log endpoint for a given service
+
+## Import
+
+Secret Manager can be imported using the `asset_id`, e.g.:
+
+```
+$ terraform import dsf_secret_manager.example_secret_manager_aws_log_group "arn:partition:service:region:account-id"
+```

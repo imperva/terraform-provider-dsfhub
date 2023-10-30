@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for ALIBABA APSARA RDS POSTGRESQLresource "dsfhub_data_source" "example_alibaba_apsara_rds_postgresql" {
+# ### Resource example for ALIBABA APSARA RDS POSTGRESQL ###
+resource "dsfhub_data_source" "example_alibaba_apsara_rds_postgresql" {
 	server_type = "ALIBABA APSARA RDS POSTGRESQL"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for GCP PUBSUBresource "dsfhub_log_aggregator" "example_gcp_pubsub" {
+# ### Resource example for GCP PUBSUB ###
+resource "dsfhub_log_aggregator" "example_gcp_pubsub" {
 	server_type = "GCP PUBSUB"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

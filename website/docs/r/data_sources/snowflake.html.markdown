@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for SNOWFLAKEresource "dsfhub_data_source" "example_snowflake" {
+# ### Resource example for SNOWFLAKE ###
+resource "dsfhub_data_source" "example_snowflake" {
 	server_type = "SNOWFLAKE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

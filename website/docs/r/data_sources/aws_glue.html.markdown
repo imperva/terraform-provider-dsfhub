@@ -20,11 +20,11 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AWS GLUEresource "dsfhub_data_source" "example_aws_glue" {
+# ### Resource example for AWS GLUE ###
+resource "dsfhub_data_source" "example_aws_glue" {
 	server_type = "AWS GLUE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset
-	arn = var.arn	# Amazon Resource Name - format is arn:partition:service:region:account-id:resource-type:resource-id and used as the asset_id
 	asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
 	asset_id = var.asset_id	# Asset ID
 	gateway_id = var.gateway_id	# Gateway ID

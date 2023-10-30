@@ -14,6 +14,28 @@ The `dsfhub_log_aggregator` resource contains the configuration parameters neces
 Documentation for the underlying API used in this resource can be found at
 [Log Aggregators API Definition page](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/84552.htm).
 
+## Example Usage
+
+```hcl
+data "dsfhub_data_source" "example_aws_rds_mysql" {
+  asset_id = "arn:rds:mysql:db:region:account-id"
+}
+
+resource "dsfhub_log_aggregator" "example_aws_log_group" {
+  server_type = "AWS LOG GROUP"
+  admin_email = "your@email.com"
+  asset_display_name = "arn:partition:service:region:account-id" # User-friendly name of the asset
+  asset_id = "arn:partition:service:region:account-id" # Use arn for aws resources
+  gateway_id = "12345-abcde-12345-abcde-12345-abcde"
+  parent_asset_id = dsf_data_source.example_aws_rds_mysql.asset_id # asset_id of the data_source resource to be consumed by the log aggregator
+  asset_connection {
+    auth_mechanism = "default"
+    reason = "default" 
+    region = "us-east-2"
+  }
+}
+```
+
 ## Log Aggregator Types
 <ul>
 	<li><a href="/docs/providers/dsfhub/r/log_aggregators/ssh.html">SSH</a></li>
@@ -151,3 +173,11 @@ Optional:
 Optional:
 
 - `logs` (String) The log endpoint for a given service
+
+## Import
+
+Log Aggregators can be imported using the `asset_id`, e.g.:
+
+```
+$ terraform import dsf_log_aggregator.example_aws_log_group "arn:partition:service:region:account-id"
+```

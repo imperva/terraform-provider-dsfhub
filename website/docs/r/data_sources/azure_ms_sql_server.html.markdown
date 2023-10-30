@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AZURE MS SQL SERVERresource "dsfhub_data_source" "example_azure_ms_sql_server" {
+# ### Resource example for AZURE MS SQL SERVER ###
+resource "dsfhub_data_source" "example_azure_ms_sql_server" {
 	server_type = "AZURE MS SQL SERVER"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

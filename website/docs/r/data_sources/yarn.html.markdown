@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for YARNresource "dsfhub_data_source" "example_yarn" {
+# ### Resource example for YARN ###
+resource "dsfhub_data_source" "example_yarn" {
 	server_type = "YARN"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for AZURE EVENTHUBresource "dsfhub_log_aggregator" "example_azure_eventhub" {
+# ### Resource example for AZURE EVENTHUB ###
+resource "dsfhub_log_aggregator" "example_azure_eventhub" {
 	server_type = "AZURE EVENTHUB"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for GCP MYSQLresource "dsfhub_data_source" "example_gcp_mysql" {
+# ### Resource example for GCP MYSQL ###
+resource "dsfhub_data_source" "example_gcp_mysql" {
 	server_type = "GCP MYSQL"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for ALIBABA LOGSTOREresource "dsfhub_log_aggregator" "example_alibaba_logstore" {
+# ### Resource example for ALIBABA LOGSTORE ###
+resource "dsfhub_log_aggregator" "example_alibaba_logstore" {
 	server_type = "ALIBABA LOGSTORE"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

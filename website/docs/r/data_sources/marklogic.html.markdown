@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for MARKLOGICresource "dsfhub_data_source" "example_marklogic" {
+# ### Resource example for MARKLOGIC ###
+resource "dsfhub_data_source" "example_marklogic" {
 	server_type = "MARKLOGIC"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

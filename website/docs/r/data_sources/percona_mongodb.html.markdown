@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for PERCONA MONGODBresource "dsfhub_data_source" "example_percona_mongodb" {
+# ### Resource example for PERCONA MONGODB ###
+resource "dsfhub_data_source" "example_percona_mongodb" {
 	server_type = "PERCONA MONGODB"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

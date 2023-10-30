@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for HORTONWORKSresource "dsfhub_data_source" "example_hortonworks" {
+# ### Resource example for HORTONWORKS ###
+resource "dsfhub_data_source" "example_hortonworks" {
 	server_type = "HORTONWORKS"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

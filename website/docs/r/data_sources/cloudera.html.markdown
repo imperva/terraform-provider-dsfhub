@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for CLOUDERAresource "dsfhub_data_source" "example_cloudera" {
+# ### Resource example for CLOUDERA ###
+resource "dsfhub_data_source" "example_cloudera" {
 	server_type = "CLOUDERA"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for ALIBABA OSSresource "dsfhub_data_source" "example_alibaba_oss" {
+# ### Resource example for ALIBABA OSS ###
+resource "dsfhub_data_source" "example_alibaba_oss" {
 	server_type = "ALIBABA OSS"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

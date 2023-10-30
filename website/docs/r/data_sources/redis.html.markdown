@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for REDISresource "dsfhub_data_source" "example_redis" {
+# ### Resource example for REDIS ###
+resource "dsfhub_data_source" "example_redis" {
 	server_type = "REDIS"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset

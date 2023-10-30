@@ -20,7 +20,8 @@ provider "dsfhub" {
 	#insecure_ssl = false
 }
 
-# ### Resource example for CYBERARKresource "dsfhub_secret_manager" "example_cyberark" {
+# ### Resource example for CYBERARK ###
+resource "dsfhub_secret_manager" "example_cyberark" {
 	server_type = "CYBERARK"
 	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset
