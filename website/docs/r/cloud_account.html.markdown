@@ -34,10 +34,10 @@ resource "dsfhub_cloud_account" "example_aws_cloud_account" {
 
 ## Cloud Account Types:
 <ul>
-	<li><a href="/docs/providers/dsfhub/r/cloud_accounts/alibaba.html">Alibaba Cloud Account</a></li>
-	<li><a href="/docs/providers/dsfhub/r/cloud_accounts/gcp.html">Google Cloud</a></li>
 	<li><a href="/docs/providers/dsfhub/r/cloud_accounts/aws.html">Amazon Account</a></li>
+	<li><a href="/docs/providers/dsfhub/r/cloud_accounts/alibaba.html">Alibaba Cloud Account</a></li>
 	<li><a href="/docs/providers/dsfhub/r/cloud_accounts/azure.html">Azure</a></li>
+	<li><a href="/docs/providers/dsfhub/r/cloud_accounts/gcp.html">Google Cloud</a></li>
 </ul>
 
 ## Argument Reference

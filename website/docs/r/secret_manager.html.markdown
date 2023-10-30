@@ -40,9 +40,9 @@ resource "dsfhub_secret_manager" "example_secret_manager_aws_log_group" {
 
 ## Secret Manager Types:
 <ul>
-	<li><a href="/docs/providers/dsfhub/r/secrets_managers/hashicorp.html">HashiCorp</a></li>
 	<li><a href="/docs/providers/dsfhub/r/secrets_managers/aws.html">Amazon Account</a></li>
 	<li><a href="/docs/providers/dsfhub/r/secrets_managers/cyberark.html">CyberArk</a></li>
+	<li><a href="/docs/providers/dsfhub/r/secrets_managers/hashicorp.html">HashiCorp</a></li>
 </ul>
 
 

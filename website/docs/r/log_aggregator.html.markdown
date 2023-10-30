@@ -38,14 +38,14 @@ resource "dsfhub_log_aggregator" "example_aws_log_group" {
 
 ## Log Aggregator Types
 <ul>
-	<li><a href="/docs/providers/dsfhub/r/log_aggregators/ssh.html">SSH</a></li>
-	<li><a href="/docs/providers/dsfhub/r/log_aggregators/aws_kinesis.html">AWS Kinesis</a></li>
-	<li><a href="/docs/providers/dsfhub/r/log_aggregators/gcp_pubsub.html">Google Cloud Pub/Sub</a></li>
-	<li><a href="/docs/providers/dsfhub/r/log_aggregators/gcp_cloud_storage_bucket.html">GCP Cloud Storage Bucket</a></li>
 	<li><a href="/docs/providers/dsfhub/r/log_aggregators/alibaba_logstore.html">Alibaba Logstore</a></li>
-	<li><a href="/docs/providers/dsfhub/r/log_aggregators/azure_eventhub.html">Azure EventHub</a></li>
+	<li><a href="/docs/providers/dsfhub/r/log_aggregators/aws_kinesis.html">AWS Kinesis</a></li>
 	<li><a href="/docs/providers/dsfhub/r/log_aggregators/aws_log_group.html">AWS Log Group</a></li>
 	<li><a href="/docs/providers/dsfhub/r/log_aggregators/aws_s3.html">Amazon S3</a></li>
+	<li><a href="/docs/providers/dsfhub/r/log_aggregators/azure_eventhub.html">Azure EventHub</a></li>
+	<li><a href="/docs/providers/dsfhub/r/log_aggregators/gcp_cloud_storage_bucket.html">GCP Cloud Storage Bucket</a></li>
+	<li><a href="/docs/providers/dsfhub/r/log_aggregators/gcp_pubsub.html">Google Cloud Pub/Sub</a></li>
+	<li><a href="/docs/providers/dsfhub/r/log_aggregators/ssh.html">SSH</a></li>
 </ul>
 
 
