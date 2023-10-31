@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_cloud_account Resource for GCP"
-description: |-
-Provides a dsfhub_cloud_account resource for GCP.
----
-
 # dsfhub_cloud_account (Resource)
 
 Provides a dsfhub_cloud_account resource for GCP.

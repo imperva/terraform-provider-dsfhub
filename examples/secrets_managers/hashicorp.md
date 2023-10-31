@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_secrets_manager Resource for HASHICORP"
-description: |-
-Provides a dsfhub_secrets_manager resource for HASHICORP.
----
-
 # dsfhub_secrets_manager (Resource)
 
 Provides a dsfhub_secrets_manager resource for HASHICORP.

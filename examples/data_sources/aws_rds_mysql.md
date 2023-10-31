@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_data_source Resource for AWS RDS MYSQL"
-description: |-
-Provides a dsfhub_data_source resource for AWS RDS MYSQL.
----
-
 # dsfhub_data_source (Resource)
 
 Provides a `dsfhub_data_source` resource for AWS RDS MYSQL.

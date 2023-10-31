@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_secrets_manager Resource for CYBERARK"
-description: |-
-Provides a dsfhub_secrets_manager resource for CYBERARK.
----
-
 # dsfhub_secrets_manager (Resource)
 
 Provides a dsfhub_secrets_manager resource for CYBERARK.

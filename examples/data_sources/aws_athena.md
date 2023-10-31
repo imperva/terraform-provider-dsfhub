@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_data_source Resource for AWS ATHENA"
-description: |-
-Provides a dsfhub_data_source resource for AWS ATHENA.
----
-
 # dsfhub_data_source (Resource)
 
 Provides a dsfhub_data_source resource for AWS ATHENA.

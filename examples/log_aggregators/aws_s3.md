@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_log_aggregator Resource for AWS S3"
-description: |-
-Provides a dsfhub_log_aggregator resource for AWS S3.
----
-
 # dsfhub_log_aggregator (Resource)
 
 Provides a dsfhub_log_aggregator resource for AWS S3.

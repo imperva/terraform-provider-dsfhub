@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_log_aggregator Resource for AZURE EVENTHUB"
-description: |-
-Provides a dsfhub_log_aggregator resource for AZURE EVENTHUB.
----
-
 # dsfhub_log_aggregator (Resource)
 
 Provides a dsfhub_log_aggregator resource for AZURE EVENTHUB.

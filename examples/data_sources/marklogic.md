@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_data_source Resource for MARKLOGIC"
-description: |-
-Provides a dsfhub_data_source resource for MARKLOGIC.
----
-
 # dsfhub_data_source (Resource)
 
 Provides a dsfhub_data_source resource for MARKLOGIC.

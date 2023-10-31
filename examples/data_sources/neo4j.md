@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_data_source Resource for NEO4J"
-description: |-
-Provides a dsfhub_data_source resource for NEO4J.
----
-
 # dsfhub_data_source (Resource)
 
 Provides a dsfhub_data_source resource for NEO4J.

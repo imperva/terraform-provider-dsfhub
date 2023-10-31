@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_log_aggregator Resource for GCP PUBSUB"
-description: |-
-Provides a dsfhub_log_aggregator resource for GCP PUBSUB.
----
-
 # dsfhub_log_aggregator (Resource)
 
 Provides a dsfhub_log_aggregator resource for GCP PUBSUB.

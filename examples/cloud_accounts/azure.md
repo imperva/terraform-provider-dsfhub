@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_cloud_account Resource for AZURE"
-description: |-
-Provides a dsfhub_cloud_account resource for AZURE.
----
-
 # dsfhub_cloud_account (Resource)
 
 Provides a dsfhub_cloud_account resource for AZURE.

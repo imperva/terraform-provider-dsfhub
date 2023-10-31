@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_data_source Resource for ALIBABA MAX COMPUTE"
-description: |-
-Provides a dsfhub_data_source resource for ALIBABA MAX COMPUTE.
----
-
 # dsfhub_data_source (Resource)
 
 Provides a dsfhub_data_source resource for ALIBABA MAX COMPUTE.

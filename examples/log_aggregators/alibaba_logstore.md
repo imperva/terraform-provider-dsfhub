@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_log_aggregator Resource for ALIBABA LOGSTORE"
-description: |-
-Provides a dsfhub_log_aggregator resource for ALIBABA LOGSTORE.
----
-
 # dsfhub_log_aggregator (Resource)
 
 Provides a dsfhub_log_aggregator resource for ALIBABA LOGSTORE.

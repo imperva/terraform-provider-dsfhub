@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_data_source Resource for AZURE STORAGE ACCOUNT"
-description: |-
-Provides a dsfhub_data_source resource for AZURE STORAGE ACCOUNT.
----
-
 # dsfhub_data_source (Resource)
 
 Provides a dsfhub_data_source resource for AZURE STORAGE ACCOUNT.

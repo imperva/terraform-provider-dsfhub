@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_secrets_manager Resource for AWS"
-description: |-
-Provides a dsfhub_secrets_manager resource for AWS.
----
-
 # dsfhub_secrets_manager (Resource)
 
 Provides a dsfhub_secrets_manager resource for AWS.

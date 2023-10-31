@@ -1,10 +1,3 @@
----
-layout: "dsfhub"
-page_title: "Example dsfhub_log_aggregator Resource for GCP CLOUD STORAGE BUCKET"
-description: |-
-Provides a dsfhub_log_aggregator resource for GCP CLOUD STORAGE BUCKET.
----
-
 # dsfhub_log_aggregator (Resource)
 
 Provides a dsfhub_log_aggregator resource for GCP CLOUD STORAGE BUCKET.
