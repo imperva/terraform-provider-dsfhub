@@ -1,50 +1,70 @@
 ---
 layout: "dsfhub"
-page_title: "dsfhub_log_aggregator Resource"
-sidebar_current: "docs-dsfhub-resource-dsfhub-log-aggregator"
+page_title: "Example dsfhub_cloud_account Resource for ALIBABA"
 description: |-
-Provides a dsfhub_log_aggregator resource.
+Provides a dsfhub_cloud_account resource for ALIBABA.
 ---
 
-# dsfhub_log_aggregator (Resource)
+# dsfhub_cloud_account (Resource)
 
-Provides a log aggregator resource.  A log aggregator is a resource that serves as a log destination for one or multiple data sources in the DSF HUB.
+Provides a dsfhub_cloud_account resource for ALIBABA.
 
-The `dsfhub_log_aggregator` resource contains the configuration parameters necessary to aggregate logs for one or multiple data sources in the DSF HUB platform.
-Documentation for the underlying API used in this resource can be found at
-[Log Aggregators API Definition page](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/84552.htm).
-
-## Example Usage
+## Example usage:
 
 ```hcl
-resource "dsfhub_log_aggregator" "example_aws_log_group_default" {
-  server_type = "AWS LOG GROUP"
-  admin_email = "your@email.com"
-  asset_display_name = "arn:partition:service:region:account-id" 
-  asset_id = "arn:partition:service:region:account-id" # Use arn for aws resources
-  gateway_id = "12345-abcde-12345-abcde-12345-abcde"
-  parent_asset_id = "your-data-source-asset-id-here"
-  version = 1.2 # Denotes the version of the asset
-  asset_connection {
-    auth_mechanism = "default"
-    reason = "default"
-    region = "us-east-2"
-  }
+# ### DSF Provider ###
+provider "dsfhub" {
+	dsfhub_token = var.dsfhub_token # TF_VAR_dsfhub_token env variable
+	dsfhub_host = var.dsfhub_host # TF_VAR_dsfhub_host env variable
+	#insecure_ssl = false
 }
 
-```
+# ### Resource example for ALIBABA ###
+resource "dsfhub_cloud_account" "example_alibaba" {
+	server_type = "ALIBABA"
+	# ### required ### 
+	admin_email = var.admin_email	# The email address to notify about this asset
+	asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
+	asset_id = var.asset_id	# Asset ID
+	gateway_id = var.gateway_id	# Gateway ID
 
-## Log Aggregator Types
-<ul>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/alibaba_logstore.md>Alibaba Logstore</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_kinesis.md>AWS Kinesis</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_log_group.md>AWS Log Group</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_s3.md>Amazon S3</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/azure_eventhub.md>Azure EventHub</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/gcp_cloud_storage_bucket.md>GCP Cloud Storage Bucket</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/gcp_pubsub.md>Google Cloud Pub/Sub</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/ssh.md>SSH</a></li>
-</ul>
+	# ### optional ### 
+	# application = var.application	# The Asset ID of the application asset that \"owns\" the asset.
+	# asset_source = var.asset_source	# The source platform/vendor/system of the asset data. Usually the service responsible for creating that asset document
+	# criticality = var.criticality # Example Values: "1", "2", "3", "4"	# The asset's importance to the business. These values are measured on a scale from \"Most critical\" (1) to \"Least critical\" (4). Allowed values: 1, 2, 3, 4
+	# jsonar_uid = var.jsonar_uid	# Unique identifier (UID) attached to the Sonar machine controlling the asset
+	# location = var.location	# Current human-readable description of the physical location of the asset, or region.
+	# managed_by = var.managed_by	# Email of the person who maintains the asset; can be different from the owner specified in the owned_by field. Defaults to admin_email.
+	# owned_by = var.owned_by	# Email of Owner / person responsible for the asset; can be different from the person in the managed_by field. Defaults to admin_email.
+	# region = var.region	# For cloud systems with regions, the default region or region used with this asset
+	# server_port = "443"	# 
+	# used_for = var.used_for # Example Values: "Production", "Test", "Development", "Demonstration", "QA", "Staging", "Training", "Disaster Recovery"	# Designates how this asset is used / the environment that the asset is supporting.
+	# version = var.version	# Denotes the version of the asset
+	asset_connection {
+		auth_mechanism = "key"
+		# ### required ### 
+		access_id = null # access_id description: "The Access key ID of Alibaba secret access key used to authenticate"
+		access_key = null # access_key description: "The Secret access key used to authenticate"
+		reason = null # Example Values: "default" # reason description: "What this connection is used for. Used to differentiate connections if multiple connections exist for this asset"
+		# ### optional ### 
+		# amazon_secret = null # amazon_secret description: "Configuration to integrate with AWS Secrets Manager"
+		# cyberark_secret = null # cyberark_secret description: "Configuration to integrate with CyberArk Vault"
+		# hashicorp_secret = null # hashicorp_secret description: "Configuration to integrate with HashiCorp Vault"
+		# ssl = null # ssl description: "If true, use SSL when connecting"
+	}
+	asset_connection {
+		auth_mechanism = "machine_role"
+		# ### required ### 
+		reason = null # Example Values: "default" # reason description: "What this connection is used for. Used to differentiate connections if multiple connections exist for this asset"
+		# ### optional ### 
+		# amazon_secret = null # amazon_secret description: "Configuration to integrate with AWS Secrets Manager"
+		# cyberark_secret = null # cyberark_secret description: "Configuration to integrate with CyberArk Vault"
+		# hashicorp_secret = null # hashicorp_secret description: "Configuration to integrate with HashiCorp Vault"
+		# role_name = null # role_name description: "What role is used to get credentials from."
+		# ssl = null # ssl description: "If true, use SSL when connecting"
+	}
+}
+```
 
 
 ## Argument Reference
@@ -53,7 +73,7 @@ resource "dsfhub_log_aggregator" "example_aws_log_group_default" {
 
 - `admin_email` (String) The email address to notify about this asset
 - `asset_connection` (Block Set, Min: 1) N/A (see [below for nested schema](#nestedblock--asset_connection))
-- `asset_id` (String) The unique identifier or resource name of the asset.
+- `asset_id` (String) (String) The unique identifier or resource name of the asset.
 - `gateway_id` (String) The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'
 - `server_type` (String) The type of server or data service to be created as a data source. The list of available data sources is documented at: https://docs.imperva.com/bundle/v4.11-sonar-user-guide/page/84552.htm
 
@@ -65,18 +85,13 @@ resource "dsfhub_log_aggregator" "example_aws_log_group_default" {
 - `aws_proxy_config` (Block Set) AWS specific proxy configuration (see [below for nested schema](#nestedblock--aws_proxy_config))
 - `credentials_endpoint` (String) A specific sts endpoint to use
 - `criticality` (Number) The asset's importance to the business. These values are measured on a scale from "Most critical" (1) to "Least critical" (4). Allowed values: 1, 2, 3, 4
-- `endpoint` (String) Logstore's endpoint
 - `jsonar_uid` (String) Unique identifier (UID) attached to the Sonar machine controlling the asset
 - `location` (String) Current human-readable description of the physical location of the asset, or region.
-- `logstore` (String) Unit that is used to collect, store and query logs
 - `managed_by` (String) Email of the person who maintains the asset; can be different from the owner specified in the owned_by field. Defaults to admin_email.
 - `owned_by` (String) Email of Owner / person responsible for the asset; can be different from the person in the managed_by field. Defaults to admin_email.
-- `parent_asset_id` (String) The name of an asset that this asset is part of (/related to). E.g. an AWS resource will generally have an AWS account asset as its parent. Also used to connect some log aggregating asset with the sources of their logs. E.g. An AWS LOG GROUP asset can have an AWS RDS as its parent, indicating that that is the log group for that RDS.
-- `project` (String) Project separates different resources of multiple users and control access to specific resources
 - `proxy` (String) Proxy to use for AWS calls if aws_proxy_config is populated the proxy field will get populated from the http value there
 - `region` (String) For cloud systems with regions, the default region or region used with this asset
 - `server_host_name` (String) Hostname (or IP if name is unknown)
-- `server_ip` (String) IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.
 - `server_port` (String)
 - `service_endpoints` (Block Set) Specify particular endpoints for a given service in the form of <service name>: "endpoint" (see [below for nested schema](#nestedblock--service_endpoints))
 - `used_for` (String) Designates how this asset is used / the environment that the asset is supporting.
@@ -93,6 +108,7 @@ Required:
 
 - `auth_mechanism` (String) Specifies the auth mechanism used by the connection
 - `reason` (String) N/A
+- `region` (String) Default AWS region for this asset
 
 Optional:
 
@@ -108,7 +124,6 @@ Optional:
 - `external_id` (String) External ID to use when assuming a role
 - `hashicorp_secret` (Block Set) Configuration to integrate with HashiCorp Vault (see [below for nested schema](#nestedblock--asset_connection--hashicorp_secret))
 - `key_file` (String) Location on disk on the key to be used to authenticate
-- `region` (String) Default AWS region for this asset
 - `role_name` (String) What role is used to get credentials from.
 - `secret_key` (String) The Secret access key used to authenticate
 - `ssl` (Boolean) If true, use SSL when connecting
@@ -155,7 +170,6 @@ Optional:
 - `secret_name` (String) HashiCorp secret mane
 
 
-
 <a id="nestedblock--aws_proxy_config"></a>
 ### Nested Schema for `aws_proxy_config`
 
@@ -171,11 +185,3 @@ Optional:
 Optional:
 
 - `logs` (String) The log endpoint for a given service
-
-## Import
-
-Log Aggregators can be imported using the `asset_id`, e.g.:
-
-```
-$ terraform import dsf_log_aggregator.example_aws_log_group_default "arn:partition:service:region:account-id"
-```

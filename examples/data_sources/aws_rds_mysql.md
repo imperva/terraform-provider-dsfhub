@@ -1,131 +1,277 @@
 ---
 layout: "dsfhub"
-page_title: "dsfhub_data_source Resource"
-sidebar_current: "docs-dsfhub-resource-dsfhub-data-source"
+page_title: "Example dsfhub_data_source Resource for AWS RDS MYSQL"
 description: |-
-Provides a dsfhub_data_source resource.  
+Provides a dsfhub_data_source resource for AWS RDS MYSQL.
 ---
 
 # dsfhub_data_source (Resource)
 
-Provides a data source resource.
+Provides a `dsfhub_data_source` resource for AWS RDS MYSQL.
 
-The `dsf_data_source` resource contains the configuration parameters necessary for controlling and managing data via the data analytics and 
-data source management tools, as well as the asset_connection information necessary for DSF Hub to connect to a particular asset.
-Documentation for the underlying API used in this resource can be found at 
-[Data Sources API Definition page](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/84552.htm).
+## Example: Creating a dsfhub_data_source:
 
-## Example Usage
+Example `dsfhub_data_source` AWS RDS MYSQL with all optional prameters:
 
 ```hcl
-resource "dsfhub_data_source" "aws_rds_mysql_password" {
+# ### DSF Provider ###
+provider "dsfhub" {
+	dsfhub_token = var.dsfhub_token # TF_VAR_dsfhub_token env variable
+	dsfhub_host = var.dsfhub_host # TF_VAR_dsfhub_host env variable
+	#insecure_ssl = false
+}
+
+# ### Resource example for AWS RDS MYSQL ###
+resource "dsfhub_data_source" "example_aws_rds_mysql" {
 	server_type = "AWS RDS MYSQL"
+	# ### required ### 
 	admin_email = var.admin_email	# The email address to notify about this asset
-	arn = var.arn	# Amazon Resource Name - format is arn:partition:service:region:account-id:resource-type:resource-id and used as the asset_id
 	asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
 	asset_id = var.asset_id	# Asset ID
 	gateway_id = var.gateway_id	# Gateway ID
 	server_host_name = var.server_host_name	# Hostname (or IP if name is unknown)
+
+	# ### optional ### 
+	# application = var.application	# The Asset ID of the application asset that \"owns\" the asset.
+	# asset_source = var.asset_source	# The source platform/vendor/system of the asset data. Usually the service responsible for creating that asset document
+	# audit_info = var.audit_info	# Normally auto-populated when enabling the audit policy, it is a sub-document in JSON format containing configuration information for audit management. See documentation for values that can be added manually depending on asset type. Editing this value does NOT enable the audit policy.
+	# audit_pull_enabled = var.audit_pull_enabled	# If true, sonargateway will collect the audit logs for this system if it can.
+	# audit_type = var.audit_type # Example Values: "LOG_GROUP", "AGGREGATED", "AWS_RDS_MYSQL_SLOW"	# Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details
+	# credentials_endpoint = var.credentials_endpoint	# A specific sts endpoint to use
+	# criticality = var.criticality # Example Values: "1", "2", "3", "4"	# The asset's importance to the business. These values are measured on a scale from \"Most critical\" (1) to \"Least critical\" (4). Allowed values: 1, 2, 3, 4
+	# database_name = var.database_name	# Specifies the name of the database (or default DB) to connect to.
+	# db_engine = var.db_engine	# Specifies the version of the engine being used by the database (e.g. oracle-ee, oracle-se, oracle-se1, oracle-se2)
+	# enable_audit_management = var.enable_audit_management	# If true, Sonar is responsible for setting and updating the policies
+	# enable_audit_monitoring = var.enable_audit_monitoring	# If true, Sonar sends emails/alerts when the audit policies change.
+	# entitlement_enabled = var.entitlement_enabled	# If true, Entitlement Management system is enabled.
+	# gateway_service = var.gateway_service	# The name of the gateway pull service (if any) used to retrieve logs for this source. Usually set by the connect gateway playbook.
+	# jsonar_uid = var.jsonar_uid	# Unique identifier (UID) attached to the Sonar machine controlling the asset
+	# location = var.location	# Current human-readable description of the physical location of the asset, or region.
+	# logs_destination_asset_id = var.logs_destination_asset_id	# The asset name of the log aggregator that stores this asset's logs.
+	# managed_by = var.managed_by	# Email of the person who maintains the asset; can be different from the owner specified in the owned_by field. Defaults to admin_email.
+	# max_concurrent_conn = var.max_concurrent_conn	# Maximum number of concurrent connections that sensitive data management should use at once.
+	# owned_by = var.owned_by	# Email of Owner / person responsible for the asset; can be different from the person in the managed_by field. Defaults to admin_email.
+	# parent_asset_id = var.parent_asset_id	# The name of an asset that this asset is part of (/related to). E.g. an AWS resource will generally have an AWS account asset as its parent. Also used to connect some log aggregating asset with the sources of their logs. E.g. An AWS LOG GROUP asset can have an AWS RDS as its parent, indicating that that is the log group for that RDS.
+	# proxy = var.proxy	# Proxy to use for AWS calls if aws_proxy_config is populated the proxy field will get populated from the http value there
+	# region = var.region	# For cloud systems with regions, the default region or region used with this asset
+	# sdm_enabled = var.sdm_enabled	# Sensitive data management (SDM) is enabled if this parameter is set to True.
+	# server_port = "3306"	# Port used by the source server
+	# service_endpoint = var.service_endpoint	# Specify a particular endpoint for a given service
+	# used_for = var.used_for # Example Values: "Production", "Test", "Development", "Demonstration", "QA", "Staging", "Training", "Disaster Recovery"	# Designates how this asset is used / the environment that the asset is supporting.
+	# version = var.version	# Denotes the version of the asset
 	asset_connection {
 		auth_mechanism = "password"
+		# ### required ### 
 		password = null # password description: "The password of the user being used to authenticate"
 		reason = null # Example Values: "default", "sonargateway", "SDM", "audit management", "ad-hoc-query" # reason description: "What this connection is used for. Used to differentiate connections if multiple connections exist for this asset"
 		username = null # username description: ""
+		# ### optional ### 
+		# amazon_secret = null # amazon_secret description: "Configuration to integrate with AWS Secrets Manager"
+		# cyberark_secret = null # cyberark_secret description: "Configuration to integrate with CyberArk Vault"
+		# driver = null # driver description: "A path to a non-default driver location. If populated this driver will be used rather than the default"
+		# hashicorp_secret = null # hashicorp_secret description: "Configuration to integrate with HashiCorp Vault"
+		# odbc_connection_string = null # odbc_connection_string description: "Additional ODBC connection string parameters. This string will get added to the connection string"
+		# ssl = null # ssl description: "If true, use SSL when connecting"
 	}
 }
 ```
 
-## Data Source Types:
-<ul>
-    <li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aerospike.md>Aerospike</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/alibaba_apsara_mongodb.md>Alibaba ApsaraDB for MongoDB</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/alibaba_apsara_rds_mysql.md>Alibaba ApsaraDB RDS for MySQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/alibaba_apsara_rds_postgresql.md>Alibaba ApsaraDB RDS for PostgreSQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/alibaba_oss.md>Alibaba Object Storage Service</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/ambari.md>Apache Ambari</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_athena.md>Amazon Athena</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_documentdb_cluster.md>Amazon DocumentDB Cluster</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_documentdb.md>Amazon DocumentDB</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_dynamodb.md>Amazon DynamoDB</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_glue.md>AWS Glue</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_lake_formation.md>AWS Lake Formation</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_neptune_cluster.md>AWS Neptune Cluster</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_neptune.md>AWS Neptune</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_rds_aurora_mysql_cluster.md>Amazon Aurora MySQL Cluster</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_rds_aurora_mysql.md>Amazon Aurora MySQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_rds_aurora_postgresql_cluster.md>Amazon Aurora PostgreSQL Cluster</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_rds_aurora_postgresql.md>Amazon Aurora PostgreSQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_rds_mariadb.md>Amazon RDS for MariaDB</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_rds_ms_sql_server.md>Amazon RDS for SQL Server</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_rds_mysql.md>Amazon RDS for MySQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_rds_oracle.md>Amazon RDS for Oracle</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_rds_postgresql.md>Amazon RDS for PostgreSQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_redshift.md>Amazon Redshift</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/aws_s3.md>Amazon S3</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/azure_cosmosdb_mongo.md>Azure Cosmos DB API for MongoDB</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/azure_cosmosdb_table.md>Azure Cosmos DB Table API</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/azure_cosmosdb.md>Azure Cosmos DB SQL API</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/azure_mariadb.md>Azure Database for MariaDB</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/azure_ms_sql_server.md>Azure SQL Server</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/azure_mysql.md>Azure Database for MySQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/azure_postgresql.md>Azure Database for PostgreSQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/azure_sql_managed_instance.md>Azure SQL Managed Instance</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/azure_storage_account.md>Azure Storage Account</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/cassandra.md>Apache Cassandra</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/cloudant_local.md>Cloudant Local</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/cloudant.md>IBM Cloudant</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/cloudera.md>Cloudera Data Platform</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/cockroachdb.md>CockroachDB</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/couchbase.md>Couchbase</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/datastax.md>Datastax Enterprise </a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/db2.md>IBM Db2</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/edb_postgresql.md>EDB Postgres Advanced Server</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/elasticsearch.md>Elasticsearch</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/eloquence.md>Eloquence</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/emr.md>EMR</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/gcp_bigquery.md>Google Cloud BigQuery</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/gcp_bigtable.md>Google Cloud Bigtable</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/gcp_ms_sql_server.md>Google Cloud SQL for SQL Server</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/gcp_mysql.md>Google Cloud SQL for MySQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/gcp_postgresql.md>Google Cloud SQL for PostgreSQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/gcp_spanner.md>Google Cloud Spanner</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/hbase.md>Apache HBase</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/hdfs.md>Hadoop Distributed File System</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/hive.md>Apache Hive</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/hortonworks.md>Hortonworks</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/impala.md>Apache Impala</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/informix.md>IBM Informix</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/iris.md>InterSystems IRIS Data Platform</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/kinetica.md>Kinetica</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/knox_gateway.md>Apache Knox</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/mariadb.md>MariaDB Server</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/marklogic.md>MarkLogic Server</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/mongodb_atlas.md>MongoDB Atlas</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/mongodb.md>MongoDB Enterprise Server</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/ms_sql_server.md>MsSQL Server</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/mysql.md>MySQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/neo4j.md>Neo4j</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/netezza.md>Netezza Performance Server</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/oracle.md>Oracle</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/percona_mongodb.md>Percona Server for MongoDB</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/percona_mysql.md>Percona Server for MySQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/postgresql.md>PostgreSQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/progress_openedge.md>Progress OpenEdge RDBMS</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/redis.md>Redis</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/sap_hana.md>SAP HANA</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/scylladb.md>ScyllaDB</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/snowflake.md>Snowflake for Data Warehouse</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/splunk.md>Splunk</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/sybase.md>Sybase</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/teradata.md>Teradata Vantage</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/yarn.md>Apache Hadoop YARN</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/yugabyte_cql.md>Yugabyte CQL</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/yugabyte_sql.md>Yugabyte SQL</a></li>
-    <li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/data_sources/alibaba_max_compute.md>Alibaba MaxCompute</a></li>
-</ul>
+## Example: Enable Logging:
 
+Example of creating a RDS database with option group, logging enabled, and onbaording as `dsfhub_data_source` resource:
 
-## Argument Reference
+```hcl
+## Providers ###
+provider "dsfhub" {
+	dsfhub_token = var.dsfhub_token
+	dsfhub_host = var.dsfhub_host
+}
+provider "aws" {
+  region     = "us-east-2"
+}
+
+### AWS Resources ###
+resource "aws_db_option_group" "stats_demo_mysql_option_group" {
+    name                        = var.rds_db_og_name
+    option_group_description    = var.rds_db_og_name
+    engine_name                 = var.engine_name
+    major_engine_version        = var.major_engine_version
+
+    option {
+        option_name = "MARIADB_AUDIT_PLUGIN"
+        
+        option_settings {
+            name    = "SERVER_AUDIT_EVENTS"
+            value   = var.server_audit_events
+        }
+        option_settings {
+            name    = "SERVER_AUDIT_EXCL_USERS"
+            value   = var.server_audit_excl_users
+        }        
+    } 
+}
+
+resource "aws_db_instance" "stats_demo_mysql_db" {
+  # general
+  allocated_storage    = var.allocated_storage
+  
+  db_name              = var.rds_db_name
+  engine               = var.engine_name
+  engine_version       = var.engine_version
+  identifier           = var.rds_db_name
+  instance_class       = var.instance_class
+  username             = var.username
+  password             = var.admin_password
+  skip_final_snapshot  = true
+
+  # network
+  publicly_accessible       = true 
+  db_subnet_group_name      = var.db_subnet_group_name
+  vpc_security_group_ids    = var.vpc_security_group_ids
+
+  # audit
+  enabled_cloudwatch_logs_exports = ["audit"]
+  option_group_name    = "${aws_db_option_group.stats_demo_mysql_option_group.name}"
+}
+
+data "aws_cloudwatch_log_group" "stats_demo_mysql_log_group" {
+    depends_on  = [aws_db_instance.stats_demo_mysql_db]
+    name        = "/aws/rds/instance/${aws_db_instance.stats_demo_mysql_db.identifier}/audit"
+}
+
+data "aws_region" "current" {}
+
+### DSFHUB Resources
+data "dsfhub_cloud_account" "example_aws_cloud_account" {
+	asset_id = "arn:aws:iam::12345678"	# Asset ID
+}
+
+resource "dsfhub_data_source" "rds_mysql_db" {
+	server_type = "AWS RDS MYSQL"
+
+	admin_email = var.admin_email
+	asset_display_name  = aws_db_instance.stats_demo_mysql_db.identifier
+	asset_id            = aws_db_instance.stats_demo_mysql_db.arn
+	gateway_id          = var.jsonar_uid
+	server_host_name    = var.server_host_name
+	region              = data.aws_region.current.name
+	server_port         = aws_db_instance.stats_demo_mysql_db.port
+	version             = aws_db_option_group.stats_demo_mysql_option_group.major_engine_version
+
+	parent_asset_id     = dsfhub_cloud_account.example_aws_cloud_account.asset_id
+
+	asset_connection {
+		auth_mechanism  = "password"
+		password        = var.admin_password
+		reason          = "default" 
+		username        = aws_db_instance.stats_demo_mysql_db.username
+	}
+}
+
+resource "dsfhub_log_aggregator" "rds-mysql-stats-demo-log-group" {
+	server_type = "AWS LOG GROUP"
+
+	admin_email         = var.admin_email	
+	asset_display_name  = data.aws_cloudwatch_log_group.stats_demo_mysql_log_group.name
+	asset_id            = data.aws_cloudwatch_log_group.stats_demo_mysql_log_group.arn
+	gateway_id          = var.jsonar_uid # Gateway ID
+	parent_asset_id     = dsfhub_data_source.rds_mysql_db.asset_id	
+
+	asset_connection {
+		auth_mechanism = "default"
+		reason = "default" 
+		region = "us-east-2" 
+	}
+}
+```
+
+## Dependencies:
+
+The [DSF Agentless Gateway](https://registry.terraform.io/modules/imperva/dsf-agentless-gw/aws/latest) is required to have access to read logs from cloud watch.  The following is an example [AWS IAM Role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) granting this access:
+
+```hcl
+#################################
+# DSF Agentless Gateway IAM role
+#################################
+
+locals {
+  role_assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+  inline_policy_secret = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "VisualEditor0",
+        "Effect" : "Allow",
+        "Action" : "secretsmanager:GetSecretValue",
+        "Resource" : concat([
+          "${var.sonarw_secret_aws_arn}",
+          "${var.password_secret_aws_arn}"
+          ],
+          [
+            var.aws_secretsmanager_access_tokens_arn
+          ]
+        )
+      }
+    ]
+    }
+  )
+  inline_policy_s3 = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "VisualEditor0",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        "Resource" : [
+          "arn:aws:s3:::${var.binaries_s3_bucket_location}",
+          "arn:aws:s3:::${var.binaries_s3_bucket_location}/*",
+        ]
+      }
+    ]
+    }
+  )
+}
+
+resource "aws_iam_instance_profile" "dsf_node_instance_iam_profile" {
+  count       = var.instance_profile_name == null ? 1 : 0
+  name_prefix = "${var.name}-${var.resource_type}-instance-iam-profile"
+  role        = var.role_name
+  tags        = var.tags
+}
+
+resource "aws_iam_role" "dsf_node_role" {
+  count               = var.instance_profile_name == null ? 1 : 0
+  name                = "${var.name}-role"
+  managed_policy_arns = null
+  assume_role_policy  = var.role_assume_role_policy
+  inline_policy {
+    name   = "${var.name}-s3-access"
+    policy = var.inline_policy_s3
+  }
+  inline_policy {
+    name   = "${var.name}-secret-access"
+    policy = var.inline_policy_secret
+  }
+  tags = var.tags
+}
+```
+
+## Argument Reference:
 
 ### Required
 
@@ -355,11 +501,3 @@ Optional:
 Optional:
 
 - `logs` (String) The log endpoint for a given service
-
-## Import
-
-DSF Data Source can be imported using the `asset_id`, e.g.:
-
-```
-$ terraform import dsf_data_source.example_aws_rds_mysql "arn:partition:service:region:account-id"
-```
