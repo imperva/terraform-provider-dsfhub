@@ -6,7 +6,6 @@ description: |-
 Provides a dsfhub_secret_manager data source.  
 ---
 
-
 # dsfhub_secret_manager (Data Source)
 
 Provides SecretManager resource configuration from a unique asset_id.

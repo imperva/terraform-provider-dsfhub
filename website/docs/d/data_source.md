@@ -6,7 +6,6 @@ description: |-
 Provides a dsfhub_data_source data source.  
 ---
 
-
 # dsfhub_data_source (Data Source)
 
 Provides DSFDataSource resource configuration from a unique asset_id.

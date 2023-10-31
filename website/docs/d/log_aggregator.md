@@ -6,7 +6,6 @@ description: |-
 Provides a dsfhub_log_aggregator data source.  
 ---
 
-
 # dsfhub_log_aggregator (Data Source)
 
 Provides LogAggregator resource configuration from a unique asset_id.
