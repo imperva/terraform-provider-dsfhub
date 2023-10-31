@@ -17,23 +17,21 @@ Documentation for the underlying API used in this resource can be found at
 ## Example Usage
 
 ```hcl
-data "dsfhub_data_source" "example_aws_rds_mysql" {
-  asset_id = "arn:rds:mysql:db:region:account-id"
-}
-
-resource "dsfhub_log_aggregator" "example_aws_log_group" {
+resource "dsf_log_aggregator" "example_aws_log_group_default" {
   server_type = "AWS LOG GROUP"
   admin_email = "your@email.com"
-  asset_display_name = "arn:partition:service:region:account-id" # User-friendly name of the asset
+  asset_display_name = "arn:partition:service:region:account-id" 
   asset_id = "arn:partition:service:region:account-id" # Use arn for aws resources
   gateway_id = "12345-abcde-12345-abcde-12345-abcde"
-  parent_asset_id = dsf_data_source.example_aws_rds_mysql.asset_id # asset_id of the data_source resource to be consumed by the log aggregator
+  parent_asset_id = "your-data-source-asset-id-here"
+  version = 1.2 # Denotes the version of the asset
   asset_connection {
     auth_mechanism = "default"
-    reason = "default" 
+    reason = "default"
     region = "us-east-2"
   }
 }
+
 ```
 
 ## Log Aggregator Types
@@ -179,5 +177,5 @@ Optional:
 Log Aggregators can be imported using the `asset_id`, e.g.:
 
 ```
-$ terraform import dsf_log_aggregator.example_aws_log_group "arn:partition:service:region:account-id"
+$ terraform import dsf_log_aggregator.example_aws_log_group_default "arn:partition:service:region:account-id"
 ```

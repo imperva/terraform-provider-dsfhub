@@ -21,19 +21,22 @@ this resource can be found at [Secret Managers API Definition page](https://docs
 ## Example Usage
 
 ```hcl
-resource "dsfhub_secret_manager" "example_secret_manager_aws_log_group" {
-  server_type = "AWS LOG GROUP"
-  admin_email = "your@email.com"
-  asset_display_name = "arn:partition:service:region:account-id" # User-friendly name of the asset
-  asset_id = "arn:partition:service:region:account-id" # Use arn for aws resources
-  gateway_id = "12345-abcde-12345-abcde-12345-abcde"
-  server_host_name = "your-host-name-here"
-  server_ip = "1.2.3.4"	
-  server_port = "12345"
+resource "dsfhub_secret_manager" "example_hashicorp" {
+  server_type = "HASHICORP"
+  admin_email = var.admin_email	# The email address to notify about this asset
+  asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
+  asset_id = var.asset_id	# Asset ID
+  gateway_id = var.gateway_id	# Gateway ID
+  server_host_name = var.server_host_name	# Hostname (or IP if name is unknown)
+  server_ip = var.server_ip	# IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.
+  server_port = var.server_port	# Port used by the source server
   asset_connection {
-    auth_mechanism = "default"
-    reason = "default" 
-    region = "us-east-2"
+    auth_mechanism = "iam_role"
+    access_id = "your_access_ID"
+    aws_iam_server_id = "vault.example.com"
+    reason = "default" # Used to differentiate connections if multiple connections exist for this asset"
+    role_name = "your_role_name"
+    secret_key = "your-secret-key-name-here"
   }
 }
 ```

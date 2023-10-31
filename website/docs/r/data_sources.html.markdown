@@ -18,31 +18,28 @@ Documentation for the underlying API used in this resource can be found at
 ## Example Usage
 
 ```hcl
-resource "dsfhub_secret_manager" "example_hashicorp" {
-  server_type = "HASHICORP"
-  admin_email = var.admin_email	# The email address to notify about this asset
-  asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
-  asset_id = var.asset_id	# Asset ID
-  gateway_id = var.gateway_id	# Gateway ID
-  server_host_name = var.server_host_name	# Hostname (or IP if name is unknown)
-  server_ip = var.server_ip	# IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.
-  server_port = var.server_port	# Port used by the source server
+data "dsfhub_data_source" "example_aws_rds_mysql" {
+  asset_id = "arn:rds:mysql:db:region:account-id"
+}
 
-
+resource "dsfhub_log_aggregator" "example_aws_log_group" {
+  server_type = "AWS LOG GROUP"
+  admin_email = "your@email.com"
+  asset_display_name = "arn:partition:service:region:account-id" # User-friendly name of the asset
+  asset_id = "arn:partition:service:region:account-id" # Use arn for aws resources
+  gateway_id = "12345-abcde-12345-abcde-12345-abcde"
+  parent_asset_id = dsf_data_source.example_aws_rds_mysql.asset_id # asset_id of the data_source resource to be consumed by the log aggregator
   asset_connection {
-    auth_mechanism = "iam_role"
-    access_id = "your_access_ID"
-    aws_iam_server_id = "vault.example.com"
-    reason = "default" # Used to differentiate connections if multiple connections exist for this asset"
-    role_name = "your_role_name"
-    secret_key = "your-secret-key-name-here"
+    auth_mechanism = "default"
+    reason = "default"
+    region = "us-east-2"
   }
 }
 ```
 
 ## Data Source Types:
 <ul>
-    <li><a href="/docs/providers/dsfhub/r/data_sources/aerospike.html">Aerospike</a></li>
+    <li><a href="data_source_aerospike.html">Aerospike</a></li>
 	<li><a href="/docs/providers/dsfhub/r/data_sources/alibaba_apsara_mongodb.html">Alibaba ApsaraDB for MongoDB</a></li>
 	<li><a href="/docs/providers/dsfhub/r/data_sources/alibaba_apsara_rds_mysql.html">Alibaba ApsaraDB RDS for MySQL</a></li>
 	<li><a href="/docs/providers/dsfhub/r/data_sources/alibaba_apsara_rds_postgresql.html">Alibaba ApsaraDB RDS for PostgreSQL</a></li>
