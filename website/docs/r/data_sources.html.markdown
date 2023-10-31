@@ -32,7 +32,8 @@ resource "dsfhub_data_source" "aws_rds_mysql_password" {
 		reason = null # Example Values: "default", "sonargateway", "SDM", "audit management", "ad-hoc-query" # reason description: "What this connection is used for. Used to differentiate connections if multiple connections exist for this asset"
 		username = null # username description: ""
 	}
-}```
+}
+```
 
 ## Data Source Types:
 <ul>
