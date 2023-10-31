@@ -17,7 +17,7 @@ Documentation for the underlying API used in this resource can be found at
 ## Example Usage
 
 ```hcl
-resource "dsf_log_aggregator" "example_aws_log_group_default" {
+resource "dsfhub_log_aggregator" "example_aws_log_group_default" {
   server_type = "AWS LOG GROUP"
   admin_email = "your@email.com"
   asset_display_name = "arn:partition:service:region:account-id" 

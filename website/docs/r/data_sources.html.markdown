@@ -18,24 +18,21 @@ Documentation for the underlying API used in this resource can be found at
 ## Example Usage
 
 ```hcl
-data "dsfhub_data_source" "example_aws_rds_mysql" {
-  asset_id = "arn:rds:mysql:db:region:account-id"
-}
-
-resource "dsfhub_log_aggregator" "example_aws_log_group" {
-  server_type = "AWS LOG GROUP"
-  admin_email = "your@email.com"
-  asset_display_name = "arn:partition:service:region:account-id" # User-friendly name of the asset
-  asset_id = "arn:partition:service:region:account-id" # Use arn for aws resources
-  gateway_id = "12345-abcde-12345-abcde-12345-abcde"
-  parent_asset_id = dsf_data_source.example_aws_rds_mysql.asset_id # asset_id of the data_source resource to be consumed by the log aggregator
-  asset_connection {
-    auth_mechanism = "default"
-    reason = "default"
-    region = "us-east-2"
-  }
-}
-```
+resource "dsfhub_data_source" "aws_rds_mysql_password" {
+	server_type = "AWS RDS MYSQL"
+	admin_email = var.admin_email	# The email address to notify about this asset
+	arn = var.arn	# Amazon Resource Name - format is arn:partition:service:region:account-id:resource-type:resource-id and used as the asset_id
+	asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
+	asset_id = var.asset_id	# Asset ID
+	gateway_id = var.gateway_id	# Gateway ID
+	server_host_name = var.server_host_name	# Hostname (or IP if name is unknown)
+	asset_connection {
+		auth_mechanism = "password"
+		password = null # password description: "The password of the user being used to authenticate"
+		reason = null # Example Values: "default", "sonargateway", "SDM", "audit management", "ad-hoc-query" # reason description: "What this connection is used for. Used to differentiate connections if multiple connections exist for this asset"
+		username = null # username description: ""
+	}
+}```
 
 ## Data Source Types:
 <ul>

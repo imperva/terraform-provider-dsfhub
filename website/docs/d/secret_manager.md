@@ -9,15 +9,23 @@ Provides a dsfhub_secret_manager data source.
 
 # dsfhub_secret_manager (Data Source)
 
-Provides SecretManager from a unique asset_id.
+Provides SecretManager resource configuration from a unique asset_id.
 
+## Example Usage
 
-## Schema
+```hcl
+data "dsfhub_secret_manager" "example_hashicorp" {
+  asset_id = "my.hashicorp.vault.server.com" 
+}
+```
 
-### Required
+## Argument Reference
 
 - `asset_id` (String) Current asset ID
 
-### Read-Only
+## Attribute Reference
 
-- `id` (String) The ID of this resource.
+The following attributes are exported:
+
+- `id` (String) The asset_id of this resource.
+- `asset_id` (String) Current asset_id

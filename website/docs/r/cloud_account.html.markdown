@@ -10,7 +10,7 @@ Provides a dsfhub_cloud_account resource.
 
 Provides a cloud account resource.
 
-The `dsf_cloud_account` resource contains the configuration parameters necessary to access [Cloud Accounts](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/80357.htm) 
+The `dsfhub_cloud_account` resource contains the configuration parameters necessary to access [Cloud Accounts](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/80357.htm) 
 (AWS, GCP, Azure, etc), from the Unified Settings Console in the DSF HUB platform. 
 Documentation for the underlying API used in this resource can be found at
 [Cloud Account API Definition page](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/84552.htm).

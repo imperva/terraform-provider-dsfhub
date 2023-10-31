@@ -6,17 +6,25 @@ description: |-
 Provides a dsfhub_data_source data source.  
 ---
 
-
 # dsfhub_cloud_account (Data Source)
 
-Provides CloudAccount from a unique asset_id.
+Returns a CloudAccount resource configuration from a unique asset_id.
 
-## Schema
+## Example Usage
 
-### Required
+```hcl
+data "dsfhub_cloud_account" "example_aws_cloud_account" {
+  asset_id = "arn:partition:service:region:account-id" # The value of the arn for aws resources
+}
+```
+
+## Argument Reference
 
 - `asset_id` (String) Current asset ID
 
-### Read-Only
+## Attribute Reference
 
-- `id` (String) The ID of this resource.
+The following attributes are exported:
+
+- `id` (String) The asset_id of this resource.
+- `asset_id` (String) Current asset_id

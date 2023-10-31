@@ -24,8 +24,8 @@ this resource can be found at [Secret Managers API Definition page](https://docs
 resource "dsfhub_secret_manager" "example_hashicorp" {
   server_type = "HASHICORP"
   admin_email = var.admin_email	# The email address to notify about this asset
-  asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
-  asset_id = var.asset_id	# Asset ID
+  asset_display_name = var.asset_display_name # User-friendly name of the asset, defined by user.
+  asset_id = "my.hashicorp.vault.server.com" # Asset ID
   gateway_id = var.gateway_id	# Gateway ID
   server_host_name = var.server_host_name	# Hostname (or IP if name is unknown)
   server_ip = var.server_ip	# IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.

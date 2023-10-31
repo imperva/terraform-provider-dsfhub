@@ -22,7 +22,7 @@ provider "dsfhub" {
 }
 
 # Create a AWS cloud_account
-resource "dsf_cloud_account" "aws_cloud_account_key" {
+resource "dsfhub_cloud_account" "aws_cloud_account_key" {
 	server_type = "AWS"
 	admin_email         = "your@email.com"	
 	asset_display_name  = "my-aws-cloud-account"	
@@ -38,7 +38,7 @@ resource "dsf_cloud_account" "aws_cloud_account_key" {
 }
 
 # Create an AWS RDS MYSQL data_source with password authentication
-resource "dsf_data_source" "example-aws-rds-mysql-password" {
+resource "dsfhub_data_source" "example-aws-rds-mysql-password" {
 	admin_email = var.admin_email
 	asset_display_name  = aws_db_instance.stats_demo_mysql_db.identifier
 	asset_id            = aws_db_instance.stats_demo_mysql_db.arn
@@ -57,7 +57,7 @@ resource "dsf_data_source" "example-aws-rds-mysql-password" {
 }
 
 # Create an AWS Log Group log_aggregator
-resource "dsf_log_aggregator" "rds-mysql-stats-demo-log-group" {
+resource "dsfhub_log_aggregator" "rds-mysql-stats-demo-log-group" {
 	server_type = "AWS LOG GROUP"
 	admin_email         = var.admin_email	
 	asset_display_name  = var.log_group_name
