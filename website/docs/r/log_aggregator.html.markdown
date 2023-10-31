@@ -36,14 +36,14 @@ resource "dsfhub_log_aggregator" "example_aws_log_group_default" {
 
 ## Log Aggregator Types
 <ul>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/alibaba_logstore.md>Alibaba Logstore</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_kinesis.md>AWS Kinesis</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_log_group.md>AWS Log Group</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_s3.md>Amazon S3</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/azure_eventhub.md>Azure EventHub</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/gcp_cloud_storage_bucket.md>GCP Cloud Storage Bucket</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/gcp_pubsub.md>Google Cloud Pub/Sub</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/ssh.md>SSH</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/alibaba_logstore.md">Alibaba Logstore</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_kinesis.md">AWS Kinesis</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_log_group.md">AWS Log Group</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_s3.md">Amazon S3</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/azure_eventhub.md">Azure EventHub</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/gcp_cloud_storage_bucket.md">GCP Cloud Storage Bucket</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/gcp_pubsub.md">Google Cloud Pub/Sub</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/ssh.md">SSH</a></li>
 </ul>
 
 

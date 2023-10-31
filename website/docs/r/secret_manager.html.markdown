@@ -43,9 +43,9 @@ resource "dsfhub_secret_manager" "example_hashicorp" {
 
 ## Secret Manager Types:
 <ul>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/secrets_managers/aws.md>Amazon Account</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/secrets_managers/cyberark.md>CyberArk</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/secrets_managers/hashicorp.md>HashiCorp</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/secrets_managers/aws.md">Amazon Account</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/secrets_managers/cyberark.md">CyberArk</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/secrets_managers/hashicorp.md">HashiCorp</a></li>
 </ul>
 
 
