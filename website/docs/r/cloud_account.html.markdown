@@ -34,10 +34,10 @@ resource "dsfhub_cloud_account" "example_aws_cloud_account" {
 
 ## Cloud Account Types:
 <ul>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/aws.html">Amazon Account</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/alibaba.html">Alibaba Cloud Account</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/azure.html">Azure</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/gcp.html">Google Cloud</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/aws.tf">Amazon Account</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/alibaba.tf">Alibaba Cloud Account</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/azure.tf">Azure</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/gcp.tf">Google Cloud</a></li>
 </ul>
 
 ## Argument Reference
