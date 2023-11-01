@@ -509,9 +509,15 @@ func resourceCloudAccountRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
 	cloudAccountId := d.Id()
 
-	log.Printf("[INFO] Reading CloudAccount with cloudAccountId: %s", cloudAccountId)
+	log.Printf("[INFO] Reading CloudAccount with cloudAccountId: %s\n", cloudAccountId)
 
 	cloudAccountReadResponse, err := client.ReadCloudAccount(cloudAccountId)
+
+	if err != nil {
+		log.Printf("[ERROR] Reading cloudAccountReadResponse with cloudAccountId: %s | err: %s\n", cloudAccountId, err)
+		return err
+	}
+
 	if cloudAccountReadResponse != nil {
 		log.Printf("[INFO] Reading CloudAcount with cloudAccountId: %s | err: %s\n", cloudAccountId, err)
 	}

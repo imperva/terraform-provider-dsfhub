@@ -1308,7 +1308,7 @@ func resourceDSFDataSourceCreate(d *schema.ResourceData, m interface{}) error {
 	serverType := d.Get("server_type").(string)
 	createResource(&dsfDataSource, serverType, d)
 
-	log.Printf("[INFO] Creating DSF data source for serverType: %s and gatewayId: %s gatewayId: \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
+	log.Printf("[INFO] Creating DSF data source for serverType: %s and gatewayId: %s \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
 	dsfDataSourceResponse, err := client.CreateDSFDataSource(dsfDataSource)
 
 	if err != nil {
@@ -1327,8 +1327,14 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
 	dsfDataSourceId := d.Id()
 
-	log.Printf("[INFO] Reading DSF data source with dsfDataSourceId: %s", dsfDataSourceId)
+	log.Printf("[INFO] Reading DSF data source with dsfDataSourceId: %s\n", dsfDataSourceId)
 	dsfDataSourceReadResponse, err := client.ReadDSFDataSource(dsfDataSourceId)
+
+	if err != nil {
+		log.Printf("[ERROR] Reading dsfDataSourceReadResponse | err: %s\n", err)
+		return err
+	}
+
 	if dsfDataSourceReadResponse != nil {
 		log.Printf("[INFO] Reading DSF data source with dsfDataSourceId: %s | err: %s\n", dsfDataSourceId, err)
 	}

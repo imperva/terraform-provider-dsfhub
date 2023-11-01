@@ -502,7 +502,7 @@ func resourceSecretManagerCreate(d *schema.ResourceData, m interface{}) error {
 	createSecretManagerResponse, err := client.CreateSecretManager(secretManager)
 
 	if err != nil {
-		log.Printf("[ERROR] adding secret manager for serverType: %s and gatewayId: %s | err: %s", serverType, secretManager.Data.GatewayID, err)
+		log.Printf("[ERROR] adding secret manager for serverType: %s and gatewayId: %s | err: %s\n", serverType, secretManager.Data.GatewayID, err)
 		return err
 	}
 
@@ -517,9 +517,15 @@ func resourceSecretManagerRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
 	secretManagerId := d.Id()
 
-	log.Printf("[INFO] Reading secret manager with secretManagerId: %s", secretManagerId)
+	log.Printf("[INFO] Reading secret manager with secretManagerId: %s\n", secretManagerId)
 
 	secretManagerReadResponse, err := client.ReadSecretManager(secretManagerId)
+
+	if err != nil {
+		log.Printf("[ERROR] Reading secretManagerReadResponse with secretManagerId: %s | err: %s\n", secretManagerId, err)
+		return err
+	}
+
 	if secretManagerReadResponse != nil {
 		log.Printf("[INFO] Reading SecretManager with secretManagerId: %s | err: %s\n", secretManagerId, err)
 	}

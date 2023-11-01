@@ -84,27 +84,26 @@ provider "aws" {
 }
 
 ### AWS Resources ###
-resource "aws_db_option_group" "stats_demo_mysql_option_group" {
-    name                        = var.rds_db_og_name
-    option_group_description    = var.rds_db_og_name
-    engine_name                 = var.engine_name
-    major_engine_version        = var.major_engine_version
+resource "aws_db_option_group" "rds_mysql_option_group" {
+  name                        = var.rds_db_og_name
+  option_group_description    = var.rds_db_og_name
+  engine_name                 = var.engine_name
+  major_engine_version        = var.major_engine_version
 
-    option {
-        option_name = "MARIADB_AUDIT_PLUGIN"
-        
-        option_settings {
-            name    = "SERVER_AUDIT_EVENTS"
-            value   = var.server_audit_events
-        }
-        option_settings {
-            name    = "SERVER_AUDIT_EXCL_USERS"
-            value   = var.server_audit_excl_users
-        }        
-    } 
+  option {
+    option_name = "MARIADB_AUDIT_PLUGIN"
+    option_settings {
+      name    = "SERVER_AUDIT_EVENTS"
+      value   = "CONNECT,QUERY,QUERY_DDL,QUERY_DML,QUERY_DCL,QUERY_DML_NO_SELECT"
+    }
+    option_settings {
+      name    = "SERVER_AUDIT_EXCL_USERS"
+      value   = "rdsadmin"
+    }
+  }
 }
 
-resource "aws_db_instance" "stats_demo_mysql_db" {
+resource "aws_db_instance" "rds_mysql_db" {
   # general
   allocated_storage    = var.allocated_storage
   
@@ -124,12 +123,12 @@ resource "aws_db_instance" "stats_demo_mysql_db" {
 
   # audit
   enabled_cloudwatch_logs_exports = ["audit"]
-  option_group_name    = "${aws_db_option_group.stats_demo_mysql_option_group.name}"
+  option_group_name    = "${aws_db_option_group.rds_mysql_option_group.name}"
 }
 
-data "aws_cloudwatch_log_group" "stats_demo_mysql_log_group" {
-    depends_on  = [aws_db_instance.stats_demo_mysql_db]
-    name        = "/aws/rds/instance/${aws_db_instance.stats_demo_mysql_db.identifier}/audit"
+data "aws_cloudwatch_log_group" "rds_mysql_log_group" {
+    depends_on  = [aws_db_instance.rds_mysql_db]
+    name        = "/aws/rds/instance/${aws_db_instance.rds_mysql_db.identifier}/audit"
 }
 
 data "aws_region" "current" {}
@@ -143,13 +142,13 @@ resource "dsfhub_data_source" "rds_mysql_db" {
 	server_type = "AWS RDS MYSQL"
 
 	admin_email = var.admin_email
-	asset_display_name  = aws_db_instance.stats_demo_mysql_db.identifier
-	asset_id            = aws_db_instance.stats_demo_mysql_db.arn
+	asset_display_name  = aws_db_instance.rds_mysql_db.identifier
+	asset_id            = aws_db_instance.rds_mysql_db.arn
 	gateway_id          = var.jsonar_uid
 	server_host_name    = var.server_host_name
 	region              = data.aws_region.current.name
-	server_port         = aws_db_instance.stats_demo_mysql_db.port
-	version             = aws_db_option_group.stats_demo_mysql_option_group.major_engine_version
+	server_port         = aws_db_instance.rds_mysql_db.port
+	version             = aws_db_option_group.rds_mysql_option_group.major_engine_version
 
 	parent_asset_id     = dsfhub_cloud_account.example_aws_cloud_account.asset_id
 
@@ -157,16 +156,16 @@ resource "dsfhub_data_source" "rds_mysql_db" {
 		auth_mechanism  = "password"
 		password        = var.admin_password
 		reason          = "default" 
-		username        = aws_db_instance.stats_demo_mysql_db.username
+		username        = aws_db_instance.rds_mysql_db.username
 	}
 }
 
-resource "dsfhub_log_aggregator" "rds-mysql-stats-demo-log-group" {
+resource "dsfhub_log_aggregator" "rds_mysql_log_group" {
 	server_type = "AWS LOG GROUP"
 
 	admin_email         = var.admin_email	
-	asset_display_name  = data.aws_cloudwatch_log_group.stats_demo_mysql_log_group.name
-	asset_id            = data.aws_cloudwatch_log_group.stats_demo_mysql_log_group.arn
+	asset_display_name  = data.aws_cloudwatch_log_group.rds_mysql_log_group.name
+	asset_id            = data.aws_cloudwatch_log_group.rds_mysql_log_group.arn
 	gateway_id          = var.jsonar_uid # Gateway ID
 	parent_asset_id     = dsfhub_data_source.rds_mysql_db.asset_id	
 

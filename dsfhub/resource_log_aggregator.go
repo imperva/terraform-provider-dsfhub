@@ -528,7 +528,7 @@ func resourceLogAggregatorCreate(d *schema.ResourceData, m interface{}) error {
 	serverType := d.Get("server_type").(string)
 	createResource(&logAggregator, serverType, d)
 
-	log.Printf("[INFO] Creating LogAggregator for serverType: %s and gatewayId: %s gatewayId: \n", serverType, logAggregator.Data.GatewayID)
+	log.Printf("[INFO] Creating LogAggregator for serverType: %s and gatewayId: %s\n", serverType, logAggregator.Data.GatewayID)
 	createLogAggregatorResponse, err := client.CreateLogAggregator(logAggregator)
 
 	if err != nil {
@@ -547,9 +547,15 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
 	logAggregatorId := d.Id()
 
-	log.Printf("[INFO] Reading LogAggregator with logAggregatorId: %s", logAggregatorId)
+	log.Printf("[INFO] Reading LogAggregator with logAggregatorId: %s\n", logAggregatorId)
 
 	logAggregatorReadResponse, err := client.ReadLogAggregator(logAggregatorId)
+
+	if err != nil {
+		log.Printf("[ERROR] Reading logAggregatorReadResponse with logAggregatorId: %s | err: %s\n", logAggregatorId, err)
+		return err
+	}
+
 	if logAggregatorReadResponse != nil {
 		log.Printf("[INFO] Reading CloudAcount with logAggregatorId: %s | err: %s\n", logAggregatorId, err)
 	}
