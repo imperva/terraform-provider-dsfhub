@@ -1,3 +1,11 @@
+terraform {
+	required_providers {
+		dsfhub = {
+			source = "imperva/dsfhub"
+		}
+	}
+}
+
 # ### DSF Provider ###
 provider "dsfhub" {
 	dsfhub_token = var.dsfhub_token # TF_VAR_dsfhub_token env variable

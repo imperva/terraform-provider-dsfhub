@@ -15,6 +15,15 @@ Use the navigation to the left to read about the available resources.
 ## Example Usage - Resources
 
 ```hcl
+# Specify path for provider, and version of terraform
+terraform {
+  required_providers {
+    dsfhub = {
+      source = "imperva/dsfhub"
+    }
+  }
+}
+
 # Configure the DSFHUB provider
 provider "dsfhub" {
   dsfhub_host = "${var.dsfhub_host}"
