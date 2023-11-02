@@ -702,7 +702,7 @@ func resourceDSFDataSource() *schema.Resource {
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
-							//Sensitive:   true,
+							Sensitive:   true,
 						},
 						"principal": {
 							Type:        schema.TypeString,
