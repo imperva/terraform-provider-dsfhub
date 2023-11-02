@@ -15,7 +15,7 @@ Use the navigation to the left to read about the available resources.
 ## Example Usage - Resources
 
 ```hcl
-# Specify path for provider, and version of terraform
+# Specify path for provider
 terraform {
   required_providers {
     dsfhub = {

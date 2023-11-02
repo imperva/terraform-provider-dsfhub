@@ -334,7 +334,7 @@ func resourceSecretManager() *schema.Resource {
 							Optional:    true,
 						},
 						"self_signed": {
-							Type:        schema.TypeString,
+							Type:        schema.TypeBool,
 							Description: "",
 							Required:    false,
 							Optional:    true,
@@ -346,7 +346,7 @@ func resourceSecretManager() *schema.Resource {
 							Optional:    true,
 						},
 						"store_aws_credentials": {
-							Type:        schema.TypeString,
+							Type:        schema.TypeBool,
 							Description: "",
 							Required:    false,
 							Optional:    true,
@@ -358,7 +358,7 @@ func resourceSecretManager() *schema.Resource {
 							Optional:    true,
 						},
 						"v2_key_engine": {
-							Type:        schema.TypeString,
+							Type:        schema.TypeBool,
 							Description: "Use a KV2 secret engine",
 							Required:    false,
 							Optional:    true,
@@ -742,7 +742,7 @@ func resourceSecretManagerConnectionHash(v interface{}) int {
 	}
 
 	if v, ok := m["self_signed"]; ok {
-		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
+		buf.WriteString(fmt.Sprintf("%s-", v.(bool)))
 	}
 
 	if v, ok := m["ssl"]; ok {
@@ -750,7 +750,7 @@ func resourceSecretManagerConnectionHash(v interface{}) int {
 	}
 
 	if v, ok := m["store_aws_credentials"]; ok {
-		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
+		buf.WriteString(fmt.Sprintf("%s-", v.(bool)))
 	}
 
 	if v, ok := m["username"]; ok {
@@ -758,7 +758,7 @@ func resourceSecretManagerConnectionHash(v interface{}) int {
 	}
 
 	if v, ok := m["v2_key_engine"]; ok {
-		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
+		buf.WriteString(fmt.Sprintf("%s-", v.(bool)))
 	}
 
 	return PositiveHash(buf.String())
