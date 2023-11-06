@@ -18,16 +18,36 @@ Documentation for the underlying API used in this resource can be found at
 ## Example Usage
 
 ```hcl
+# Example generic variable reference:
+variable "admin_email" {
+  default = "your@email.com"
+}
+variable "gateway_id" {
+  default = "7a4af7cf-4292-89d9-46ec-183756ksdjd"
+}
+variable "region" {
+  default = "us-east-1"
+}
+
+# Example dsfhub_cloud_account specific variables for AWS
+variable "cloud_account_aws_asset_display_name" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "cloud_account_aws_asset_id" {
+  default = "arn:partition:service:region:account-id"
+}
+
+# Example dsfhub_cloud_account usage for AWS
 resource "dsfhub_cloud_account" "example_aws_cloud_account" {
   server_type = "AWS"
-  admin_email = "your@email.com"
-  asset_display_name = "arn:partition:service:region:account-id" # User-friendly name of the asset
-  asset_id = "arn:partition:service:region:account-id" # Also populates arn field for aws
-  gateway_id = "12345-abcde-12345-abcde-12345-abcde"
+  admin_email = var.admin_email	# The email address to notify about this asset
+  asset_display_name = var.cloud_account_aws_asset_display_name # User-friendly name of the asset, defined by user.
+  asset_id = var.cloud_account_aws_asset_id # The unique identifier or resource name of the asset. For AWS, use arn, for Azure, use subscription ID, for GCP, use project ID
+  gateway_id = var.gateway_id# The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'
   asset_connection {
     auth_mechanism = "iam_role"
     reason = "default"
-    region = "us-east-1"
+    region = var.region # For cloud systems with regions, the default region or region used with this asset
   }
 }
 ```
@@ -46,7 +66,7 @@ resource "dsfhub_cloud_account" "example_aws_cloud_account" {
 
 - `admin_email` (String) The email address to notify about this asset
 - `asset_connection` (Block Set, Min: 1) N/A (see [below for nested schema](#nestedblock--asset_connection))
-- `asset_id` (String) (String) The unique identifier or resource name of the asset.
+- `asset_id` (String) The unique identifier or resource name of the asset.
 - `gateway_id` (String) The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'
 - `server_type` (String) The type of server or data service to be created as a data source. The list of available data sources is documented at: https://docs.imperva.com/bundle/v4.11-sonar-user-guide/page/84552.htm
 
@@ -65,7 +85,7 @@ resource "dsfhub_cloud_account" "example_aws_cloud_account" {
 - `proxy` (String) Proxy to use for AWS calls if aws_proxy_config is populated the proxy field will get populated from the http value there
 - `region` (String) For cloud systems with regions, the default region or region used with this asset
 - `server_host_name` (String) Hostname (or IP if name is unknown)
-- `server_port` (String)
+- `server_port` (String) Port used by the source server
 - `service_endpoints` (Block Set) Specify particular endpoints for a given service in the form of <service name>: "endpoint" (see [below for nested schema](#nestedblock--service_endpoints))
 - `used_for` (String) Designates how this asset is used / the environment that the asset is supporting.
 - `version` (Number) Denotes the version of the asset

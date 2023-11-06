@@ -21,22 +21,60 @@ this resource can be found at [Secret Managers API Definition page](https://docs
 ## Example Usage
 
 ```hcl
+# Example generic variable reference:
+variable "admin_email" {
+  default = "your@email.com"
+}
+variable "gateway_id" {
+  default = "7a4af7cf-4292-89d9-46ec-183756ksdjd"
+}
+
+# Example dsfhub_secret_manager specific variables for HASHICORP
+variable "secret_manager_hashicorp_asset_display_name" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "secret_manager_hashicorp_asset_id" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "secret_manager_hashicorp_server_host_name" {
+  default = "your-data-source-asset-id-here"
+}
+variable "secret_manager_hashicorp_server_ip" {
+  default = "1.2.3.4"
+}
+variable "secret_manager_hashicorp_server_port" {
+  default = 1234
+}
+variable "secret_manager_hashicorp_access_id" {
+  default = "ABCDE12345ABCDE12345"
+}
+variable "secret_manager_hashicorp_aws_iam_server_id" {
+  default = "your.vault.example.com"
+}
+variable "secret_manager_hashicorp_role_name" {
+  default = "your-role-name-here"
+}
+variable "secret_manager_hashicorp_secret_key" {
+  default = "A1b2C3d4/H5i6J7k8/A1b2C3d4/H5i6J7k8"
+}
+
+# Example dsfhub_secret_manager usage for HASHICORP
 resource "dsfhub_secret_manager" "example_hashicorp" {
   server_type = "HASHICORP"
   admin_email = var.admin_email	# The email address to notify about this asset
-  asset_display_name = var.asset_display_name # User-friendly name of the asset, defined by user.
-  asset_id = "my.hashicorp.vault.server.com" # Asset ID
-  gateway_id = var.gateway_id	# Gateway ID
-  server_host_name = var.server_host_name	# Hostname (or IP if name is unknown)
-  server_ip = var.server_ip	# IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.
-  server_port = var.server_port	# Port used by the source server
+  asset_display_name = var.secret_manager_hashicorp_asset_display_name # User-friendly name of the asset, defined by user.
+  asset_id = var.secret_manager_hashicorp_asset_id # The unique identifier or resource name of the asset. For AWS, use arn, for Azure, use subscription ID, for GCP, use project ID
+  gateway_id = var.gateway_id # The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'
+  server_host_name = var.secret_manager_hashicorp_server_host_name# Hostname (or IP if name is unknown)
+  server_ip = var.secret_manager_hashicorp_server_ip	# IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.
+  server_port = var.secret_manager_hashicorp_server_port	# Port used by the source server
   asset_connection {
     auth_mechanism = "iam_role"
-    access_id = "your_access_ID"
-    aws_iam_server_id = "vault.example.com"
+    access_id = var.secret_manager_hashicorp_access_id # The Access key ID of AWS secret access key used to authenticate
+    aws_iam_server_id = var.secret_manager_hashicorp_aws_iam_server_id
     reason = "default" # Used to differentiate connections if multiple connections exist for this asset"
-    role_name = "your_role_name"
-    secret_key = "your-secret-key-name-here"
+    role_name = var.secret_manager_hashicorp_role_name # AWS role name to use for authentication
+    secret_key = var.secret_manager_hashicorp_secret_key # The AWS secret access key used to authenticate
   }
 }
 ```
@@ -77,7 +115,7 @@ resource "dsfhub_secret_manager" "example_hashicorp" {
 - `proxy` (String) Proxy to use for AWS calls if aws_proxy_config is populated the proxy field will get populated from the http value there
 - `region` (String) For cloud systems with regions, the default region or region used with this asset
 - `server_ip` (String) IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.
-- `server_port` (String)
+- `server_port` (String) Port used by the source server
 - `service_endpoints` (Block Set) Specify particular endpoints for a given service in the form of <service name>: "endpoint" (see [below for nested schema](#nestedblock--service_endpoints))
 - `used_for` (String) Designates how this asset is used / the environment that the asset is supporting.
 - `version` (Number) Denotes the version of the asset

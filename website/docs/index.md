@@ -30,115 +30,105 @@ provider "dsfhub" {
   dsfhub_token = "${var.dsfhub_token}"
 }
 
-# Create a AWS dsfhub_cloud_account
-resource "dsfhub_cloud_account" "aws_cloud_account_key" {
-	server_type = "AWS"
-	admin_email         = "your@email.com"	
-	asset_display_name  = "my-aws-cloud-account"	
-	asset_id            = "arn:aws:iam::12345678"
-	gateway_id          = "12345-abcde-12345-abcde"
-	asset_connection {
-		auth_mechanism = "key"
-		access_id = var.aws_key_access_id
-		reason = "default" 
-		region = "us-east-2" 
-		secret_key = var.aws_key_secret_key
-	}
+# Example generic variable reference:
+variable "admin_email" {
+  default = "your@email.com"
+}
+variable "gateway_id" {
+  default = "7a4af7cf-4292-89d9-46ec-183756ksdjd"
+}
+variable "region" {
+  default = "us-east-1"
 }
 
-# Create an AWS RDS MYSQL dsfhub_data_source with password authentication
-resource "dsfhub_data_source" "example-aws-rds-mysql-password" {
-	admin_email = var.admin_email
-	asset_display_name  = aws_db_instance.stats_demo_mysql_db.identifier
-	asset_id            = aws_db_instance.stats_demo_mysql_db.arn
-	gateway_id          = local.gw_ec2_01.jsonar_uid
-	server_host_name    = "my-rds-mysql-endpoint-here"
-	region              = "us-east-2"
-	server_port         = "3306"
-	version             = 8
-	parent_asset_id     = dsf_cloud_account.aws_cloud_account_key.asset_id
-	asset_connection {
-		auth_mechanism  = "password"
-		password        = var.password
-		reason          = "default" 
-		username        = var.username
-	}
+# Example dsfhub_cloud_account specific variables for AWS
+variable "cloud_account_aws_asset_display_name" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "cloud_account_aws_asset_id" {
+  default = "arn:partition:service:region:account-id"
 }
 
-# Create an AWS Log Group dsfhub_log_aggregator
-resource "dsfhub_log_aggregator" "rds-mysql-stats-demo-log-group" {
-	server_type = "AWS LOG GROUP"
-	admin_email         = var.admin_email	
-	asset_display_name  = var.log_group_name
-	asset_id            = var.log_group_arn
-	gateway_id          = var.gateway_jsonar_uid
-	parent_asset_id     = dsf_data_source.example-aws-rds-mysql-password.asset_id	
-	asset_connection {
-		auth_mechanism = "default"
-		reason = "default" 
-		region = "us-east-2" 
-	}
-}
-```
-
-## Example Usage - Resources and Data Sources
-
-```hcl
-# Configure the DSFHUB provider
-provider "dsfhub" {
-  dsfhub_host = "${var.dsfhub_host}"
-  dsfhub_token = "${var.dsfhub_token}"
+# Example dsfhub_cloud_account usage for AWS
+resource "dsfhub_cloud_account" "example_aws_cloud_account" {
+  server_type = "AWS"
+  admin_email = var.admin_email	# The email address to notify about this asset
+  asset_display_name = var.cloud_account_aws_asset_display_name # User-friendly name of the asset, defined by user.
+  asset_id = var.cloud_account_aws_asset_id # The unique identifier or resource name of the asset. For AWS, use arn, for Azure, use subscription ID, for GCP, use project ID
+  gateway_id = var.gateway_id# The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'
+  asset_connection {
+    auth_mechanism = "iam_role"
+    reason = "default"
+    region = var.region # For cloud systems with regions, the default region or region used with this asset
+  }
 }
 
-# Reference an AWS dsfhub_cloud_account (Data Source)
-data "dsfhub_cloud_account" "example_aws_cloud_account" {
-  asset_id = "arn:partition:service:region:account-id" # The value of the arn for aws resources
+# Example dsfhub_data_source specific variables for AWS RDS MYSQL
+variable "data_source_aws_rds_mysql_asset_display_name" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "data_source_aws_rds_mysql_asset_id" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "data_source_aws_rds_mysql_server_host_name" {
+  default = "your-data-source-asset-id-here"
+}
+variable "data_source_aws_rds_mysql_username" {
+  default = "your-db-username"
+}
+variable "data_source_aws_rds_mysql_password" {
+  default = "your-db-password--here"
 }
 
-# ### Resource example for ORACLE with password auth_mechanism ###
-resource "dsfhub_data_source" "example_oracle_password_and_wallet" {
-	server_type = "ORACLE"
-	admin_email = var.admin_email	# The email address to notify about this asset
-	asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
-	asset_id = var.asset_id	# Asset ID
-	gateway_id = var.gateway_id	# Gateway ID
-	server_host_name = var.server_host_name	# Hostname (or IP if name is unknown)
-	server_ip = var.server_ip	# IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.
-	service_name = var.service_name	# Service Name or SID used to connect
-	parent_asset_id = dsf_cloud_account.example_aws_cloud_account.asset_id
-	asset_connection {
-		auth_mechanism = "password"
-		password = null # password description: "The password of the user being used to authenticate"
-		reason = null # Example Values: "default", "sonargateway", "SDM", "audit management", "ad-hoc-query" # reason description: "What this connection is used for. Used to differentiate connections if multiple connections exist for this asset"
-		username = null # username description: "The user to use when connecting. For Oracle assets, the username should be in exact case as defined in table \"dba_users\", otherwise Oracle normally converts everything to all-caps."
-	}
-	asset_connection {
-		auth_mechanism = "oracle_wallet"
-		dsn = null # dsn description: "Data Source Name"
-		password = null # password description: "The password of the user being used to authenticate"
-		reason = null # Example Values: "default", "sonargateway", "SDM", "audit management", "ad-hoc-query" # reason description: "What this connection is used for. Used to differentiate connections if multiple connections exist for this asset"
-		username = null # username description: "The user to use when connecting. For Oracle assets, the username should be in exact case as defined in table \"dba_users\", otherwise Oracle normally converts everything to all-caps."
-		wallet_dir = null # wallet_dir description: "Path to the Oracle wallet directory"
-	}
+# Example dsfhub_data_source usage for AWS RDS MYSQL
+resource "dsfhub_data_source" "aws_rds_mysql_password" {
+  server_type = "AWS RDS MYSQL"
+  admin_email = var.admin_email	
+  asset_display_name = var.data_source_aws_rds_mysql_asset_display_name	
+  asset_id = var.data_source_aws_rds_mysql_asset_id 
+  gateway_id = var.gateway_id
+  parent_asset_id = dsf_cloud_account.example_aws_cloud_account.asset_id
+  server_host_name = var.data_source_aws_rds_mysql_server_host_name	
+  asset_connection {
+    auth_mechanism = "password"
+    password = var.data_source_aws_rds_mysql_password 
+    reason = "default" 
+    username = var.data_source_aws_rds_mysql_username 
+  }
 }
 
-# Create an AWS Log Group log_aggregator
-resource "dsfhub_log_aggregator" "rds-mysql-stats-demo-log-group" {
-	server_type = "AWS LOG GROUP"
-	admin_email         = var.admin_email	
-	asset_display_name  = var.log_group_name
-	asset_id            = var.log_group_arn
-	gateway_id          = var.gateway_jsonar_uid
-	parent_asset_id     = dsf_data_source.example_oracle_password_and_wallet.asset_id	
-	asset_connection {
-		auth_mechanism = "default"
-		reason = "default" 
-		region = "us-east-2" 
-	}
+# Example dsfhub_log_aggregator specific variables for AWS LOG GROUP
+variable "log_aggregator_aws_log_group_asset_display_name" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "log_aggregator_aws_log_group_asset_id" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "log_aggregator_parent_data_source_asset_id" {
+  default = "your-data-source-asset-id-here"
+}
+variable "log_aggregator_aws_log_group_version" {
+  default = 1.0
+}
+
+# Example dsfhub_log_aggregator usage for AWS LOG GROUP
+resource "dsfhub_log_aggregator" "example_aws_log_group_default" {
+  server_type = "AWS LOG GROUP"
+  admin_email = var.admin_email
+  asset_display_name = var.log_aggregator_aws_log_group_asset_display_name
+  asset_id = var.log_aggregator_aws_log_group_asset_id
+  gateway_id = var.gateway_id
+  parent_asset_id = dsfhub_data_source.aws_rds_mysql_password.asset_id
+  version = var.log_aggregator_aws_log_group_version
+  asset_connection {
+    auth_mechanism = "default"
+    reason = "default"
+    region = var.region
+  }
 }
 ```
 
-## Argument Reference
+## DSFHUB Provider Argument Reference
 
 The following arguments are supported:
 

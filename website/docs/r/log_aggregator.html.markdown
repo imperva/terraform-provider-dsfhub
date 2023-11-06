@@ -17,18 +17,44 @@ Documentation for the underlying API used in this resource can be found at
 ## Example Usage
 
 ```hcl
+# Example generic variable reference:
+variable "admin_email" {
+  default = "your@email.com"
+}
+variable "gateway_id" {
+  default = "7a4af7cf-4292-89d9-46ec-183756ksdjd"
+}
+variable "region" {
+  default = "us-east-1"
+}
+
+# Example dsfhub_log_aggregator specific variables for AWS LOG GROUP
+variable "log_aggregator_aws_log_group_asset_display_name" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "log_aggregator_aws_log_group_asset_id" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "log_aggregator_parent_data_source_asset_id" {
+  default = "your-data-source-asset-id-here"
+}
+variable "log_aggregator_aws_log_group_version" {
+  default = 1.0
+}
+
+# Example dsfhub_log_aggregator usage for AWS LOG GROUP
 resource "dsfhub_log_aggregator" "example_aws_log_group_default" {
   server_type = "AWS LOG GROUP"
-  admin_email = "your@email.com"
-  asset_display_name = "arn:partition:service:region:account-id" 
-  asset_id = "arn:partition:service:region:account-id" # Use arn for aws resources
-  gateway_id = "12345-abcde-12345-abcde-12345-abcde"
-  parent_asset_id = "your-data-source-asset-id-here"
-  version = 1.2 # Denotes the version of the asset
+  admin_email = var.admin_email	# The email address to notify about this asset
+  asset_display_name = var.log_aggregator_aws_log_group_asset_display_name # User-friendly name of the asset, defined by user.
+  asset_id = var.log_aggregator_aws_log_group_asset_id # The unique identifier or resource name of the asset. For AWS, use arn, for Azure, use subscription ID, for GCP, use project ID
+  gateway_id = var.gateway_id # The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'
+  parent_asset_id = var.log_aggregator_parent_data_source_asset_id # The name of an asset that this asset is part of (/related to). E.g. an AWS resource will generally have an AWS account asset as its parent. Also used to connect some log aggregating asset with the sources of their logs. E.g. An AWS LOG GROUP asset can have an AWS RDS as its parent, indicating that that is the log group for that RDS.
+  version = var.log_aggregator_aws_log_group_version # Denotes the version of the asset
   asset_connection {
     auth_mechanism = "default"
     reason = "default"
-    region = "us-east-2"
+    region = var.region # For cloud systems with regions, the default region or region used with this asset
   }
 }
 
@@ -77,7 +103,7 @@ resource "dsfhub_log_aggregator" "example_aws_log_group_default" {
 - `region` (String) For cloud systems with regions, the default region or region used with this asset
 - `server_host_name` (String) Hostname (or IP if name is unknown)
 - `server_ip` (String) IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.
-- `server_port` (String)
+- `server_port` (String) Port used by the source server
 - `service_endpoints` (Block Set) Specify particular endpoints for a given service in the form of <service name>: "endpoint" (see [below for nested schema](#nestedblock--service_endpoints))
 - `used_for` (String) Designates how this asset is used / the environment that the asset is supporting.
 - `version` (Number) Denotes the version of the asset

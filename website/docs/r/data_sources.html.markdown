@@ -18,19 +18,44 @@ Documentation for the underlying API used in this resource can be found at
 ## Example Usage
 
 ```hcl
+# Example generic variable reference:
+variable "admin_email" {
+  default = "your@email.com"
+}
+variable "gateway_id" {
+  default = "7a4af7cf-4292-89d9-46ec-183756ksdjd"
+}
+
+# Example dsfhub_data_source specific variables for AWS RDS MYSQL
+variable "data_source_aws_rds_mysql_asset_display_name" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "data_source_aws_rds_mysql_asset_id" {
+  default = "arn:partition:service:region:account-id"
+}
+variable "data_source_aws_rds_mysql_server_host_name" {
+  default = "your-data-source-asset-id-here"
+}
+variable "data_source_aws_rds_mysql_username" {
+  default = "your-db-username"
+}
+variable "data_source_aws_rds_mysql_password" {
+  default = "your-db-password--here"
+}
+
+# Example dsfhub_data_source usage for AWS RDS MYSQL
 resource "dsfhub_data_source" "aws_rds_mysql_password" {
 	server_type = "AWS RDS MYSQL"
-	admin_email = var.admin_email	# The email address to notify about this asset
-	arn = var.arn	# Amazon Resource Name - format is arn:partition:service:region:account-id:resource-type:resource-id and used as the asset_id
-	asset_display_name = var.asset_display_name	# User-friendly name of the asset, defined by user.
-	asset_id = var.asset_id	# Asset ID
-	gateway_id = var.gateway_id	# Gateway ID
-	server_host_name = var.server_host_name	# Hostname (or IP if name is unknown)
+	admin_email = var.admin_email # The email address to notify about this asset
+	asset_display_name = var.data_source_aws_rds_mysql_asset_display_name # User-friendly name of the asset, defined by user.
+    asset_id = var.data_source_aws_rds_mysql_asset_id # The unique identifier or resource name of the asset. For AWS, use arn, for Azure, use subscription ID, for GCP, use project ID
+    gateway_id = var.gateway_id # The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'
+	server_host_name = var.data_source_aws_rds_mysql_server_host_name # Hostname (or IP if name is unknown)
 	asset_connection {
 		auth_mechanism = "password"
-		password = null # password description: "The password of the user being used to authenticate"
-		reason = null # Example Values: "default", "sonargateway", "SDM", "audit management", "ad-hoc-query" # reason description: "What this connection is used for. Used to differentiate connections if multiple connections exist for this asset"
-		username = null # username description: ""
+		password = var.data_source_aws_rds_mysql_password # The password of the user being used to authenticate
+		reason = "default" # Example Values: "default", "sonargateway", "SDM", "audit management", "ad-hoc-query" # reason description: "What this connection is used for. Used to differentiate connections if multiple connections exist for this asset"
+		username = var.data_source_aws_rds_mysql_username # The username of the user being used to authenticate
 	}
 }
 ```
