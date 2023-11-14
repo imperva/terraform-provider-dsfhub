@@ -545,7 +545,7 @@ func resourceCloudAccountRead(d *schema.ResourceData, m interface{}) error {
 	if cloudAccountReadResponse.Data.AssetData.ServerPort != nil {
 		var serverPort string
 		if serverPortNum, ok := cloudAccountReadResponse.Data.AssetData.ServerPort.(float64); ok {
-			serverPort = fmt.Sprintf("%d", float64(serverPortNum))
+			serverPort = fmt.Sprintf("%d", int(serverPortNum))
 		} else {
 			serverPort = cloudAccountReadResponse.Data.AssetData.ServerPort.(string)
 		}

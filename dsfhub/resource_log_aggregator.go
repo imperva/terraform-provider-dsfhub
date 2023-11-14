@@ -583,7 +583,7 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 	if logAggregatorReadResponse.Data.AssetData.ServerPort != nil {
 		var serverPort string
 		if serverPortNum, ok := logAggregatorReadResponse.Data.AssetData.ServerPort.(float64); ok {
-			serverPort = fmt.Sprintf("%d", float64(serverPortNum))
+			serverPort = fmt.Sprintf("%d", int(serverPortNum))
 		} else {
 			serverPort = logAggregatorReadResponse.Data.AssetData.ServerPort.(string)
 		}
