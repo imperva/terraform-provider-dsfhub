@@ -1,7 +1,7 @@
 ---
 subcategory: "DSFHUB Templates by Database"
 layout: "dsfhub"
-page_title: "DSFHUB Database Template - AWS RDS MYSQL"
+page_title: "Module - AWS RDS MYSQL"
 description: |-
   Provides an combined example of creating an AWS RDS MYSQL database, associated option groups enabling audit logs, onboarding to the DSFHUB with IAM permissions for the DSF Agentless Gateway to access.
 ---
@@ -212,7 +212,13 @@ resource "dsfhub_log_aggregator" "rds-mysql-db-log-group" {
 
 ## Dependencies:
 
-The [DSF Agentless Gateway](https://registry.terraform.io/modules/imperva/dsf-agentless-gw/aws/latest) is required to have access to read logs from cloud watch.  The following is an example [AWS IAM Role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) granting this access:
+The [DSF Agentless Gateway](https://registry.terraform.io/modules/imperva/dsf-agentless-gw/aws/latest) is required to have access to read logs from cloud watch.  The following is an example [AWS IAM Role](../guides/iam_aws_kinesis.md) granting this access:
+
+<ul>
+<li><a target="_blank" href="../guides/iam_aws_kinesis.md">Kinesis Streams</a></li>
+<li><a target="_blank" href="../guides/iam_aws_log_group.md">CloudWatch Log Groups</a></li>
+<li><a target="_blank" href="../guides/iam_aws_secrets.md">Secret Manager</a></li>
+</ul>
 
 ```hcl
 #################################
