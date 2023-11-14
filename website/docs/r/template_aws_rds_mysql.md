@@ -10,7 +10,7 @@ description: |-
 
 Provides a module template for creating an AWS RDS MYSQL database, the associated option groups enabling audit logs, and onboarding to the DSFHUB with IAM permissions for the DSF Agentless Gateway to access those logs.
 
-## Onboarding Template Variables
+## Variables
 
 ```hcl
 # DSFHUB Provider Required Variables
@@ -111,7 +111,7 @@ variable "vpc_security_group_ids" {
 }
 ```
 
-## Onboarding Template Providers and Resources
+## Providers and Resources
 
 ```hcl
 

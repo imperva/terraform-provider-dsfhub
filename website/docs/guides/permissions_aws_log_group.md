@@ -1,7 +1,7 @@
 ---
-subcategory: "DSF Agentless Gateway Permissions"
+subcategory: ""
 layout: "dsfhub"
-page_title: "DSF Agentless Gateway Required IAM Permissions - Log Group"
+page_title: "AWS IAM Permissions - CloudWatch Log Group"
 description: |-
   AWS IAM permissions for the DSF Agentless Gateway to access logs via Cloud Watch Log Groups.
 ---
