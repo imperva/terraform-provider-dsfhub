@@ -1,6 +1,6 @@
 ---
-subcategory: ""
-layout: "imperva"
+subcategory: "DSF Agentless Gateway Permissions"
+layout: "dsfhub"
 page_title: "DSF Agentless Gateway AWS IAM Kinesis Permissions"
 description: |-
   AWS IAM permissions for the DSF Agentless Gateway to access logs via Kinesis. 

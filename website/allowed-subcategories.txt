@@ -1,1 +1,3 @@
 DSFHUB Provider Reference
+DSF Agentless Gateway Permissions
+DSFHUB Templates by Database
