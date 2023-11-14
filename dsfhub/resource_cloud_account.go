@@ -542,7 +542,15 @@ func resourceCloudAccountRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("region", cloudAccountReadResponse.Data.AssetData.Region)
 	d.Set("server_host_name", cloudAccountReadResponse.Data.AssetData.ServerHostName)
 	d.Set("server_type", cloudAccountReadResponse.Data.ServerType)
-	d.Set("server_port", cloudAccountReadResponse.Data.AssetData.ServerPort)
+	if cloudAccountReadResponse.Data.AssetData.ServerPort != nil {
+		var serverPort string
+		if serverPortNum, ok := cloudAccountReadResponse.Data.AssetData.ServerPort.(int); ok {
+			serverPort = fmt.Sprintf("%d", int(serverPortNum))
+		} else {
+			serverPort = cloudAccountReadResponse.Data.AssetData.ServerPort.(string)
+		}
+		d.Set("server_port", serverPort)
+	}
 	d.Set("used_for", cloudAccountReadResponse.Data.AssetData.UsedFor)
 	d.Set("version", cloudAccountReadResponse.Data.AssetData.Version)
 

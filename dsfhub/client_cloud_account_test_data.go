@@ -42,7 +42,7 @@ var cloudAccountTestDataJson = `{
                     "managed_by": "string",
                     "owned_by": "string",
                     "region": "string",
-                    "server_port": "string",
+                    "Server Port": 1234,
                     "used_for": "Production",
                     "version": 1.0
                 },

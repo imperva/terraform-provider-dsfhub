@@ -580,7 +580,15 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("region", logAggregatorReadResponse.Data.AssetData.Region)
 	d.Set("server_host_name", logAggregatorReadResponse.Data.AssetData.ServerHostName)
 	d.Set("server_type", logAggregatorReadResponse.Data.ServerType)
-	d.Set("server_port", logAggregatorReadResponse.Data.AssetData.ServerPort)
+	if logAggregatorReadResponse.Data.AssetData.ServerPort != nil {
+		var serverPort string
+		if serverPortNum, ok := logAggregatorReadResponse.Data.AssetData.ServerPort.(int); ok {
+			serverPort = fmt.Sprintf("%d", int(serverPortNum))
+		} else {
+			serverPort = logAggregatorReadResponse.Data.AssetData.ServerPort.(string)
+		}
+		d.Set("server_port", serverPort)
+	}
 	d.Set("used_for", logAggregatorReadResponse.Data.AssetData.UsedFor)
 	d.Set("version", logAggregatorReadResponse.Data.AssetData.Version)
 

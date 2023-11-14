@@ -549,7 +549,15 @@ func resourceSecretManagerRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("region", secretManagerReadResponse.Data.AssetData.Region)
 	d.Set("server_host_name", secretManagerReadResponse.Data.AssetData.ServerHostName)
 	d.Set("server_ip", secretManagerReadResponse.Data.AssetData.ServerIP)
-	d.Set("server_port", secretManagerReadResponse.Data.AssetData.ServerPort)
+	if secretManagerReadResponse.Data.AssetData.ServerPort != nil {
+		var serverPort string
+		if serverPortNum, ok := secretManagerReadResponse.Data.AssetData.ServerPort.(int); ok {
+			serverPort = fmt.Sprintf("%d", int(serverPortNum))
+		} else {
+			serverPort = secretManagerReadResponse.Data.AssetData.ServerPort.(string)
+		}
+		d.Set("server_port", serverPort)
+	}
 	d.Set("used_for", secretManagerReadResponse.Data.AssetData.UsedFor)
 	d.Set("version", secretManagerReadResponse.Data.AssetData.Version)
 
@@ -742,7 +750,7 @@ func resourceSecretManagerConnectionHash(v interface{}) int {
 	}
 
 	if v, ok := m["self_signed"]; ok {
-		buf.WriteString(fmt.Sprintf("%s-", v.(bool)))
+		buf.WriteString(fmt.Sprintf("%v-", v.(bool)))
 	}
 
 	if v, ok := m["ssl"]; ok {
@@ -750,7 +758,7 @@ func resourceSecretManagerConnectionHash(v interface{}) int {
 	}
 
 	if v, ok := m["store_aws_credentials"]; ok {
-		buf.WriteString(fmt.Sprintf("%s-", v.(bool)))
+		buf.WriteString(fmt.Sprintf("%v-", v.(bool)))
 	}
 
 	if v, ok := m["username"]; ok {
@@ -758,7 +766,7 @@ func resourceSecretManagerConnectionHash(v interface{}) int {
 	}
 
 	if v, ok := m["v2_key_engine"]; ok {
-		buf.WriteString(fmt.Sprintf("%s-", v.(bool)))
+		buf.WriteString(fmt.Sprintf("%v-", v.(bool)))
 	}
 
 	return PositiveHash(buf.String())

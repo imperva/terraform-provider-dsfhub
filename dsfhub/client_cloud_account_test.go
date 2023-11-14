@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -189,7 +190,7 @@ func TestClientAddCloudAccountValidFromLocalSchema(t *testing.T) {
 	}
 
 	for serverType, secretManager := range cloudAccountTestData.ServerType {
-		log.Printf("[DEBUG] serverType %v, secretManager, %v\n", serverType, secretManager)
+		log.Printf("[DEBUG] serverType %v, secretManager %v, ServerPort '%s' %v\n", serverType, secretManager, secretManager.Data.AssetData.ServerPort, reflect.TypeOf(secretManager.Data.AssetData.ServerPort))
 	}
 
 	DSFHUBToken := "foo"

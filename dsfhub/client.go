@@ -103,34 +103,34 @@ type AssetData struct {
 	EnableAuditMonitoring  bool              `json:"enable_audit_monitoring,omitempty"`
 	EnabledLogsExports     string            `json:"enabled_logs_exports,omitempty"`
 	//Endpoint               string            `json:"endpoint,omitempty"`
-	EntitlementEnabled     bool   `json:"entitlement_enabled,omitempty"`
-	GatewayService         string `json:"gateway_service,omitempty"`
-	HostTimezoneOffset     string `json:"host_timezone_offset,omitempty"`
-	IgnoreLatestOf         string `json:"ignore_latest_of,omitempty"`
-	IsCluster              bool   `json:"is_cluster,omitempty"`
-	IsMultiZones           bool   `json:"is_multi_zones,omitempty"`
-	JsonarUID              string `json:"jsonar_uid,omitempty"`
-	JsonarUIDDisplayName   string `json:"jsonar_uid_display_name,omitempty"`
-	Location               string `json:"location,omitempty"`
-	LogBucketID            string `json:"log_bucket_id,omitempty"`
-	LogsDestinationAssetID string `json:"logs_destination_asset_id,omitempty"`
-	Logstore               string `json:"logstore,omitempty"`
-	ManagedBy              string `json:"managed_by,omitempty"`
-	MaxConcurrentConn      string `json:"max_concurrent_conn,omitempty"`
-	OwnedBy                string `json:"owned_by,omitempty"`
-	ParentAssetID          string `json:"parent_asset_id,omitempty"`
-	Project                string `json:"project,omitempty"`
-	ADProvider             string `json:"provider,omitempty"`
-	ProviderUrl            string `json:"provider_url,omitempty"`
-	Proxy                  string `json:"proxy,omitempty"`
-	PubsubSubscription     string `json:"pubsub_subscription,omitempty"`
-	PullType               string `json:"pull_type,omitempty"`
-	Region                 string `json:"region,omitempty"`
-	SdmEnabled             bool   `json:"sdm_enabled,omitempty"`
-	Searches               string `json:"searches,omitempty"`
-	ServerHostName         string `json:"Server Host Name,omitempty"`
-	ServerIP               string `json:"Server IP,omitempty"`
-	ServerPort             string `json:"Server Port,omitempty"`
+	EntitlementEnabled     bool        `json:"entitlement_enabled,omitempty"`
+	GatewayService         string      `json:"gateway_service,omitempty"`
+	HostTimezoneOffset     string      `json:"host_timezone_offset,omitempty"`
+	IgnoreLatestOf         string      `json:"ignore_latest_of,omitempty"`
+	IsCluster              bool        `json:"is_cluster,omitempty"`
+	IsMultiZones           bool        `json:"is_multi_zones,omitempty"`
+	JsonarUID              string      `json:"jsonar_uid,omitempty"`
+	JsonarUIDDisplayName   string      `json:"jsonar_uid_display_name,omitempty"`
+	Location               string      `json:"location,omitempty"`
+	LogBucketID            string      `json:"log_bucket_id,omitempty"`
+	LogsDestinationAssetID string      `json:"logs_destination_asset_id,omitempty"`
+	Logstore               string      `json:"logstore,omitempty"`
+	ManagedBy              string      `json:"managed_by,omitempty"`
+	MaxConcurrentConn      string      `json:"max_concurrent_conn,omitempty"`
+	OwnedBy                string      `json:"owned_by,omitempty"`
+	ParentAssetID          string      `json:"parent_asset_id,omitempty"`
+	Project                string      `json:"project,omitempty"`
+	ADProvider             string      `json:"provider,omitempty"`
+	ProviderUrl            string      `json:"provider_url,omitempty"`
+	Proxy                  string      `json:"proxy,omitempty"`
+	PubsubSubscription     string      `json:"pubsub_subscription,omitempty"`
+	PullType               string      `json:"pull_type,omitempty"`
+	Region                 string      `json:"region,omitempty"`
+	SdmEnabled             bool        `json:"sdm_enabled,omitempty"`
+	Searches               string      `json:"searches,omitempty"`
+	ServerHostName         string      `json:"Server Host Name,omitempty"`
+	ServerIP               string      `json:"Server IP,omitempty"`
+	ServerPort             interface{} `json:"Server Port,omitempty"`
 	//ServerType             string         `json:"serverType,omitempty"`
 	ServiceEndpoint  string            `json:"service_endpoint,omitempty"`
 	ServiceEndpoints *ServiceEndpoints `json:"service_endpoints,omitempty"`

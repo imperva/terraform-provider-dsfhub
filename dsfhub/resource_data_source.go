@@ -1400,7 +1400,15 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("searches", dsfDataSourceReadResponse.Data.AssetData.Searches)
 	d.Set("server_host_name", dsfDataSourceReadResponse.Data.AssetData.ServerHostName)
 	d.Set("server_ip", dsfDataSourceReadResponse.Data.AssetData.ServerIP)
-	d.Set("server_port", dsfDataSourceReadResponse.Data.AssetData.ServerPort)
+	if dsfDataSourceReadResponse.Data.AssetData.ServerPort != nil {
+		var serverPort string
+		if serverPortNum, ok := dsfDataSourceReadResponse.Data.AssetData.ServerPort.(int); ok {
+			serverPort = fmt.Sprintf("%d", int(serverPortNum))
+		} else {
+			serverPort = dsfDataSourceReadResponse.Data.AssetData.ServerPort.(string)
+		}
+		d.Set("server_port", serverPort)
+	}
 	d.Set("server_type", dsfDataSourceReadResponse.Data.ServerType)
 	d.Set("service_endpoint", dsfDataSourceReadResponse.Data.AssetData.ServiceEndpoint)
 	d.Set("service_name", dsfDataSourceReadResponse.Data.AssetData.ServiceName)
