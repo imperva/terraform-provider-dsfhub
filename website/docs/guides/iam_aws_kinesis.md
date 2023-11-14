@@ -1,7 +1,7 @@
 ---
 subcategory: ""
 layout: "dsfhub"
-page_title: "AWS IAM Permissions - Kinesis"
+page_title: "AWS IAM - Kinesis"
 description: |-
   AWS IAM permissions for the DSF Agentless Gateway to access logs via AWS Kinesis Data Streams.
 ---

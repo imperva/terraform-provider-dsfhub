@@ -1,7 +1,7 @@
 ---
 subcategory: ""
 layout: "dsfhub"
-page_title: "AWS IAM Permissions - Secrets"
+page_title: "AWS IAM - Secrets"
 description: |-
   AWS IAM permissions for the DSF Agentless Gateway to access logs via AWS Secrets Manager. 
 ---

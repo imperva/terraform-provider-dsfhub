@@ -1,7 +1,7 @@
 ---
-subcategory: "DSFHUB Database Modules"
+subcategory: "Example Modules"
 layout: "dsfhub"
-page_title: "Module - AWS RDS MYSQL"
+page_title: "Modules - AWS RDS MYSQL"
 description: |-
   Provides an combined example of creating an AWS RDS MYSQL database, associated option groups enabling audit logs, onboarding to the DSFHUB with IAM permissions for the DSF Agentless Gateway to access.
 ---

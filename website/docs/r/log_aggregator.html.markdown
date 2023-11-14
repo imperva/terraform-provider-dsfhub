@@ -1,19 +1,18 @@
 ---
-subcategory: "DSFHUB Provider Reference"
+subcategory: "Provider Reference"
 layout: "dsfhub"
-page_title: "DSFHUB Cloud Account Resource"
+page_title: "DSFHUB Log Aggregator Resource"
 description: |-
-  Provides a dsfhub_secret_manager resource.
+  Provides a dsfhub_log_aggregator resource.
 ---
 
-# dsfhub_cloud_account (Resource)
+# dsfhub_log_aggregator (Resource)
 
-Provides a cloud account resource.
+Provides a log aggregator resource.  A log aggregator is a resource that serves as a log destination for one or multiple data sources in the DSF HUB.
 
-The `dsfhub_cloud_account` resource contains the configuration parameters necessary to access [Cloud Accounts](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/80357.htm) 
-(AWS, GCP, Azure, etc), from the Unified Settings Console in the DSF HUB platform. 
+The `dsfhub_log_aggregator` resource contains the configuration parameters necessary to aggregate logs for one or multiple data sources in the DSF HUB platform.
 Documentation for the underlying API used in this resource can be found at
-[Cloud Account API Definition page](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/84552.htm).
+[Log Aggregators API Definition page](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/84552.htm).
 
 ## Example Usage
 
@@ -29,36 +28,50 @@ variable "region" {
   default = "us-east-1"
 }
 
-# Example dsfhub_cloud_account specific variables for AWS
-variable "cloud_account_aws_asset_display_name" {
+# Example dsfhub_log_aggregator specific variables for AWS LOG GROUP
+variable "log_aggregator_aws_log_group_asset_display_name" {
   default = "arn:partition:service:region:account-id"
 }
-variable "cloud_account_aws_asset_id" {
+variable "log_aggregator_aws_log_group_asset_id" {
   default = "arn:partition:service:region:account-id"
+}
+variable "log_aggregator_parent_data_source_asset_id" {
+  default = "your-data-source-asset-id-here"
+}
+variable "log_aggregator_aws_log_group_version" {
+  default = 1.0
 }
 
-# Example dsfhub_cloud_account usage for AWS
-resource "dsfhub_cloud_account" "example_aws_cloud_account" {
-  server_type = "AWS"
+# Example dsfhub_log_aggregator usage for AWS LOG GROUP
+resource "dsfhub_log_aggregator" "example_aws_log_group_default" {
+  server_type = "AWS LOG GROUP"
   admin_email = var.admin_email	# The email address to notify about this asset
-  asset_display_name = var.cloud_account_aws_asset_display_name # User-friendly name of the asset, defined by user.
-  asset_id = var.cloud_account_aws_asset_id # The unique identifier or resource name of the asset. For AWS, use arn, for Azure, use subscription ID, for GCP, use project ID
-  gateway_id = var.gateway_id# The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'
+  asset_display_name = var.log_aggregator_aws_log_group_asset_display_name # User-friendly name of the asset, defined by user.
+  asset_id = var.log_aggregator_aws_log_group_asset_id # The unique identifier or resource name of the asset. For AWS, use arn, for Azure, use subscription ID, for GCP, use project ID
+  gateway_id = var.gateway_id # The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'
+  parent_asset_id = var.log_aggregator_parent_data_source_asset_id # The name of an asset that this asset is part of (/related to). E.g. an AWS resource will generally have an AWS account asset as its parent. Also used to connect some log aggregating asset with the sources of their logs. E.g. An AWS LOG GROUP asset can have an AWS RDS as its parent, indicating that that is the log group for that RDS.
+  version = var.log_aggregator_aws_log_group_version # Denotes the version of the asset
   asset_connection {
-    auth_mechanism = "iam_role"
+    auth_mechanism = "default"
     reason = "default"
     region = var.region # For cloud systems with regions, the default region or region used with this asset
   }
 }
+
 ```
 
-## Cloud Account Types:
+## Log Aggregator Types
 <ul>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/aws.md">Amazon Account</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/alibaba.md">Alibaba Cloud Account</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/azure.md">Azure</a></li>
-	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/cloud_accounts/gcp.md">Google Cloud</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/alibaba_logstore.md">Alibaba Logstore</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_kinesis.md">AWS Kinesis</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_log_group.md">AWS Log Group</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/aws_s3.md">Amazon S3</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/azure_eventhub.md">Azure EventHub</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/gcp_cloud_storage_bucket.md">GCP Cloud Storage Bucket</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/gcp_pubsub.md">Google Cloud Pub/Sub</a></li>
+	<li><a href="https://github.com/imperva/terraform-provider-dsfhub/tree/main/examples/log_aggregators/ssh.md">SSH</a></li>
 </ul>
+
 
 ## Argument Reference
 
@@ -78,13 +91,18 @@ resource "dsfhub_cloud_account" "example_aws_cloud_account" {
 - `aws_proxy_config` (Block Set) AWS specific proxy configuration (see [below for nested schema](#nestedblock--aws_proxy_config))
 - `credentials_endpoint` (String) A specific sts endpoint to use
 - `criticality` (Number) The asset's importance to the business. These values are measured on a scale from "Most critical" (1) to "Least critical" (4). Allowed values: 1, 2, 3, 4
+- `endpoint` (String) Logstore's endpoint
 - `jsonar_uid` (String) Unique identifier (UID) attached to the Sonar machine controlling the asset
 - `location` (String) Current human-readable description of the physical location of the asset, or region.
+- `logstore` (String) Unit that is used to collect, store and query logs
 - `managed_by` (String) Email of the person who maintains the asset; can be different from the owner specified in the owned_by field. Defaults to admin_email.
 - `owned_by` (String) Email of Owner / person responsible for the asset; can be different from the person in the managed_by field. Defaults to admin_email.
+- `parent_asset_id` (String) The name of an asset that this asset is part of (/related to). E.g. an AWS resource will generally have an AWS account asset as its parent. Also used to connect some log aggregating asset with the sources of their logs. E.g. An AWS LOG GROUP asset can have an AWS RDS as its parent, indicating that that is the log group for that RDS.
+- `project` (String) Project separates different resources of multiple users and control access to specific resources
 - `proxy` (String) Proxy to use for AWS calls if aws_proxy_config is populated the proxy field will get populated from the http value there
 - `region` (String) For cloud systems with regions, the default region or region used with this asset
 - `server_host_name` (String) Hostname (or IP if name is unknown)
+- `server_ip` (String) IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.
 - `server_port` (String) Port used by the source server
 - `service_endpoints` (Block Set) Specify particular endpoints for a given service in the form of <service name>: "endpoint" (see [below for nested schema](#nestedblock--service_endpoints))
 - `used_for` (String) Designates how this asset is used / the environment that the asset is supporting.
@@ -101,7 +119,6 @@ Required:
 
 - `auth_mechanism` (String) Specifies the auth mechanism used by the connection
 - `reason` (String) N/A
-- `region` (String) Default AWS region for this asset
 
 Optional:
 
@@ -117,6 +134,7 @@ Optional:
 - `external_id` (String) External ID to use when assuming a role
 - `hashicorp_secret` (Block Set) Configuration to integrate with HashiCorp Vault (see [below for nested schema](#nestedblock--asset_connection--hashicorp_secret))
 - `key_file` (String) Location on disk on the key to be used to authenticate
+- `region` (String) Default AWS region for this asset
 - `role_name` (String) What role is used to get credentials from.
 - `secret_key` (String) The Secret access key used to authenticate
 - `ssl` (Boolean) If true, use SSL when connecting
@@ -163,6 +181,7 @@ Optional:
 - `secret_name` (String) HashiCorp secret mane
 
 
+
 <a id="nestedblock--aws_proxy_config"></a>
 ### Nested Schema for `aws_proxy_config`
 
@@ -181,8 +200,8 @@ Optional:
 
 ## Import
 
-Cloud Account can be imported using the `asset_id`, e.g.:
+Log Aggregators can be imported using the `asset_id`, e.g.:
 
 ```
-$ terraform import dsf_cloud_account.example_aws_cloud_account "arn:partition:service:region:account-id"
+$ terraform import dsf_log_aggregator.example_aws_log_group_default "arn:partition:service:region:account-id"
 ```

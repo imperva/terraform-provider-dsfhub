@@ -1,5 +1,5 @@
 ---
-subcategory: "DSFHUB Provider Reference"
+subcategory: "Provider Reference"
 layout: "dsfhub"
 page_title: "DSFHUB Cloud Account - Terraform Data Source"
 description: |-
