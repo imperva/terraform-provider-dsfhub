@@ -1,9 +1,9 @@
 ---
+subcategory: "DSFHUB Provider Reference"
 layout: "dsfhub"
-page_title: "dsfhub_data_source Data Source"
-sidebar_current: "docs-dsfhub-data-source-dsfhub-data-source"
+page_title: "DSFHUB Data Source - Terraform Data Source"
 description: |-
-Provides a dsfhub_data_source data source.  
+  Provides a dsfhub_data_source terraform data source.
 ---
 
 # dsfhub_data_source (Data Source)

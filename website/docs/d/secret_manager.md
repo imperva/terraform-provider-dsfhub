@@ -1,9 +1,9 @@
 ---
+subcategory: "DSFHUB Provider Reference"
 layout: "dsfhub"
-page_title: "dsfhub_secret_manager Data Source"
-sidebar_current: "docs-dsfhub-data-source-dsfhub-secret-manager"
+page_title: "DSFHUB Secret Manager - Terraform Data Source"
 description: |-
-Provides a dsfhub_secret_manager data source.  
+  Provides a dsfhub_secret_manager terraform data source.
 ---
 
 # dsfhub_secret_manager (Data Source)

@@ -1,9 +1,9 @@
 ---
+subcategory: "DSFHUB Provider Reference"
 layout: "dsfhub"
-page_title: "dsfhub_secret_manager Resource"
-sidebar_current: "docs-dsfhub-resource-dsfhub-secret-manager"
+page_title: "DSFHUB Secret Manager Resource"
 description: |-
-Provides a dsfhub_secret_manager resource.
+  Provides a dsfhub_secret_manager resource.
 ---
 
 # dsfhub_secret_manager (Resource)

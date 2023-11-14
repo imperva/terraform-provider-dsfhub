@@ -1,9 +1,9 @@
 ---
+subcategory: "DSFHUB Provider Reference"
 layout: "dsfhub"
-page_title: "dsfhub_cloud_account Resource"
-sidebar_current: "docs-dsfhub-resource-dsfhub-cloud-account"
+page_title: "DSFHUB Cloud Account Resource"
 description: |-
-Provides a dsfhub_cloud_account resource.
+  Provides a dsfhub_secret_manager resource.
 ---
 
 # dsfhub_cloud_account (Resource)

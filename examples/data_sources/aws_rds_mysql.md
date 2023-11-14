@@ -162,7 +162,7 @@ resource "dsfhub_data_source" "rds_mysql_db" {
 
 resource "dsfhub_log_aggregator" "rds_mysql_log_group" {
 	server_type = "AWS LOG GROUP"
-
+  
 	admin_email         = var.admin_email	
 	asset_display_name  = data.aws_cloudwatch_log_group.rds_mysql_log_group.name
 	asset_id            = data.aws_cloudwatch_log_group.rds_mysql_log_group.arn
@@ -186,80 +186,38 @@ The [DSF Agentless Gateway](https://registry.terraform.io/modules/imperva/dsf-ag
 # DSF Agentless Gateway IAM role
 #################################
 
-locals {
-  role_assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+# #### IAM Permissions for DSF Agentless Gateway ###
+data "aws_iam_role" "agentless_gateway" {
+  name = var.agentless_gatway_iam_role_name
+}
+
+resource "aws_iam_policy" "log_group_policy" {
+  name        = "DSFAgentlessGatewayLogGroupPolicy-${var.deployment_name}"
+  description = "DSF Agentless Gateway Log Group Policy for ${var.deployment_name}"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
       {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      },
+        "Sid": "VisualEditor0",
+        "Effect": "Allow",
+        "Action": [
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+          "logs:FilterLogEvents",
+          "logs:GetLogEvents"
+        ]
+        "Resource": [
+          "${data.aws_cloudwatch_log_group.rds_mysql_log_group.arn}/*",
+        ]
+      }
     ]
   })
-  inline_policy_secret = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "VisualEditor0",
-        "Effect" : "Allow",
-        "Action" : "secretsmanager:GetSecretValue",
-        "Resource" : concat([
-          "${var.sonarw_secret_aws_arn}",
-          "${var.password_secret_aws_arn}"
-          ],
-          [
-            var.aws_secretsmanager_access_tokens_arn
-          ]
-        )
-      }
-    ]
-    }
-  )
-  inline_policy_s3 = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "VisualEditor0",
-        "Effect" : "Allow",
-        "Action" : [
-          "s3:GetObject",
-          "s3:ListBucket"
-        ]
-        "Resource" : [
-          "arn:aws:s3:::${var.binaries_s3_bucket_location}",
-          "arn:aws:s3:::${var.binaries_s3_bucket_location}/*",
-        ]
-      }
-    ]
-    }
-  )
 }
 
-resource "aws_iam_instance_profile" "dsf_node_instance_iam_profile" {
-  count       = var.instance_profile_name == null ? 1 : 0
-  name_prefix = "${var.name}-${var.resource_type}-instance-iam-profile"
-  role        = var.role_name
-  tags        = var.tags
-}
-
-resource "aws_iam_role" "dsf_node_role" {
-  count               = var.instance_profile_name == null ? 1 : 0
-  name                = "${var.name}-role"
-  managed_policy_arns = null
-  assume_role_policy  = var.role_assume_role_policy
-  inline_policy {
-    name   = "${var.name}-s3-access"
-    policy = var.inline_policy_s3
-  }
-  inline_policy {
-    name   = "${var.name}-secret-access"
-    policy = var.inline_policy_secret
-  }
-  tags = var.tags
+resource "aws_iam_role_policy_attachment" "log_group_policy_attachment" {
+  policy_arn = aws_iam_policy.log_group_policy.arn
+  role       = data.aws_iam_role.agentless_gateway.name
 }
 ```
 

@@ -1,9 +1,9 @@
 ---
+subcategory: "DSFHUB Provider Reference"
 layout: "dsfhub"
-page_title: "dsfhub_data_source Resource"
-sidebar_current: "docs-dsfhub-resource-dsfhub-data-source"
+page_title: "DSFHUB Data Source Resource"
 description: |-
-Provides a dsfhub_data_source resource.  
+  Provides a dsfhub_data_source resource.
 ---
 
 # dsfhub_data_source (Resource)

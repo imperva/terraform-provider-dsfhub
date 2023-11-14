@@ -1,9 +1,9 @@
 ---
+subcategory: "DSFHUB Provider Reference"
 layout: "dsfhub"
-page_title: "dsfhub_log_aggregator Data Source"
-sidebar_current: "docs-dsfhub-data-source-dsfhub-log-aggregator"
+page_title: "DSFHUB Log Aggregator - Terraform Data Source"
 description: |-
-Provides a dsfhub_log_aggregator data source.  
+  Provides a dsfhub_log_aggregator terraform data source.
 ---
 
 # dsfhub_log_aggregator (Data Source)

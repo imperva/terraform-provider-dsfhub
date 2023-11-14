@@ -1,9 +1,9 @@
 ---
+subcategory: "DSFHUB Provider Reference"
 layout: "dsfhub"
-page_title: "dsfhub_cloud_account Cloud Account"
-sidebar_current: "docs-dsfhub-data-source-dsfhub-cloud-account"
+page_title: "DSFHUB Cloud Account - Terraform Data Source"
 description: |-
-Provides a dsfhub_data_source data source.  
+  Provides a dsfhub_cloud_account terraform data source.
 ---
 
 # dsfhub_cloud_account (Data Source)

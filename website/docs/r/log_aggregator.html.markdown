@@ -1,9 +1,9 @@
 ---
+subcategory: "DSFHUB Provider Reference"
 layout: "dsfhub"
-page_title: "dsfhub_log_aggregator Resource"
-sidebar_current: "docs-dsfhub-resource-dsfhub-log-aggregator"
+page_title: "DSFHUB Log Aggregator Resource"
 description: |-
-Provides a dsfhub_log_aggregator resource.
+  Provides a dsfhub_log_aggregator resource.
 ---
 
 # dsfhub_log_aggregator (Resource)
