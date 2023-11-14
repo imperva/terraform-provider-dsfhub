@@ -1,5 +1,5 @@
 ---
-subcategory: "DSFHUB Templates by Database"
+subcategory: "DSFHUB Database Modules"
 layout: "dsfhub"
 page_title: "Module - AWS RDS MYSQL"
 description: |-
@@ -114,7 +114,6 @@ variable "vpc_security_group_ids" {
 ## Providers and Resources
 
 ```hcl
-
 ## Providers ###
 provider "aws" {
   region = var.region
@@ -210,64 +209,15 @@ resource "dsfhub_log_aggregator" "rds-mysql-db-log-group" {
 }
 ```
 
-## Dependencies:
+## Agentless Gateway Permission Dependencies:
 
-The [DSF Agentless Gateway](https://registry.terraform.io/modules/imperva/dsf-agentless-gw/aws/latest) is required to have access to read logs from cloud watch.  The following is an example [AWS IAM Role](../guides/iam_aws_kinesis.md) granting this access:
+The [DSF Agentless Gateway](https://registry.terraform.io/modules/imperva/dsf-agentless-gw/aws/latest) is required to have [AWS IAM Role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) access to the AWS service the database is configured to publish logs to in order to consume audit.
 
 <ul>
-<li><a target="_blank" href="../guides/iam_aws_kinesis.md">Kinesis Streams</a></li>
-<li><a target="_blank" href="../guides/iam_aws_log_group.md">CloudWatch Log Groups</a></li>
-<li><a target="_blank" href="../guides/iam_aws_secrets.md">Secret Manager</a></li>
+<li><a target="_blank" href="../guides/iam_aws_kinesis.md">AWS IAM Permissions for Kinesis Streams</a></li>
+<li><a target="_blank" href="../guides/iam_aws_log_group.md">AWS IAM Permissions for CloudWatch Log Groups</a></li>
+<li><a target="_blank" href="../guides/iam_aws_secrets.md">AWS IAM Permissions for Secret Manager</a></li>
 </ul>
-
-```hcl
-#################################
-# DSF Agentless Gateway IAM role
-#################################
-
-# DSF Agentless-Gateway Variables for IAM permissions granting access logs
-variable "agentless_gatway_iam_role_name" {
-  description = "Name of the DSF agentless gateway role to add permissions to access db logs."
-  type = string
-  default =  "your-gw-role-name-here"
-}
-
-variable "db_cloud_watch_log_group_arn" {
-  description = " ARN of the Cloudwatch log group."
-  type = string
-  default =  "arn:aws:logs:us-east-2:1234567890:log-group:/aws/rds/instance/your-mysql-db-identifier/audit:*"
-}
-
-# #### IAM Permissions for DSF Agentless Gateway ###
-resource "aws_iam_policy" "log_group_policy" {
-  name        = "DSFAgentlessGatewayLogGroupPolicy-${var.deployment_name}"
-  description = "DSF Agentless Gateway Log Group Policy for ${var.deployment_name}"
-
-  policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Sid": "VisualEditor0",
-        "Effect": "Allow",
-        "Action": [
-          "logs:DescribeLogGroups",
-          "logs:DescribeLogStreams",
-          "logs:FilterLogEvents",
-          "logs:GetLogEvents"
-        ]
-        "Resource": [
-          "${var.db_cloud_watch_log_group_arn}/*",
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "log_group_policy_attachment" {
-  policy_arn = aws_iam_policy.log_group_policy.arn
-  role       = var.agentless_gatway_iam_role_name
-}
-```
 
 ## Argument Reference:
 

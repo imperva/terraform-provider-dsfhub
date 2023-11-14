@@ -1402,8 +1402,8 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("server_ip", dsfDataSourceReadResponse.Data.AssetData.ServerIP)
 	if dsfDataSourceReadResponse.Data.AssetData.ServerPort != nil {
 		var serverPort string
-		if serverPortNum, ok := dsfDataSourceReadResponse.Data.AssetData.ServerPort.(int); ok {
-			serverPort = fmt.Sprintf("%d", int(serverPortNum))
+		if serverPortNum, ok := dsfDataSourceReadResponse.Data.AssetData.ServerPort.(float64); ok {
+			serverPort = fmt.Sprintf("%d", float64(serverPortNum))
 		} else {
 			serverPort = dsfDataSourceReadResponse.Data.AssetData.ServerPort.(string)
 		}

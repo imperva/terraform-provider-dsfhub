@@ -1,10 +1,14 @@
 ---
 subcategory: ""
 layout: "dsfhub"
-page_title: "AWS IAM Permissions - Kinesis"
+page_title: "AWS IAM Permissions - Secrets"
 description: |-
-  AWS IAM permissions for the DSF Agentless Gateway to access logs via Kinesis. 
+  AWS IAM permissions for the DSF Agentless Gateway to access logs via AWS Secrets Manager. 
 ---
+
+# DSF Agentless Gateway Required IAM Permissions - Secrets Manager
+
+The DSF Agentless Gateway requires the following IAM permissions to access an AWS Secrets Manager.
 
 ## Variable Reference
 
