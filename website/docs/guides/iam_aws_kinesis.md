@@ -8,14 +8,14 @@ description: |-
 
 # DSF Agentless Gateway Requied IAM Permissions - Kinesis
 
-The DSF Agentless Gateway requires the following IAM permissions to access AWS Kinesis Data Streams.
+The DSF Agentless Gateway requires the following IAM permissions to access [AWS Kinesis Data Streams](https://docs.aws.amazon.com/streams/latest/dev/introduction.html).
 
 ## Variable Reference
 
 ```
-# Variables for the DSF Agentless-Gateway IAM permissions granting access to cloudwatch logs
+# Variables for the DSF Agentless-Gateway IAM permissions granting access to kinesis streams
 variable "agentless_gatway_iam_role_name" {
-	description = "Name of the DSF agentless gateway role to grant permissions to access db logs via cloudwatch."
+	description = "Name of the DSF agentless gateway role to grant permissions to access kinesis streams."
 	type = string
 	default =  "your-iam-gw-role-name"
 }

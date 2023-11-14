@@ -8,7 +8,7 @@ description: |-
 
 # DSF Agentless Gateway Required IAM Permissions - Secrets Manager
 
-The DSF Agentless Gateway requires the following IAM permissions to access an AWS Secrets Manager.
+The DSF Agentless Gateway requires the following IAM permissions to access an [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html).
 
 ## Variable Reference
 

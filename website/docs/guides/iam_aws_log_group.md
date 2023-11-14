@@ -8,7 +8,7 @@ description: |-
 
 # DSF Agentless Gateway Required IAM Permissions - Log Group
 
-The DSF Agentless Gateway requires the following IAM permissions to access an AWS Cloud Watch Log Group.
+The DSF Agentless Gateway requires the following IAM permissions to access an [AWS Cloud Watch Log Group](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html).
 
 ## Variable Reference
 
