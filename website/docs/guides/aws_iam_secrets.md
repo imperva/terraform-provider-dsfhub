@@ -13,6 +13,7 @@ The DSF Agentless Gateway requires the following IAM permissions to access an [A
 ## Variable Reference
 
 ```
+# Variables for the DSF Agentless-Gateway IAM permissions granting access to AWS Secrets Manager
 variable "aws_secretsmanager_access_tokens_arn" {
   description =  "The email address to notify about this asset"
   default = null 

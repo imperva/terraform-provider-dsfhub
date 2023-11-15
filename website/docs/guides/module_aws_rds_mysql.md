@@ -214,7 +214,7 @@ resource "dsfhub_log_aggregator" "rds-mysql-db-log-group" {
 The [DSF Agentless Gateway](https://registry.terraform.io/modules/imperva/dsf-agentless-gw/aws/latest) is required to have [AWS IAM Role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) access to the AWS service the database is configured to publish logs to in order to consume audit.
 
 <ul>
-<li><a target="_blank" href="../guides/iam_aws_kinesis.md">AWS IAM Permissions for Kinesis Streams</a></li>
-<li><a target="_blank" href="../guides/iam_aws_log_group.md">AWS IAM Permissions for CloudWatch Log Groups</a></li>
-<li><a target="_blank" href="../guides/iam_aws_secrets.md">AWS IAM Permissions for Secret Manager</a></li>
+<li><a target="_blank" href="aws_iam_kinesis.md">AWS IAM Permissions for Kinesis Streams</a></li>
+<li><a target="_blank" href="aws_iam_log_group.md">AWS IAM Permissions for CloudWatch Log Groups</a></li>
+<li><a target="_blank" href="aws_iam_secrets.md">AWS IAM Permissions for Secret Manager</a></li>
 </ul>
