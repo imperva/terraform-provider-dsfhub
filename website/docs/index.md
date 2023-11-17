@@ -33,8 +33,8 @@ terraform {
 
 # Configure the DSFHUB provider
 provider "dsfhub" {
-  dsfhub_host = "${var.dsfhub_host}"
-  dsfhub_token = "${var.dsfhub_token}"
+  dsfhub_host = "${var.dsfhub_host}"  # TF_VAR_dsfhub_host env variable
+  dsfhub_token = "${var.dsfhub_token}" # TF_VAR_dsfhub_token env variable
 }
 ```
 
