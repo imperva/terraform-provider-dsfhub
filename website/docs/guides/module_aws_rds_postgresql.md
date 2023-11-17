@@ -1,7 +1,7 @@
 ---
 subcategory: "Example Modules"
 layout: "dsfhub"
-page_title: "AWS RDS POSTGRESQL - S3 Bucket"
+page_title: "AWS RDS POSTGRESQL - Log Group"
 description: |-
   Provides an combined example of creating an AWS RDS POSTGRESQL database, associated option groups enabling audit logs, onboarding to the DSFHUB with IAM permissions for the DSF Agentless Gateway to access.
 ---

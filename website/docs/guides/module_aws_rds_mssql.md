@@ -204,6 +204,22 @@ resource "dsfhub_data_source" "rds-mssql-db" {
     username        = aws_db_instance.mssql_db.username
   }
 }
+
+resource "dsfhub_log_aggregator" "mssql_s3_bucket" {
+  server_type = "AWS S3"
+  admin_email = var.admin_email
+  asset_display_name = aws_s3_bucket.mssql_audit_bucket.arn
+  asset_id = aws_s3_bucket.mssql_audit_bucket.arn
+  gateway_id = var.gateway_id
+  server_host_name = aws_s3_bucket.mssql_audit_bucket.arn
+  audit_pull_enabled = true
+  parent_asset_id = aws_db_instance.mssql_db.arn
+
+  asset_connection {
+    auth_mechanism = "default"
+    reason = "default"
+  }
+}
 ```
 
 ## Agentless Gateway Permission Dependencies:

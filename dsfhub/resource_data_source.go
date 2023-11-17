@@ -1246,6 +1246,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
 			},
 			"ssl": {
 				Type:        schema.TypeBool,
@@ -1652,6 +1653,7 @@ func resourceDSFDataSourceUpdate(d *schema.ResourceData, m interface{}) error {
 	dsfDataSource := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&dsfDataSource, serverType, d)
+	dsfDataSource.Data.AssetData.AuditPullEnabled = false
 
 	log.Printf("[INFO] Updating DSF data source for serverType: %s and gatewayId: %s assetId: %s\n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, dsfDataSource.Data.AssetData.AssetID)
 	_, err := client.UpdateDSFDataSource(dsfDataSourceId, dsfDataSource)
@@ -1665,14 +1667,22 @@ func resourceDSFDataSourceUpdate(d *schema.ResourceData, m interface{}) error {
 
 	auditPullEnabled := d.Get("audit_pull_enabled").(bool)
 	if auditPullEnabled == true {
-		log.Printf("[INFO] Enabling audit for dsfDataSourceId: %s \n", dsfDataSourceId)
-		_, err := client.EnableAuditDSFDataSource(dsfDataSourceId)
-		if err != nil {
-			log.Printf("[INFO] Error enabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
-			return err
+		wait := 6 * time.Second
+		log.Printf("[INFO] Disabling and enabling audit for DSF data source dsfDataSourceId: %s and gatewayId: %s \n", dsfDataSourceId, dsfDataSource.Data.GatewayID)
+		_, err1 := client.DisableAuditDSFDataSource(dsfDataSourceId)
+		if err1 != nil {
+			log.Printf("[INFO] Error disabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
+			return err1
 		}
+		time.Sleep(wait)
+		_, err2 := client.EnableAuditDSFDataSource(dsfDataSourceId)
+		if err2 != nil {
+			log.Printf("[INFO] Error enabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
+			return err2
+		}
+		time.Sleep(wait)
 	} else if auditPullEnabled == false {
-		log.Printf("[INFO] Creating DSF data source for serverType: %s and gatewayId: %s \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
+		log.Printf("[INFO] Disabling DSF data source for serverType: %s and gatewayId: %s \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
 		_, err := client.DisableAuditDSFDataSource(dsfDataSourceId)
 		if err != nil {
 			log.Printf("[INFO] Error disabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
