@@ -1,19 +1,19 @@
 ---
-subcategory: "Example Modules"
+subcategory: "Example Assets"
 layout: "dsfhub"
 page_title: "AWS RDS POSTGRESQL - Log Group"
 description: |-
   Provides an combined example of creating an AWS RDS POSTGRESQL database, associated option groups enabling audit logs, onboarding to the DSFHUB with IAM permissions for the DSF Agentless Gateway to access.
 ---
 
-# AWS RDS MSSQL Onboarding Template
+# AWS RDS POSTGRESQL Onboarding Template
 
 Provides a module template for creating an AWS RDS POSTGRESQL database, the associated option groups enabling audit logs, creating the [dsfhub_data_source](../r/data_source.md) resource to onboard to the DSFHUB with IAM permissions for the DSF Agentless Gateway.
 
 <details>
-<summary>AWS RDS MSSQL Variables</summary>
+<summary>AWS RDS POSTGRESQL Variables</summary>
 
-## AWS RDS MSSQL Variables
+## AWS RDS POSTGRESQL Variables
 
 ```hcl
 # DSFHUB Provider Required Variables
@@ -192,6 +192,4 @@ The [DSF Agentless Gateway](https://registry.terraform.io/modules/imperva/dsf-ag
 
 <ul>
 <li><a target="_blank" href="aws_iam_kinesis.md">AWS IAM Permissions for Kinesis Streams</a></li>
-<li><a target="_blank" href="aws_iam_log_group.md">AWS IAM Permissions for CloudWatch Log Groups</a></li>
-<li><a target="_blank" href="aws_iam_secrets.md">AWS IAM Permissions for Secret Manager</a></li>
 </ul>

@@ -1,7 +1,7 @@
 ---
-subcategory: ""
+subcategory: "AWS IAM Permissions"
 layout: "dsfhub"
-page_title: "AWS IAM - S3 Bucket"
+page_title: "S3 Bucket"
 description: |-
   AWS IAM permissions for the DSF Agentless Gateway to access logs via AWS S3 Buckets.
 ---

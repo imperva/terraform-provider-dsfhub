@@ -105,12 +105,12 @@ func resourceDSFDataSource() *schema.Resource {
 			// 	Computed:     true,
 			// },
 			"audit_type": {
-				Type:         schema.TypeString,
-				Description:  "Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details",
-				Required:     false,
-				Optional:     true,
-				ValidateFunc: validation.StringInSlice([]string{"COSMOS_TABLE"}, false),
-				Default:      nil,
+				Type:        schema.TypeString,
+				Description: "Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details",
+				Required:    false,
+				Optional:    true,
+				//ValidateFunc: validation.StringInSlice([]string{"COSMOS_TABLE", "COSMOS_TABLE", "COSMOS_TABLE", "COSMOS_TABLE"}, false),
+				Default: nil,
 			},
 			"availability_zones": {
 				Type:        schema.TypeString,
