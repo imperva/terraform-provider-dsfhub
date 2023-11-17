@@ -1,14 +1,14 @@
 ---
 subcategory: "Example Modules"
 layout: "dsfhub"
-page_title: "AWS RDS MSSQL - S3 Bucket"
+page_title: "AWS RDS POSTGRESQL - S3 Bucket"
 description: |-
-  Provides an combined example of creating an AWS RDS MSSQL database, associated option groups enabling audit logs, onboarding to the DSFHUB with IAM permissions for the DSF Agentless Gateway to access.
+  Provides an combined example of creating an AWS RDS POSTGRESQL database, associated option groups enabling audit logs, onboarding to the DSFHUB with IAM permissions for the DSF Agentless Gateway to access.
 ---
 
 # AWS RDS MSSQL Onboarding Template
 
-Provides a module template for creating an AWS RDS MSSQL database, the associated option groups enabling audit logs, creating the [dsfhub_data_source](../r/data_source.md) resource to onboard to the DSFHUB with IAM permissions for the DSF Agentless Gateway.
+Provides a module template for creating an AWS RDS POSTGRESQL database, the associated option groups enabling audit logs, creating the [dsfhub_data_source](../r/data_source.md) resource to onboard to the DSFHUB with IAM permissions for the DSF Agentless Gateway.
 
 <details>
 <summary>AWS RDS MSSQL Variables</summary>
@@ -129,71 +129,51 @@ provider "dsfhub" {
 }
 
 ### AWS Resources ###
-resource "aws_s3_bucket" "mssql_audit_bucket" {
-  bucket_prefix = "mssql-rds-audit-s3-bucket-"
-}
+esource "aws_db_parameter_group" "postgresql_param_group" {
+  name   = var.deployment_name
+  family = "postgres15"
 
-resource "aws_db_option_group" "mssql_option_group" {
-  engine_name              = "sqlserver-ex"
-  major_engine_version     = var.db_major_engine_version
-  name_prefix              = "${var.deployment_name}-option-group"
-  option_group_description = "${var.deployment_name}-option-group"
-
-  option {
-    db_security_group_memberships  = []
-    option_name                    = "SQLSERVER_AUDIT"
-    port                           = 0
-    vpc_security_group_memberships = []
-
-    option_settings {
-      name  = "ENABLE_COMPRESSION"
-      value = "false"
-    }
-    option_settings {
-      name  = "IAM_ROLE_ARN"
-      value = aws_iam_role.mssql_role.arn
-    }
-    option_settings {
-      name  = "S3_BUCKET_ARN"
-      value = aws_s3_bucket.mssql_audit_bucket.arn
-    }
+  parameter {
+    name  = "log_connections"
+    value = "1"
   }
 }
 
-resource "aws_db_instance" "mssql_db" {
+resource "aws_db_instance" "postgresql_db" {
   allocated_storage      = var.db_allocated_storage
-  engine                 = "sqlserver-ex"
+  engine                 = "postgres"
   engine_version         = var.db_engine_version
-  identifier_prefix      = "${var.deployment_name}-"
+  identifier             = lower(var.db_name)
   instance_class         = var.db_instance_class
-  license_model          = "license-included"
-  option_group_name      = aws_db_option_group.mssql_option_group.name
+  license_model          = "postgresql-license"
   skip_final_snapshot    = true
-  storage_type           = "gp2"
 
   # Credentials
   username               = var.db_master_username
   password               = var.db_master_password
 
-  # Network
+  # network
   publicly_accessible    = true
   db_subnet_group_name   = var.db_subnet_group_name
   vpc_security_group_ids = var.vpc_security_group_ids
+
+  # audit
+  enable_cloudwatch_logs_exports = ["postgresql","upgrade"]
+  parameter_group_name   = aws_db_parameter_group.postgresql_param_group.name
 }
 
 # ### DSFHUB Resources ###
-resource "dsfhub_data_source" "rds-mssql-db" {
-  server_type = "MS SQL SERVER"
+resource "dsfhub_data_source" "rds-postgresql-db" {
+  server_type = "AWS RDS POSTGRESQL"
 
   admin_email = var.admin_email
-  asset_display_name  = aws_db_instance.mssql_db.identifier
-  asset_id            = aws_db_instance.mssql_db.arn
+  asset_display_name  = aws_db_instance.postgresql_db.identifier
+  asset_id            = aws_db_instance.postgresql_db.arn
   gateway_id          = var.gateway_id
-  server_host_name    = aws_db_instance.mssql_db.arn
+  server_host_name    = aws_db_instance.postgresql_db.arn
   region              = var.region
-  server_ip           = aws_db_instance.mssql_db.arn
-  server_port         = aws_db_instance.mssql_db.port
-  version             = aws_db_option_group.mssql_option_group.major_engine_version
+  server_port         = aws_db_instance.postgresql_db.port
+  version             = var.engine_version
   parent_asset_id     = var.dsf_cloud_account_asset_id
   audit_pull_enabled  = true
 
@@ -201,7 +181,7 @@ resource "dsfhub_data_source" "rds-mssql-db" {
     auth_mechanism  = "password"
     password        = var.db_master_password
     reason          = "default"
-    username        = aws_db_instance.mssql_db.username
+    username        = var.db_master_username
   }
 }
 ```
