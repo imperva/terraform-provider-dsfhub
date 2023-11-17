@@ -10,7 +10,10 @@ description: |-
 
 Provides a module template for creating an AWS RDS MYSQL database, the associated option groups enabling audit logs, creating the [dsfhub_data_source](../r/data_source.md) and [dsfhub_log_aggregator](../r/log_aggregator.md) records to onboard to the DSFHUB with IAM permissions for the DSF Agentless Gateway.
 
-## Variables
+<details>
+<summary>AWS RDS MYSQL Variables</summary>
+
+## AWS RDS MYSQL Variables
 
 ```hcl
 # DSFHUB Provider Required Variables
@@ -110,6 +113,7 @@ variable "vpc_security_group_ids" {
   default = ["sg-abcde12345"]
 }
 ```
+</details>
 
 ## Providers and Resources
 
@@ -183,6 +187,7 @@ resource "dsfhub_data_source" "rds-mysql-db" {
   server_port         = aws_db_instance.mysql_db.port
   version             = aws_db_option_group.mysql_option_group.major_engine_version
   parent_asset_id     = var.dsf_cloud_account_asset_id
+  audit_pull_enabled  = true
 
   asset_connection {
     auth_mechanism  = "password"

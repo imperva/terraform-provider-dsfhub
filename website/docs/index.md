@@ -40,6 +40,8 @@ provider "dsfhub" {
 
 ## Example Usage - dsfhub_cloud_account
 
+The following is an example of creating a  [dsfhub_cloud_account](../r/cloud_account.md) resource used in this example to connect the DSFHUB to an AWS account. 
+
 ```hcl
 # Example generic variable reference:
 variable "admin_email" {
@@ -78,6 +80,8 @@ resource "dsfhub_cloud_account" "example_aws_cloud_account" {
 
 ## Example Usage - dsfhub_data_source
 
+The following is an example of creating a  [dsfhub_data_source](../r/data_source.md) resource used to describe the database asset for the agentless gateway to consume audit from. The `dsfhub_cloud_account.asset_id` is referenced in the `dsfhub_data_source.parent_asset_id` param. 
+
 ```hcl
 # Example dsfhub_data_source specific variables for AWS RDS MYSQL
 variable "data_source_aws_rds_mysql_asset_display_name" {
@@ -115,6 +119,8 @@ resource "dsfhub_data_source" "aws_rds_mysql_password" {
 ```
 
 ## Example Usage - dsfhub_log_aggregator
+
+The following is an example of creating a [dsfhub_log_aggregator](../r/log_aggregator.md) resource used as the mechanism for the agentless gateway to consume audit data in this case via `AWS LOG GROUP`. The `dsfhub_data_source.asset_id` is referenced in the `dsfhub_log_aggregator.parent_asset_id` param.
 
 ```hcl
 # Example dsfhub_log_aggregator specific variables for AWS LOG GROUP
