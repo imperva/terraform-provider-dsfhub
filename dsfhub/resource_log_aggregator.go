@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"log"
+	"time"
 )
 
 func resourceLogAggregator() *schema.Resource {
@@ -56,6 +57,14 @@ func resourceLogAggregator() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+			},
+			"audit_pull_enabled": {
+				Type:        schema.TypeBool,
+				Description: "If true, sonargateway will collect the audit logs for this system if it can.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+				Computed:    true,
 			},
 			"available_regions": {
 				Type:        schema.TypeString,
@@ -386,6 +395,14 @@ func resourceLogAggregator() *schema.Resource {
 				Description: "The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'",
 				Required:    true,
 			},
+			"gateway_service": {
+				Type:        schema.TypeString,
+				Description: "The name of the gateway pull service (if any) used to retrieve logs for this source. Usually set by the connect gateway playbook.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+				Computed:    true,
+			},
 			"jsonar_uid": {
 				Type:        schema.TypeString,
 				Description: "Unique identifier (UID) attached to the Sonar machine controlling the asset",
@@ -539,6 +556,26 @@ func resourceLogAggregatorCreate(d *schema.ResourceData, m interface{}) error {
 	logAggregatorId := createLogAggregatorResponse.Data.ID
 	d.SetId(logAggregatorId)
 
+	auditPullEnabled := d.Get("audit_pull_enabled").(bool)
+	parentAssetId := d.Get("parent_asset_id")
+	if parentAssetId != nil && auditPullEnabled == true {
+		wait := 6 * time.Second
+		parentAssetId := d.Get("parent_asset_id").(string)
+		log.Printf("[INFO] Disabling and enabling audit for DSF data source parentAssetId: %s \n", parentAssetId)
+		_, err1 := client.DisableAuditDSFDataSource(parentAssetId)
+		if err1 != nil {
+			log.Printf("[INFO] Error disabling audit for parentAssetId: %s\n", parentAssetId)
+			return err1
+		}
+		time.Sleep(wait)
+		_, err2 := client.EnableAuditDSFDataSource(parentAssetId)
+		if err2 != nil {
+			log.Printf("[INFO] Error enabling audit for parentAssetId: %s\n", parentAssetId)
+			return err2
+		}
+		time.Sleep(wait)
+	}
+
 	// Set the rest of the state from the resource read
 	return resourceLogAggregatorRead(d, m)
 }
@@ -568,10 +605,12 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("asset_display_name", logAggregatorReadResponse.Data.AssetData.AssetDisplayName)
 	d.Set("asset_id", logAggregatorReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", logAggregatorReadResponse.Data.AssetData.AssetSource)
+	d.Set("audit_pull_enabled", logAggregatorReadResponse.Data.AssetData.AuditPullEnabled)
 	d.Set("available_regions", logAggregatorReadResponse.Data.AssetData.AvailableRegions)
 	d.Set("credential_endpoint", logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint)
 	d.Set("criticality", logAggregatorReadResponse.Data.AssetData.Criticality)
 	d.Set("gateway_id", logAggregatorReadResponse.Data.GatewayID)
+	d.Set("gateway_service", logAggregatorReadResponse.Data.AssetData.GatewayService)
 	d.Set("jsonar_uid", logAggregatorReadResponse.Data.AssetData.JsonarUID)
 	d.Set("location", logAggregatorReadResponse.Data.AssetData.Location)
 	d.Set("managed_by", logAggregatorReadResponse.Data.AssetData.ManagedBy)

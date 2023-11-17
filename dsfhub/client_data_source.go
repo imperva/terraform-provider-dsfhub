@@ -146,3 +146,61 @@ func (c *Client) DeleteDSFDataSource(dataSourceId string) (*ResourceResponse, er
 
 	return &deleteDSFDataSourceResponse, nil
 }
+
+// EnableAuditDSFDataSource enables logging for a DSF data source
+func (c *Client) EnableAuditDSFDataSource(dataSourceId string) (*UpdateAuditResponse, error) {
+	log.Printf("[INFO] Enabling audit for dataSourceId: %v\n", dataSourceId)
+
+	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s/operations/enable-audit-collection", url.QueryEscape(dataSourceId))
+	resp, err := c.MakeCall(http.MethodPost, reqURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error enabling audit for dataSourceId: %s | err: %s\n", dataSourceId, err)
+	}
+
+	// Read the body
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+
+	// Dump JSON
+	log.Printf("[DEBUG] Enable audit for DSFDataSource '%v' JSON response: %s\n", dataSourceId, string(responseBody))
+
+	// Parse the JSON
+	var enableAuditResponse UpdateAuditResponse
+	err = json.Unmarshal([]byte(responseBody), &enableAuditResponse)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing enable audit DSFDataSource JSON response dataSourceId: %s | err: %s\n", dataSourceId, err)
+	}
+	if enableAuditResponse.Errors != nil {
+		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
+	}
+	return &enableAuditResponse, nil
+}
+
+// DisableAuditDSFDataSource enables logging for a DSF data source
+func (c *Client) DisableAuditDSFDataSource(dataSourceId string) (*UpdateAuditResponse, error) {
+	log.Printf("[INFO] Disabling audit for dataSourceId: %v\n", dataSourceId)
+
+	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s/operations/disable-audit-collection", url.QueryEscape(dataSourceId))
+	resp, err := c.MakeCall(http.MethodPost, reqURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error disabling audit for dataSourceId: %s | err: %s\n", dataSourceId, err)
+	}
+
+	// Read the body
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+
+	// Dump JSON
+	log.Printf("[DEBUG] Disable audit for DSFDataSource '%v' JSON response: %s\n", dataSourceId, string(responseBody))
+
+	// Parse the JSON
+	var disableAuditResponse UpdateAuditResponse
+	err = json.Unmarshal([]byte(responseBody), &disableAuditResponse)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing disable audit DSFDataSource JSON response dataSourceId: %s | err: %s\n", dataSourceId, err)
+	}
+	if disableAuditResponse.Errors != nil {
+		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
+	}
+	return &disableAuditResponse, nil
+}

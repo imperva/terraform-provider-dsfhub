@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"log"
+	"time"
 )
 
 func resourceDSFDataSource() *schema.Resource {
@@ -93,8 +94,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Description: "If true, sonargateway will collect the audit logs for this system if it can.",
 				Required:    false,
 				Optional:    true,
-				Default:     nil,
-				Computed:    true,
+				Default:     true,
 			},
 			// "audit_state": {
 			// 	Type:         schema.TypeString,
@@ -1090,6 +1090,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
 			},
 			"log_bucket_id": {
 				Type:        schema.TypeString,
@@ -1104,6 +1105,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
 			},
 			"managed_by": {
 				Type:        schema.TypeString,
@@ -1307,7 +1309,7 @@ func resourceDSFDataSourceCreate(d *schema.ResourceData, m interface{}) error {
 	dsfDataSource := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&dsfDataSource, serverType, d)
-
+	dsfDataSource.Data.AssetData.AuditPullEnabled = false
 	log.Printf("[INFO] Creating DSF data source for serverType: %s and gatewayId: %s \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
 	dsfDataSourceResponse, err := client.CreateDSFDataSource(dsfDataSource)
 
@@ -1318,6 +1320,31 @@ func resourceDSFDataSourceCreate(d *schema.ResourceData, m interface{}) error {
 
 	dsfDataSourceId := dsfDataSourceResponse.Data.AssetData.AssetID
 	d.SetId(dsfDataSourceId)
+
+	auditPullEnabled := d.Get("audit_pull_enabled").(bool)
+	if auditPullEnabled == true {
+		wait := 6 * time.Second
+		log.Printf("[INFO] Disabling and enabling audit for DSF data source dsfDataSourceId: %s and gatewayId: %s \n", dsfDataSourceId, dsfDataSource.Data.GatewayID)
+		_, err1 := client.DisableAuditDSFDataSource(dsfDataSourceId)
+		if err1 != nil {
+			log.Printf("[INFO] Error disabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
+			return err1
+		}
+		time.Sleep(wait)
+		_, err2 := client.EnableAuditDSFDataSource(dsfDataSourceId)
+		if err2 != nil {
+			log.Printf("[INFO] Error enabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
+			return err2
+		}
+		time.Sleep(wait)
+	} else if auditPullEnabled == false {
+		log.Printf("[INFO] Disabling DSF data source for serverType: %s and gatewayId: %s \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
+		_, err := client.DisableAuditDSFDataSource(dsfDataSourceId)
+		if err != nil {
+			log.Printf("[INFO] Error disabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
+			return err
+		}
+	}
 
 	// Set the rest of the state from the resource read
 	return resourceDSFDataSourceRead(d, m)
@@ -1636,6 +1663,23 @@ func resourceDSFDataSourceUpdate(d *schema.ResourceData, m interface{}) error {
 
 	d.SetId(dsfDataSourceId)
 
+	auditPullEnabled := d.Get("audit_pull_enabled").(bool)
+	if auditPullEnabled == true {
+		log.Printf("[INFO] Enabling audit for dsfDataSourceId: %s \n", dsfDataSourceId)
+		_, err := client.EnableAuditDSFDataSource(dsfDataSourceId)
+		if err != nil {
+			log.Printf("[INFO] Error enabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
+			return err
+		}
+	} else if auditPullEnabled == false {
+		log.Printf("[INFO] Creating DSF data source for serverType: %s and gatewayId: %s \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
+		_, err := client.DisableAuditDSFDataSource(dsfDataSourceId)
+		if err != nil {
+			log.Printf("[INFO] Error disabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
+			return err
+		}
+	}
+
 	// Set the rest of the state from the resource read
 	return resourceDSFDataSourceRead(d, m)
 }
@@ -1652,62 +1696,6 @@ func resourceDSFDataSourceDelete(d *schema.ResourceData, m interface{}) error {
 	}
 	return nil
 }
-
-//func dsCheckRequiredFields(d *schema.ResourceData) (bool, error) {
-//	missingParams := []string{}
-//	var requiredFields RequiredFieldsMap
-//	err := json.Unmarshal([]byte(requiredDataSourceFieldsJson), &requiredFields)
-//	if err != nil {
-//		log.Printf("[DEBUG] json.Unmarshal([]byte(requiredFieldsJson), &requiredFields) %s:\n", err)
-//		panic(err)
-//	}
-//
-//	serverType := d.Get("server_type").(string)
-//	serverTypeObj, found := requiredFields.ServerType[serverType]
-//	if !found {
-//		return false, fmt.Errorf("[DEBUG] Unsupported serverType: %s\n", serverType)
-//	}
-//	for _, field := range serverTypeObj.Required {
-//		curField := d.Get(field)
-//		log.Printf("[DEBUG] Checking for field: '%s', value: '%s' reflect.TypeOf() '%s' '%s'\n", field, curField, reflect.ValueOf(d.Get(field)))
-//		if _, ok := d.GetOk(field); !ok {
-//			if _, found := ignoreDataSourceParamsByServerType[serverType][field]; !found {
-//				missingParams = append(missingParams, field)
-//				log.Printf("[DEBUG] ERROR: Missing required field '%s' for serverType '%s'\n", field, serverType)
-//			} else {
-//				log.Printf("[INFO] Ignoring missing required field '%s' for serverType '%s'\n", field, serverType)
-//			}
-//		}
-//	}
-//
-//	connections := d.Get("asset_connection").(*schema.Set)
-//	for _, conn := range connections.List() {
-//		connection := conn.(map[string]interface{})
-//		authMechanism := connection["auth_mechanism"].(string)
-//		log.Printf("[DEBUG] Checking for authMechanism: %s\n", authMechanism)
-//		authMechanismFields, found := serverTypeObj.AuthMechanisms[authMechanism]
-//		if !found {
-//			return false, fmt.Errorf("[DEBUG] Unsupported authMechanism '%s' for serverType '%s', %s\n", authMechanism, serverType)
-//		}
-//		for _, field := range authMechanismFields {
-//			log.Printf("[DEBUG] Checking for field: '%s', value: '%s'\n", field, connection[field])
-//			val := fmt.Sprintf("%v", connection[field])
-//			if _, found := connection[field]; !found || strings.Trim(val, " ") == "" {
-//				if _, found := ignoreDataSourceParamsByServerType[serverType][field]; !found {
-//					missingParams = append(missingParams, field)
-//					log.Printf("[DEBUG] Missing required connection field '%s' for serverType '%s' with auth_mechanism '%s'\n", field, serverType, authMechanism)
-//				} else {
-//					log.Printf("[INFO] Ignoring missing required connection field '%s' for serverType '%s' with auth_mechanism '%s'\n", field, serverType, authMechanism)
-//				}
-//			}
-//		}
-//	}
-//	if len(missingParams) > 0 {
-//		return false, fmt.Errorf("[DEBUG] Missing required fields for dsf_data_source with serverType '%s', missing fields: %s\n", serverType, "\""+strings.Join(missingParams, ", ")+"\"")
-//	} else {
-//		return true, nil
-//	}
-//}
 
 func resourceDataSourceConnectionHash(v interface{}) int {
 	var buf bytes.Buffer

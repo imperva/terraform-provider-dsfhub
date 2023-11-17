@@ -311,7 +311,8 @@ func resourceCloudAccount() *schema.Resource {
 						"reason": {
 							Type:         schema.TypeString,
 							Description:  "N/A",
-							Required:     true,
+							Required:     false,
+							Optional:     true,
 							ValidateFunc: validation.StringInSlice([]string{"default"}, false),
 						},
 						"region": {

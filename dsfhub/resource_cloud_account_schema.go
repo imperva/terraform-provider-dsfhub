@@ -55,27 +55,21 @@ var requiredCloudAccountJson = `{
         "AWS": {
             "auth_mechanisms": {
                 "default": [
-                    "reason",
                     "region",
                     "reason"
                 ],
                 "iam_role": [
-                    "reason",
-                    "region",
-                    "reason"
-                ],
+				],
                 "key": [
                     "reason",
                     "region",
-                    "reason",
                     "access_id",
                     "secret_key"
                 ],
                 "profile": [
                     "reason",
                     "username",
-                    "region",
-                    "reason"
+                    "region"
                 ]
             },
             "required": [
