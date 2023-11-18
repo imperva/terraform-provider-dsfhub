@@ -1,14 +1,14 @@
 ---
 subcategory: "Example Assets"
 layout: "dsfhub"
-page_title: "AWS RDS POSTGRESQL - Log Group"
+page_title: "AWS RDS ORACLE - ODBC"
 description: |-
-  Provides an combined example of creating an AWS RDS POSTGRESQL database, associated option groups enabling audit logs, onboarding to the DSFHUB with IAM permissions for the DSF Agentless Gateway to access.
+  Provides an combined example of creating an AWS RDS ORACLE database, associated option groups enabling audit logs, and onboarding to the DSFHUB.
 ---
 
 # AWS RDS Oracle Onboarding Template
 
-Provides a module template for creating an AWS RDS Oracle database, the associated option groups enabling audit logs, creating the [dsfhub_data_source](../r/data_source.md) resource to onboard to the DSFHUB with IAM permissions for the DSF Agentless Gateway.
+Provides a module template for creating an AWS RDS Oracle database, the associated option groups enabling audit logs, creating the [dsfhub_data_source](../r/data_source.md) resource to onboard to the DSFHUB a SQL script to create a user for the DSF Agentless Gateway to retrieve logs from the database via ODBC connection.
 
 <details>
 <summary>AWS RDS Oracle Variables</summary>
@@ -241,7 +241,32 @@ resource "null_resource" "upload-script" {
     destination = "/tmp/configure_database.sh"
   }
 }
+```
 
+## Script to create dsf database user, and remotely execute
+
+The following script is remotely executed through the agentless gateway against the Oracle server to create the user that is used to retrieve database logs via ODBC connection.  Create the `configure_database.sh` file in the same directory that terraform is being executed from, or you can execute this separately o the database to create this user. 
+
+```hcl
+#!/usr/bin/env bash
+#sudo su - sonarw
+source /etc/sysconfig/jsonar
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${JSONAR_BASEDIR}/lib:${JSONAR_BASEDIR}/lib64:${JSONAR_LOCALDIR}/lib
+
+${JSONAR_BASEDIR}/bin/isql -v -k "Driver=${JSONAR_BASEDIR}/lib/libsqora.so; DBQ=$ORACLE_HOSTNAME/$ORACLE_SID; UID=$ADMIN_USER; Pwd=$ADMIN_PASSWORD" << EOF
+CREATE USER $DB_USER IDENTIFIED BY $DB_PASSWORD;
+GRANT CREATE SESSION TO $DB_USER;
+CREATE AUDIT POLICY $POLICY_NAME ACTIONS ALL ONLY TOPLEVEL;
+AUDIT POLICY $POLICY_NAME;
+EOF
+# ${JSONAR_BASEDIR}/bin/isql -v -k "Driver=${JSONAR_BASEDIR}/lib/libsqora.so; DBQ=$ORACLE_HOSTNAME/$ORACLE_SID; UID=$ADMIN_USER; Pwd=$ADMIN_PASSWORD" << EOF
+# .i ./create_purge.sql
+EOF
+```
+
+The following null_resource.remote-execute resource remote executes the script to create the db user.
+
+```hcl
 # ### null_resource used to run database script to create user for dsf to consume logs ###
 resource "null_resource" "remote-execute" {
   depends_on = [null_resource.upload-script]
@@ -270,7 +295,13 @@ resource "null_resource" "remote-execute" {
     ]
   }
 }
+```
 
+## dsfhub_data_source resource for AWS RDS ORACLE
+
+The following is an example of the dsfhub_data_source resource used to onboard the Oracle database to the DSFHUB.
+
+```hcl
 # ### DSFHUB Resources ###
 resource "dsfhub_data_source" "aws_rds_oracle" {
   depends_on = [null_resource.remote-execute]
@@ -294,5 +325,50 @@ resource "dsfhub_data_source" "aws_rds_oracle" {
     username = var.db_audit_username
   }
 }
-
 ```
+
+<details>
+<summary>Create Audit Purge Jobs on Oracle Server</summary>
+
+The following SQL is an example of creating audit purge jobs on the oracle database server.
+
+```hcl
+/* Create audit purge job */
+BEGIN
+DBMS_SCHEDULER.create_job (
+job_name => 'SET_LAST_ARCHIVE_TIME',
+job_type => 'PLSQL_BLOCK',
+job_action => 'BEGIN
+DBMS_AUDIT_MGMT.SET_LAST_ARCHIVE_TIMESTAMP(
+audit_trail_type => DBMS_AUDIT_MGMT.AUDIT_TRAIL_UNIFIED,
+/* Change this value to set a different archive timestamp */
+last_archive_time => sysdate-30
+);
+END;',
+start_date => SYSTIMESTAMP,
+/* Update frequency as needed */
+repeat_interval => 'freq=daily; byhour=0; byminute=0; bysecond=0;',
+end_date => NULL,
+enabled => TRUE,
+comments => 'last archive time.');
+END;
+/
+BEGIN
+DBMS_AUDIT_MGMT.SET_LAST_ARCHIVE_TIMESTAMP(
+audit_trail_type => DBMS_AUDIT_MGMT.AUDIT_TRAIL_UNIFIED,
+/* Change this value to set a different archive timestamp */
+last_archive_time => sysdate-30
+);
+END;
+/
+BEGIN
+DBMS_AUDIT_MGMT.CREATE_PURGE_JOB(
+audit_trail_type            =>  DBMS_AUDIT_MGMT.AUDIT_TRAIL_UNIFIED,
+audit_trail_purge_interval  =>  24 /* hours */,
+audit_trail_purge_name      =>  'SCHEDULED_AUDIT_PURGE',
+use_last_arch_timestamp     =>  TRUE
+);
+END;
+/
+```
+</details>
