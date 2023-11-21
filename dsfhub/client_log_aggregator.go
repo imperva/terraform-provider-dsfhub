@@ -49,7 +49,7 @@ func (c *Client) CreateLogAggregator(logAggregator ResourceWrapper) (*ResourceWr
 func (c *Client) ReadLogAggregator(logAggregatorId string) (*ResourceWrapper, error) {
 	log.Printf("[INFO] Getting LogAggregator for logAggregatorId: %s)\n", logAggregatorId)
 
-	reqURL := fmt.Sprintf(endpointLogAggregators+"/%s", url.QueryEscape(logAggregatorId))
+	reqURL := fmt.Sprintf(endpointLogAggregators+"/%s", url.PathEscape(logAggregatorId))
 	resp, err := c.MakeCall(http.MethodGet, reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error reading LogAggregator for logAggregatorId: %s | err: %s\n", logAggregatorId, err)
@@ -85,7 +85,7 @@ func (c *Client) UpdateLogAggregator(logAggregatorId string, logAggregatorData R
 		return nil, fmt.Errorf("failed to JSON marshal logAggregator: %s", err)
 	}
 
-	reqURL := fmt.Sprintf(endpointLogAggregators+"/%s", url.QueryEscape(logAggregatorId))
+	reqURL := fmt.Sprintf(endpointLogAggregators+"/%s", url.PathEscape(logAggregatorId))
 	resp, err := c.MakeCall(http.MethodPut, reqURL, logAggregatorJSON)
 	if err != nil {
 		return nil, fmt.Errorf("error updating LogAggregator with logAggregatorId: %s | err: %s\n", logAggregatorId, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateLogAggregator(logAggregatorId string, logAggregatorData R
 func (c *Client) DeleteLogAggregator(logAggregatorId string) (*ResourceResponse, error) {
 	log.Printf("[INFO] Deleting LogAggregator with logAggregatorId: %s\n", logAggregatorId)
 
-	reqURL := fmt.Sprintf(endpointLogAggregators+"/%s", url.QueryEscape(logAggregatorId))
+	reqURL := fmt.Sprintf(endpointLogAggregators+"/%s", url.PathEscape(logAggregatorId))
 	resp, err := c.MakeCall(http.MethodDelete, reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting LogAggregator for logAggregatorId: %s, %s\n", logAggregatorId, err)

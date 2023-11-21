@@ -258,7 +258,7 @@ func TestClientReadLogAggregatorBadJSON(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientAddLogAggregatorBadJSON \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		if req.URL.String() != endpoint {
@@ -318,7 +318,7 @@ func TestClientReadLogAggregatorValidLogAggregatorId(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientReadLogAggregatorValidLogAggregatorId \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)
@@ -380,7 +380,7 @@ func TestClientUpdateLogAggregatorBadJSON(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientUpdateLogAggregatorBadJSON \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		if req.URL.String() != endpoint {
@@ -422,7 +422,7 @@ func TestClientUpdateLogAggregatorInvalidLogAggregator(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientUpdateLogAggregatorInvalidLogAggregator \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(404)
@@ -466,7 +466,7 @@ func TestClientUpdateLogAggregatorValid(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientAddLogAggregatorValid \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)
@@ -562,7 +562,7 @@ func TestClientDeleteLogAggregatorValidLogAggregatorId(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientDeleteLogAggregatorValidLogAggregatorId \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointLogAggregators + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)

@@ -259,7 +259,7 @@ func TestClientReadCloudAccountBadJSON(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientAddCloudAccountBadJSON \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		if req.URL.String() != endpoint {
@@ -319,7 +319,7 @@ func TestClientReadCloudAccountValidCloudAccountId(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientReadCloudAccountValidCloudAccountId \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)
@@ -381,7 +381,7 @@ func TestClientUpdateCloudAccountBadJSON(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientUpdateCloudAccountBadJSON \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		if req.URL.String() != endpoint {
@@ -423,7 +423,7 @@ func TestClientUpdateCloudAccountInvalidCloudAccount(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientUpdateCloudAccountInvalidCloudAccount \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(404)
@@ -467,7 +467,7 @@ func TestClientUpdateCloudAccountValid(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientAddCloudAccountValid \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)
@@ -563,7 +563,7 @@ func TestClientDeleteCloudAccountValidCloudAccountId(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientDeleteCloudAccountValidCloudAccountId \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointCloudAccounts + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)

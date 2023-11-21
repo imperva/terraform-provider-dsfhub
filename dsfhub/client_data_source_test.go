@@ -258,7 +258,7 @@ func TestClientReadDSFDataSourceBadJSON(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientAddDSFDataSourceBadJSON \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		if req.URL.String() != endpoint {
@@ -318,7 +318,7 @@ func TestClientReadDSFDataSourceValidDSFDataSourceId(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientReadDSFDataSourceValidDSFDataSourceId \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)
@@ -380,7 +380,7 @@ func TestClientUpdateDSFDataSourceBadJSON(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientUpdateDSFDataSourceBadJSON \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		if req.URL.String() != endpoint {
@@ -422,7 +422,7 @@ func TestClientUpdateDSFDataSourceInvalidDSFDataSource(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientUpdateDSFDataSourceInvalidDSFDataSource \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(404)
@@ -466,7 +466,7 @@ func TestClientUpdateDSFDataSourceValid(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientAddDSFDataSourceValid \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)
@@ -562,7 +562,7 @@ func TestClientDeleteDSFDataSourceValidDataSourceId(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientDeleteDSFDataSourceValidDataSourceId \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.QueryEscape(testArn))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointDsfDataSource + "/" + url.PathEscape(testArn))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)

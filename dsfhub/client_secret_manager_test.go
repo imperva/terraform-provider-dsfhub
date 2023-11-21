@@ -307,7 +307,7 @@ func TestClientReadSecretManagerBadJSON(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientReadSecretManagerBadJSON \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.QueryEscape(testSMAssetId))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.PathEscape(testSMAssetId))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		if req.URL.String() != endpoint {
@@ -367,7 +367,7 @@ func TestClientReadSecretManagerValidSecretManager(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientReadSecretManagerValidSecretManager \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.QueryEscape(testSMAssetId))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.PathEscape(testSMAssetId))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)
@@ -438,7 +438,7 @@ func TestClientUpdateSecretManagerBadJSON(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientUpdateSecretManagerBadJSON \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.QueryEscape(testSMAssetId))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.PathEscape(testSMAssetId))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		if req.URL.String() != endpoint {
@@ -489,7 +489,7 @@ func TestClientUpdateSecretManagerInvalidSecretManager(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientUpdateSecretManagerInvalidSecretManager \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.QueryEscape(testSMAssetId))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.PathEscape(testSMAssetId))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(404)
@@ -542,7 +542,7 @@ func TestClientUpdateSecretManagerValid(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientUpdateSecretManagerValid \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.QueryEscape(testSMAssetId))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.PathEscape(testSMAssetId))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)
@@ -647,7 +647,7 @@ func TestClientDeleteSecretManagerValidSecretManagerId(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientDeleteSecretManagerValidSecretManagerId \n")
 	DSFHUBToken := "foo"
-	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.QueryEscape(testSMAssetId))
+	endpoint := fmt.Sprint(baseAPIPrefix + endpointSecretManagers + "/" + url.PathEscape(testSMAssetId))
 
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)
