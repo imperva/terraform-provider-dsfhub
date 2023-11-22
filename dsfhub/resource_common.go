@@ -17,10 +17,13 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 	structDataFieldKeys := reflect.ValueOf(&dsfDataSource.Data).Elem()
 	for i := 0; i < structDataFieldsAry.NumField(); i++ {
 		curStructField := structDataFieldsAry.Type().Field(i)
+		log.Printf("[DEBUG] checking for Data field in assetSchema: %v\n", curStructField.Name)
 		if schemaField, found := assetSchema.Details[curStructField.Name]; found {
+			log.Printf("[DEBUG] Data field curStructField.Name '%v' present in assetSchema\n", curStructField.Name)
 			if curStructField.Name != "AssetData" {
 				//Check to see if field value is set in tf input
 				if _, found := d.GetOk(schemaField.ID); found {
+					log.Printf("[DEBUG] Get schema Data field by schemaField.ID (%v)\n", schemaField.ID)
 					structField := structDataFieldKeys.FieldByName(curStructField.Name)
 					populateStructField(&structField, schemaField, d)
 				} else {
@@ -37,11 +40,14 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 	structAssetDataFieldKeys := reflect.ValueOf(&dsfDataSource.Data.AssetData).Elem()
 	for i := 0; i < structAssetDataFieldsAry.NumField(); i++ {
 		curStructField := structAssetDataFieldsAry.Type().Field(i)
+		log.Printf("[DEBUG] checking for field in assetSchema: %v\n", curStructField.Name)
 		if schemaField, found := assetSchema.Details[curStructField.Name]; found {
+			log.Printf("[DEBUG] field curStructField.Name '%v' present in assetSchema\n", curStructField.Name)
 			if curStructField.Name != "Connections" {
 				//Check to see if field value is set in tf input
 				if _, found := d.GetOk(schemaField.ID); found {
 					structField := structAssetDataFieldKeys.FieldByName(curStructField.Name)
+					log.Printf("[DEBUG] Get schema field by schemaField.ID (%v)\n", schemaField.ID)
 					if structField.Kind() == reflect.Ptr {
 						switch schemaField.ID {
 						case "audit_info":
@@ -78,7 +84,12 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 							}
 						}
 					} else {
-						populateStructField(&structField, schemaField, d)
+						if schemaField.ID == "server_port" {
+							log.Printf("[DEBUG] Setting AssetData server_port interface as string (%v)\n", schemaField.ID)
+							dsfDataSource.Data.AssetData.ServerPort = d.Get("server_port").(string)
+						} else {
+							populateStructField(&structField, schemaField, d)
+						}
 					}
 				} else {
 					log.Printf("[DEBUG] Unknown type for AssetData field d.GetOk(%v)\n", schemaField.ID)
@@ -332,22 +343,30 @@ func populateStructField(structField *reflect.Value, schemaField SchemaField, d 
 			switch structField.Kind() {
 			case reflect.Int:
 				value := d.Get(schemaField.ID).(int)
+				log.Printf("[DEBUG] populateStructField value for schemaField.ID: %v int '%v' Type:%v\n", schemaField.ID, value, reflect.TypeOf(value))
 				structField.SetInt(int64(value))
 			case reflect.Float64:
 				value := d.Get(schemaField.ID).(float64)
+				log.Printf("[DEBUG] populateStructField value for schemaField.ID: %v float64 '%v' Type:%v\n", schemaField.ID, value, reflect.TypeOf(value))
 				structField.SetFloat(value)
 			case reflect.String:
 				value := d.Get(schemaField.ID).(string)
+				log.Printf("[DEBUG] populateStructField value for schemaField.ID: %v string '%v' Type:%v\n", schemaField.ID, value, reflect.TypeOf(value))
 				structField.SetString(value)
 			case reflect.Bool:
 				value := d.Get(schemaField.ID).(bool)
+				log.Printf("[DEBUG] populateStructField value for schemaField.ID: %v bool '%v' Type:%v\n", schemaField.ID, value, reflect.TypeOf(value))
 				structField.SetBool(value)
+			//case reflect.Interface:
+			//	value := d.Get(schemaField.ID).(string)
+			//	log.Printf("[DEBUG] reflect.Interface %v Type:%v\n", schemaField.ID, reflect.TypeOf(value))
+			//	structField.SetString(string(value))
 			//case reflect.Slice:
 			//	// Handle slices or arrays here
 			//case reflect.Map:
 			//	// Handle maps here
 			default:
-				log.Printf("[DEBUG] Unknown type for field schemaField.ID:%v Type:%v\n", schemaField.ID, structField.Kind())
+				log.Printf("[DEBUG] populateStructField unknown type for field schemaField.ID:%v Type:%v\n", schemaField.ID, structField.Kind())
 			}
 		} else {
 			log.Printf("[DEBUG] Schema field can not be set, !structField.CanSet(): %v ", schemaField.ID)

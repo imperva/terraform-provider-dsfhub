@@ -173,6 +173,27 @@ func resourceLogAggregator() *schema.Resource {
 							Required:     true,
 							ValidateFunc: validation.StringInSlice([]string{"default", "service_account", "azure_ad", "kerberos"}, false),
 						},
+						"azure_storage_account": {
+							Type:        schema.TypeString,
+							Description: "The name of the unique namespace where the EventHub is located. The field can contain only lowercase letters and numbers. Name must be between 3 and 24 characters.",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"azure_storage_container": {
+							Type:        schema.TypeString,
+							Description: "Location where a given EventHub\u2019s processing is stored (One storage container per EventHub). This name may only contain lowercase letters, numbers, and hyphens, and must begin with a letter or a number. Each hyphen must be preceded and followed by a non-hyphen character. The name must also be between 3 and 63 characters long.",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"azure_storage_secret_key": {
+							Type:        schema.TypeString,
+							Description: "Azure Storage Secret Key",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
 						"ca_certs_path": {
 							Type:        schema.TypeString,
 							Description: "Certificate authority certificates path; what location should the sysetm look for certificate information from. Equivalent to --capath in a curl call",
@@ -259,7 +280,42 @@ func resourceLogAggregator() *schema.Resource {
 							Optional:    true,
 							Default:     nil,
 						},
+						"eventhub_access_key": {
+							Type:        schema.TypeString,
+							Description: "Eventhub Access Key",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"eventhub_access_policy": {
+							Type:        schema.TypeString,
+							Description: "EventHub Access Policy",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"eventhub_name": {
+							Type:        schema.TypeString,
+							Description: "EventHub Namespace",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"eventhub_namespace": {
+							Type:        schema.TypeString,
+							Description: "The name for the management container that the EventHub belongs to, one namespace can contain multiple EventHubs. The namespace can contain only letters, numbers, and hyphens. The namespace must start with a letter, and it must end with a letter or number. The value must be between 6 and 50 characters long.",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
 						"external_id": {
+							Type:        schema.TypeString,
+							Description: "External ID to use when assuming a role",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"format": {
 							Type:        schema.TypeString,
 							Description: "External ID to use when assuming a role",
 							Required:    false,
@@ -496,6 +552,7 @@ func resourceLogAggregator() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
 			},
 			"service_endpoints": {
 				Type:        schema.TypeSet,
@@ -545,7 +602,7 @@ func resourceLogAggregatorCreate(d *schema.ResourceData, m interface{}) error {
 	serverType := d.Get("server_type").(string)
 	createResource(&logAggregator, serverType, d)
 
-	log.Printf("[INFO] Creating LogAggregator for serverType: %s and gatewayId: %s\n", serverType, logAggregator.Data.GatewayID)
+	log.Printf("[INFO] Creating LogAggregator for serverType: %s and gatewayId: %s\n", logAggregator.Data.ServerType, logAggregator.Data.GatewayID)
 	createLogAggregatorResponse, err := client.CreateLogAggregator(logAggregator)
 
 	if err != nil {
@@ -655,11 +712,19 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 		connection["access_key"] = v.ConnectionData.AccessKey
 		connection["application_id"] = v.ConnectionData.ApplicationID
 		connection["auth_mechanism"] = v.ConnectionData.AuthMechanism
+		connection["azure_storage_account"] = v.ConnectionData.AzureStorageAccount
+		connection["azure_storage_container"] = v.ConnectionData.AzureStorageContainer
+		connection["azure_storage_secret_key"] = v.ConnectionData.AzureStorageSecretKey
 		connection["ca_certs_path"] = v.ConnectionData.CaCertsPath
 		connection["client_secret"] = v.ConnectionData.ClientSecret
 		connection["cyberark_secret"] = v.ConnectionData.CyberarkSecret
 		connection["directory_id"] = v.ConnectionData.DirectoryID
+		connection["eventhub_access_key"] = v.ConnectionData.EventhubAccessKey
+		connection["eventhub_access_policy"] = v.ConnectionData.EventhubAccessPolicy
+		connection["eventhub_name"] = v.ConnectionData.EventhubName
+		connection["eventhub_namespace"] = v.ConnectionData.EventhubNamespace
 		connection["external_id"] = v.ConnectionData.ExternalID
+		connection["format"] = v.ConnectionData.Format
 		connection["hashicorp_secret"] = v.ConnectionData.HashicorpSecret
 		connection["key_file"] = v.ConnectionData.KeyFile
 		connection["reason"] = v.Reason
@@ -778,6 +843,18 @@ func resourceLogAggregatorConnectionHash(v interface{}) int {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 
+	if v, ok := m["azure_storage_account"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["azure_storage_container"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["azure_storage_secret_key"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
 	if v, ok := m["ca_certs_path"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
@@ -790,7 +867,27 @@ func resourceLogAggregatorConnectionHash(v interface{}) int {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 
+	if v, ok := m["eventhub_access_key"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["eventhub_access_policy"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["eventhub_name"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["eventhub_namespace"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
 	if v, ok := m["external_id"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["format"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 

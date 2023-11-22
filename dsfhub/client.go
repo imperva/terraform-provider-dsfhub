@@ -70,7 +70,7 @@ type ResourceData struct {
 	IsMonitored     bool      `json:"isMonitored,omitempty"`
 	ParentAssetID   string    `json:"parentAssetId,omitempty"`
 	RemoteSyncState string    `json:"remoteSyncState,omitempty"`
-	ServerType      string    `json:"serverType,omitempty"`
+	ServerType      string    `json:"serverType"`
 }
 
 type AssetData struct {
