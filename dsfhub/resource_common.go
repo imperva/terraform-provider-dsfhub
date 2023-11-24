@@ -183,7 +183,7 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 												hs.FieldMapping[fmFieldName] = string(fmFieldObj.(string))
 											}
 										case "path":
-											hs.SecretAssetID = fieldObj.(string)
+											hs.Path = fieldObj.(string)
 										case "secret_asset_id":
 											hs.SecretAssetID = fieldObj.(string)
 										case "secret_name":
@@ -209,7 +209,7 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 												hs.FieldMapping[fmFieldName] = string(fmFieldObj.(string))
 											}
 										case "path":
-											hs.SecretAssetID = fieldObj.(string)
+											hs.Path = fieldObj.(string)
 										case "secret_asset_id":
 											hs.SecretAssetID = fieldObj.(string)
 										case "secret_name":
