@@ -94,7 +94,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Description: "If true, sonargateway will collect the audit logs for this system if it can.",
 				Required:    false,
 				Optional:    true,
-				Default:     true,
+				Default:     false,
 			},
 			// "audit_state": {
 			// 	Type:         schema.TypeString,
