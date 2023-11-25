@@ -87,6 +87,7 @@ resource "dsfhub_log_aggregator" "example_aws_log_group_default" {
 
 - `asset_display_name` (String) User-friendly name of the asset, defined by user.
 - `asset_source` (String) The source platform/vendor/system of the asset data. Usually the service responsible for creating that asset document
+- `audit_type` (String) Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details.  Example: "BIGQUERY","BIGTABLE","BUCKET","MSSQL","MYSQL","POSTGRESQL","SPANNER".
 - `available_regions` (String) A list of regions to use in discovery actions that iterate through region
 - `aws_proxy_config` (Block Set) AWS specific proxy configuration (see [below for nested schema](#nestedblock--aws_proxy_config))
 - `credentials_endpoint` (String) A specific sts endpoint to use

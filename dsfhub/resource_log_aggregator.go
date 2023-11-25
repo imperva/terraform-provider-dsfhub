@@ -66,6 +66,14 @@ func resourceLogAggregator() *schema.Resource {
 				Default:     nil,
 				Computed:    true,
 			},
+			"audit_type": {
+				Type:         schema.TypeString,
+				Description:  "Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details.  Example: \"BIGQUERY\",\"BIGTABLE\",\"BUCKET\",\"MSSQL\",\"MYSQL\",\"POSTGRESQL\",\"SPANNER\"",
+				Required:     false,
+				Optional:     true,
+				Default:      nil,
+				ValidateFunc: validation.StringInSlice([]string{"BIGQUERY", "BIGTABLE", "BUCKET", "MSSQL", "MYSQL", "POSTGRESQL", "SPANNER"}, false),
+			},
 			"available_regions": {
 				Type:        schema.TypeString,
 				Description: "A list of regions to use in discovery actions that iterate through region",
@@ -520,6 +528,13 @@ func resourceLogAggregator() *schema.Resource {
 				Optional:    true,
 				Default:     nil,
 			},
+			"pubsub_subscription": {
+				Type:        schema.TypeString,
+				Description: "Pub/Sub Subscription. Example: projects/my-project-name/subscriptions/my-subscription-name",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
 			"region": {
 				Type:        schema.TypeString,
 				Description: "For cloud systems with regions, the default region or region used with this asset",
@@ -663,6 +678,7 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("asset_id", logAggregatorReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", logAggregatorReadResponse.Data.AssetData.AssetSource)
 	d.Set("audit_pull_enabled", logAggregatorReadResponse.Data.AssetData.AuditPullEnabled)
+	d.Set("audit_type", logAggregatorReadResponse.Data.AssetData.AuditType)
 	d.Set("available_regions", logAggregatorReadResponse.Data.AssetData.AvailableRegions)
 	d.Set("credential_endpoint", logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint)
 	d.Set("criticality", logAggregatorReadResponse.Data.AssetData.Criticality)
@@ -673,6 +689,7 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("managed_by", logAggregatorReadResponse.Data.AssetData.ManagedBy)
 	d.Set("owned_by", logAggregatorReadResponse.Data.AssetData.OwnedBy)
 	d.Set("proxy", logAggregatorReadResponse.Data.AssetData.Proxy)
+	d.Set("pubsub_subscription", logAggregatorReadResponse.Data.AssetData.PubsubSubscription)
 	d.Set("region", logAggregatorReadResponse.Data.AssetData.Region)
 	d.Set("server_host_name", logAggregatorReadResponse.Data.AssetData.ServerHostName)
 	d.Set("server_type", logAggregatorReadResponse.Data.ServerType)
