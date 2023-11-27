@@ -3,7 +3,7 @@ subcategory: "Example Assets"
 layout: "dsfhub"
 page_title: "AZURE MYSQL - Event Hub"
 description: |-
-  Provides an combined example of creating an AZURE MYSQL database, associated configurations for audit logs, onboarding to the DSFHUB with necessary configs for the DSF Agentless Gateway to access.
+  Provides a combined example of creating an AZURE MYSQL database, associated configurations for audit logs, onboarding to the DSFHUB with necessary configs for the DSF Agentless Gateway to access.
 ---
 
 # Azure MYSQL Onboarding Template
