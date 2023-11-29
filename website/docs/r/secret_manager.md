@@ -58,6 +58,26 @@ variable "secret_manager_hashicorp_secret_key" {
   default = "A1b2C3d4/H5i6J7k8/A1b2C3d4/H5i6J7k8"
 }
 
+variable "hashicorp_field_mapping" {
+  description = "Object listing the mappings between DSF fields and their corresponding locations with the hashicorp secret manager."
+  type = map(string)
+  default = {
+    username = "username_field"
+    password = "password_field"
+  }
+}
+
+variable "hashicorp_secret_name" {
+  description = "The secret name created in the KV secrets engine."
+  type = string
+}
+
+variable "hashicorp_secret_path" {
+  description = "The path to where you enabled a KV secrets engine on your hashcorp server."
+  type = string
+}
+
+
 # Example dsfhub_secret_manager usage for HASHICORP
 resource "dsfhub_secret_manager" "example_hashicorp" {
   server_type = "HASHICORP"
@@ -75,6 +95,41 @@ resource "dsfhub_secret_manager" "example_hashicorp" {
     reason = "default" # Used to differentiate connections if multiple connections exist for this asset"
     role_name = var.secret_manager_hashicorp_role_name # AWS role name to use for authentication
     secret_key = var.secret_manager_hashicorp_secret_key # The AWS secret access key used to authenticate
+  }
+}
+
+resource "dsfhub_data_source" "example_sybase_kerberos" {
+  server_type = "SYBASE"
+
+  admin_email        = var.admin_email
+  asset_display_name = "example-sybase-kerberos-asset"
+  asset_id           = "${var.sybase_server_host_name}:SYBASE::${var.sybase_server_port}"
+  database_name      = "example-sybase-db-name"
+  gateway_id         = var.gateway_id
+  server_host_name   = "example-server-host-name"
+  server_ip          = "example-server-host-ip"
+  server_port        = "5000"
+  version            = "16"
+
+  audit_pull_enabled = true
+
+  asset_connection {
+    auth_mechanism = "kerberos"
+
+    reason       = "default"
+    external     = false
+    kerberos_kdc = var.kerberos_kdc
+    kerberos_spn = var.kerberos_spn
+    password     = "dummy_password_val"
+    principal    = "dummy_principal_val"
+
+    hashicorp_secret {
+      secret_asset_id = dsfhub_secret_manager.example_hashicorp.asset_id
+      path            = var.hashicorp_secret_path
+      secret_name     = var.hashicorp_secret_name
+
+      field_mapping = var.hashicorp_field_mapping
+    }
   }
 }
 ```
