@@ -3,7 +3,7 @@ subcategory: ""
 layout: "dsfhub"
 page_title: "Manage Bulk Assets from CSV"
 description: |-
-Example of how to manage assets in bulk from a csv file as a data source.
+    Example of how to manage assets in bulk from a csv file as a data source.
 ---
 
 # Manage Bulk Assets from CSV
