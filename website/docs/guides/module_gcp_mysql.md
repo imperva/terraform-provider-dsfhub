@@ -215,3 +215,11 @@ resource "dsfhub_log_aggregator" "gcp_mysql_pubsub" {
   }
 }
 ```
+
+## Agentless Gateway Permission Dependencies:
+
+The [DSF Agentless Gateway](https://registry.terraform.io/modules/imperva/dsf-agentless-gw/aws/latest) is required to have the following [IAM policy for Cloud Pub/Sub Topic](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic_iam) access to database audit.
+
+<ul>
+<li><a target="_blank" href="gcp_pubsub_iam.md">GCP IAM Permissions for PubSub Topics</a></li>
+</ul>

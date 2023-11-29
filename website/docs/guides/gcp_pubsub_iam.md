@@ -3,16 +3,16 @@ subcategory: "Agentless Gateway Permissions"
 layout: "dsfhub"
 page_title: "GCP IAM - PubSub"
 description: |-
-  GCP permissions for the DSF Agentless Gateway to access logs via Cloud Watch Log Groups.
+  GCP IAM - PubSub
 ---
 
 # Agentless Gateway IAM Permissions - PubSub Topic
 
-The DSF Agentless Gateway requires the following IAM permissions to access a PubSub Topic.
+The DSF Agentless Gateway requires the following IAM permissions to access a GCP PubSub Topic.
 
 ## Variable Reference
 
-```
+```hcl
 # Variables for the creating GCP pubsub topic, project sink, and iam binding to grant the DSF Agentless-Gateway access database logs
 variable "project" {
   description =  "The project field should be your personal project id. The project indicates the default GCP project all of your resources will be created in. Most Terraform resources will have a project field."
@@ -35,7 +35,7 @@ variable "db_name" {
 
 ## Example Usage
 
-```
+```hcl
 ### Google Provider ###
 provider "google" {
   project = var.project

@@ -172,7 +172,7 @@ resource "azurerm_mysql_server" "azure_mysql_server" {
 
 # Enable Audit Log
 resource "azurerm_mysql_configuration" "audit_log_enabled" {
-    depends_on          \= [azurerm_mysql_server.azure_mysql_server]
+    depends_on          = [azurerm_mysql_server.azure_mysql_server]
     name                = "audit_log_enabled"
     resource_group_name = var.resource_group_name
     server_name         = azurerm_mysql_server.azure_mysql_server.name
@@ -301,3 +301,11 @@ resource "dsfhub_log_aggregator" "example_azure_eventhub" {
 	}
 }
 ```
+
+## Agentless Gateway Permission Dependencies:
+
+The [DSF Agentless Gateway](https://registry.terraform.io/modules/imperva/dsf-agentless-gw/aws/latest) is required to have the following [Event Hub Authorization Rule](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub_authorization_rule) access to database audit.
+
+<ul>
+<li><a target="_blank" href="azure_eventhub_authorization.md">Event Hub Authorization Rule for EventHub Namespaces</a></li>
+</ul>

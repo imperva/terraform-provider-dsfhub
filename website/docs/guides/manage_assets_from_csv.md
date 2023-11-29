@@ -3,12 +3,12 @@ subcategory: ""
 layout: "dsfhub"
 page_title: "Manage Bulk Assets from CSV"
 description: |-
-    Example of how to manage assets in bulk from a csv file as a data source.
+  Manage Bulk Assets from CSV
 ---
 
 # Manage Bulk Assets from CSV
 
-Terraform can natively import csv data using the [csvdecode](https://www.terraform.io/docs/language/functions/csvdecode.html) function. The following example shows how to use the csvdecode function to manage [dsf_data_source](../r/data_source.md) resources in bulk from a csv file.
+Terraform can natively import csv data using the [csvdecode](https://www.terraform.io/docs/language/functions/csvdecode.html) function. The following example shows how to use the csvdecode function to manage [dsf_data_source](https://registry.terraform.io/modules/imperva/dsf-agentless-gw/aws/latest) resources in bulk from a csv file.
 
 <details>
 <summary>Example CSV file format</summary>
