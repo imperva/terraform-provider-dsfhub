@@ -1,14 +1,14 @@
 ---
-subcategory: "GCP PubSub IAM Permissions"
+subcategory: "Agentless Gateway Permissions"
 layout: "dsfhub"
-page_title: "PubSub Topic and IAM"
+page_title: "GCP IAM - PubSub"
 description: |-
   GCP permissions for the DSF Agentless Gateway to access logs via Cloud Watch Log Groups.
 ---
 
-# DSF Agentless Gateway Required IAM Permissions - PubSub Topic
+# Agentless Gateway IAM Permissions - PubSub Topic
 
-The DSF Agentless Gateway requires the following IAM permissions to access PubSub Topic.
+The DSF Agentless Gateway requires the following IAM permissions to access a PubSub Topic.
 
 ## Variable Reference
 
@@ -70,9 +70,28 @@ resource "google_pubsub_topic_iam_binding" "binding" {
 
 ## Troubleshooting
 
-To validate that the DSF agentless gateway has the appropriate permissions to access the desired pubsub topic in GCP, you can [SSH](https://cloud.google.com/compute/docs/instances/ssh) to the gateway and run the following commands in a terminal:
+To validate that the DSF agentless gateway has the appropriate permissions to access the desired pubsub topic in GCP, you can [SSH](https://cloud.google.com/compute/docs/instances/ssh) to the gateway and run the following commands in a terminal.
+
+### Export the environment variables
 
 ```console
 export $(cat /etc/sysconfig/jsonar)
-$JSONAR_BASEDIR/bin/aws logs describe-log-streams --log-group-name "/aws/rds/instance/customappmysqlprod/audit" --region=us-east-2
+```
+
+### Validate access to pubsub topic
+
+Use the local gcloud client and service-account to validate access and [describe the pubsub topic](https://cloud.google.com/sdk/gcloud/reference/pubsub/topics/describe)
+
+```console
+$JSONAR_BASEDIR/bin/gcloud auth activate-service-account --key-file=/path/to/your/key.json
+$JSONAR_BASEDIR/bin/gcloud pubsub topics --project your-project-name-here describe your-pubsub-topic-here
+```
+
+### Describe subscription and pull single record
+
+Use the local gcloud client to [describe the subscription](https://cloud.google.com/sdk/gcloud/reference/pubsub/subscriptions/describe), and check [pull a message](https://cloud.google.com/sdk/gcloud/reference/pubsub/subscriptions/pull):
+
+```console
+$JSONAR_BASEDIR/bin/gcloud pubsub subscriptions --project your-project-name-here describe your-subscription-name-here
+$JSONAR_BASEDIR/bin/gcloud pubsub subscriptions --project your-project-name-here pull your-subscription-name-here --no-auto-ack
 ```

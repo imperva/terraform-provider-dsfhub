@@ -13,7 +13,7 @@ Provides a module template for creating an AWS RDS POSTGRESQL database, the asso
 <details>
 <summary>AWS RDS POSTGRESQL Variables</summary>
 
-## AWS RDS POSTGRESQL Variables
+### AWS RDS POSTGRESQL Variables
 
 ```hcl
 # DSFHUB Provider Required Variables
@@ -129,17 +129,55 @@ provider "dsfhub" {
 }
 
 ### AWS Resources ###
-esource "aws_db_parameter_group" "postgresql_param_group" {
+resource "aws_db_parameter_group" "postgresql_param_group" {
   name   = var.deployment_name
   family = "postgres15"
 
   parameter {
     name  = "log_connections"
     value = "1"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name  = "log_disconnections"
+    value = "1"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name  = "log_error_verbosity"
+    value = "verbose"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name  = "log_min_duration_statement"
+    value = "5000"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name  = "pgaudit.log"
+    value = "all"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name  = "pgaudit.role"
+    value = "rds_pgaudit"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name  = "shared_preload_libraries"
+    value = "pgaudit,pg_stat_statements"
+    apply_method = "pending-reboot"
   }
 }
 
 resource "aws_db_instance" "postgresql_db" {
+  depends_on 			 = [aws_db_parameter_group.postgresql_param_group]
   allocated_storage      = var.db_allocated_storage
   engine                 = "postgres"
   engine_version         = var.db_engine_version
@@ -147,6 +185,7 @@ resource "aws_db_instance" "postgresql_db" {
   instance_class         = var.db_instance_class
   license_model          = "postgresql-license"
   skip_final_snapshot    = true
+  apply_immediately      = true
 
   # Credentials
   username               = var.db_master_username
@@ -158,38 +197,212 @@ resource "aws_db_instance" "postgresql_db" {
   vpc_security_group_ids = var.vpc_security_group_ids
 
   # audit
-  enable_cloudwatch_logs_exports = ["postgresql","upgrade"]
-  parameter_group_name   = aws_db_parameter_group.postgresql_param_group.name
-}
-
-# ### DSFHUB Resources ###
-resource "dsfhub_data_source" "rds-postgresql-db" {
-  server_type = "AWS RDS POSTGRESQL"
-
-  admin_email = var.admin_email
-  asset_display_name  = aws_db_instance.postgresql_db.identifier
-  asset_id            = aws_db_instance.postgresql_db.arn
-  gateway_id          = var.gateway_id
-  server_host_name    = aws_db_instance.postgresql_db.arn
-  region              = var.region
-  server_port         = aws_db_instance.postgresql_db.port
-  version             = var.engine_version
-  parent_asset_id     = var.dsf_cloud_account_asset_id
-  audit_pull_enabled  = true
-
-  asset_connection {
-    auth_mechanism  = "password"
-    password        = var.db_master_password
-    reason          = "default"
-    username        = var.db_master_username
-  }
+  enabled_cloudwatch_logs_exports = ["postgresql","upgrade"]
+  parameter_group_name            = aws_db_parameter_group.postgresql_param_group.name
 }
 ```
+
+<details>
+<summary>Granting Agentless Gateway rds:RebootDBInstance IAM Permission</summary>
+
+```hcl
+resource "aws_iam_role_policy_attachment" "log_group_policy_attachment" {
+  policy_arn = aws_iam_policy.log_group_policy.arn
+  role       = data.aws_iam_role.agentless_gateway.name
+}
+
+resource "aws_iam_policy" "db_reboot_policy" {
+  name        = "DSFAgentlessGatewayDBRebootPolicy-${var.deployment_name}"
+  description = "DSF Agentless Gateway DB Reboot Policy for ${var.deployment_name}"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "VisualEditor0",
+        "Effect": "Allow",
+        "Action": [
+          "rds:RebootDBInstance"
+        ]
+        "Resource": [
+          "${aws_db_instance.postgresql_db.arn}",
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "db_reboot_policy_attachment" {
+  policy_arn = aws_iam_policy.db_reboot_policy.arn
+  role       = data.aws_iam_role.agentless_gateway.name
+}
+```
+</details>
+
+
+<details>
+<summary>Script examples to reboot and configure the database</summary>
+
+## Script examples to reboot and configure the database  
+
+The following scripts are remotely executed through the agentless gateway using a `remote-execute` with a [null_resource](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) against the PostgreSQL server to reboot the database (required for the shared_preload_libraries param in the aws_db_parameter_group), and configure database granting the user `rds_superuser` permissions to the `rds_pgaudit` role, and creating the `pgaudit` extension.
+
+### Create the following scripts in the same directory as the terraform configuration file
+
+Script 1: `configure_database.sh`
+```bash
+source /etc/sysconfig/jsonar
+export DB_HOST="$DB_HOST"
+export DB_PORT="$DB_PORT"
+export ADMIN_USER="$ADMIN_USER"
+export ADMIN_PASSWORD="$ADMIN_PASSWORD"
+export DB_NAME="$DB_NAME"
+export JSONAR_BASEDIR="$JSONAR_BASEDIR"
+export REGION="$REGION"
+export ACTION="$ACTION"
+
+if [ "$ACTION" == "REBOOT" ]; then
+	export $(cat /etc/sysconfig/jsonar)
+	${JSONAR_BASEDIR}/bin/aws rds reboot-db-instance --db-instance-identifier $DB_NAME --region $REGION
+else:
+	${JSONAR_BASEDIR}/bin/python3 /tmp/configure_database.py
+fi
+```
+
+Script 2: `configure_database.py`
+```python
+import os
+import ssl
+import pg8000
+
+host = os.environ.get("DB_HOST")
+port = os.environ.get('DB_PORT')
+user = os.environ.get('ADMIN_USER')
+password = os.environ.get('ADMIN_PASSWORD')
+database = "postgres"
+
+ssl_context = ssl.SSLContext()
+
+client = pg8000.connect(host=host, 
+                        port=port, 
+                        user=user, 
+                        password=password, 
+                        database=database,
+                        ssl_context=ssl_context)
+
+client.run("GRANT rds_superuser TO "+user)
+client.run("ALTER USER "+user+" WITH CREATEROLE")
+
+auditor_role_exists = client.run("SELECT rolname FROM pg_catalog.pg_roles WHERE rolname = 'rds_pgaudit'")
+if auditor_role_exists:
+	print('Auditor role "rds_pgaudit" already exists.')
+else:
+	print('Creating auditor role "rds_pgaudit".')
+	client.run("CREATE ROLE rds_pgaudit")
+	client.run("COMMIT")
+	
+audit_extension_exists = client.run("SELECT extname FROM pg_catalog.pg_extension WHERE extname = 'pgaudit'")
+if audit_extension_exists:
+	print('Audit extension "pgaudit" already exists.')
+else:
+	print('Creating audit extension "pgaudit".')
+	client.run("CREATE EXTENSION pgaudit")
+	client.run("COMMIT")
+```
+
+### null_resource examples to execute the scripts
+
+```hcl
+### Uploading scripts to the agentless gateway ###
+resource "null_resource" "upload-script" {
+    depends_on = [aws_db_instance.postgresql_db]
+
+	connection {
+		type        		= "ssh"
+		user        		= var.dsf_gateway_ssh_user
+		private_key 		= file(var.dsf_gateway_private_key)
+		host        		= var.dsf_gateway_host
+		bastion_host 		= var.bastion_host
+		bastion_user 		= var.bastion_ssh_user
+		bastion_private_key = file(var.bastion_private_key)
+	}
+
+	provisioner "file" {
+		source      = "configure_database.sh"
+		destination = "/tmp/configure_database.sh"
+	}
+	provisioner "file" {
+		source      = "configure_database.py"
+		destination = "/tmp/configure_database.py"
+	}
+}
+
+### The shared_preload_libraries in the aws_db_parameter_group requires ###
+### a reboot, this parameter is required for the pgaudit extension to   ###
+### work, executed in the null_resource.remote-execute below            ###
+resource "null_resource" "reboot-database" {
+    depends_on = [null_resource.upload-script]
+	connection {
+		type        		= "ssh"
+		user        		= var.dsf_gateway_ssh_user
+		private_key 		= file(var.dsf_gateway_private_key)
+		host        		= var.dsf_gateway_host
+		bastion_host 		= var.bastion_host
+		bastion_user 		= var.bastion_ssh_user
+		bastion_private_key = file(var.bastion_private_key)
+	}
+
+	provisioner "remote-exec" {
+    	inline = [
+			"export DB_HOST='${aws_db_instance.postgresql_db.address}'",
+			"export DB_NAME='${var.db_name}'",
+			"export DB_PORT='${aws_db_instance.postgresql_db.port}'",
+			"export ADMIN_USER='${var.db_master_username}'",
+			"export ADMIN_PASSWORD='${var.db_master_password}'",
+			"export ACTION='REBOOT'",
+			"export REGION='${var.region}'",
+			"source /etc/sysconfig/jsonar",
+			"chmod +x /tmp/configure_database.sh",
+			"/tmp/configure_database.sh",
+		]
+	}
+}
+
+### Execute the script to configure the database ###
+resource "null_resource" "reboot-database" {
+    depends_on = [null_resource.upload-script]
+	connection {
+		type        		= "ssh"
+		user        		= var.dsf_gateway_ssh_user
+		private_key 		= file(var.dsf_gateway_private_key)
+		host        		= var.dsf_gateway_host
+		bastion_host 		= var.bastion_host
+		bastion_user 		= var.bastion_ssh_user
+		bastion_private_key = file(var.bastion_private_key)
+	}
+
+	provisioner "remote-exec" {
+    	inline = [
+			"export DB_HOST='${aws_db_instance.postgresql_db.address}'",
+			"export DB_NAME='postgres'",
+			"export DB_PORT='${aws_db_instance.postgresql_db.port}'",
+			"export ADMIN_USER='${var.db_master_username}'",
+			"export ADMIN_PASSWORD='${var.db_master_password}'",
+			"export ACTION='CONFIGURE'",
+			"export REGION='${var.region}'",
+			"source /etc/sysconfig/jsonar",
+			"chmod +x /tmp/configure_database.sh",
+			"/tmp/configure_database.sh",
+		]
+	}
+}
+```
+</details>
 
 ## Agentless Gateway Permission Dependencies:
 
 The [DSF Agentless Gateway](https://registry.terraform.io/modules/imperva/dsf-agentless-gw/aws/latest) is required to have [AWS IAM Role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) access to the AWS service the database is configured to publish logs to in order to consume audit.
 
 <ul>
-<li><a target="_blank" href="aws_iam_kinesis.md">AWS IAM Permissions for Kinesis Streams</a></li>
+<li><a target="_blank" href="aws_iam_log_group.md">AWS IAM Permissions for CloudWatch Log Groups</a></li>
 </ul>

@@ -1,7 +1,7 @@
 ---
-subcategory: "AWS IAM Permissions"
+subcategory: "Agentless Gateway Permissions"
 layout: "dsfhub"
-page_title: "S3 Bucket"
+page_title: "AWS IAM - S3 Bucket"
 description: |-
   AWS IAM permissions for the DSF Agentless Gateway to access logs via AWS S3 Buckets.
 ---
@@ -78,4 +78,13 @@ resource "aws_iam_role_policy_attachment" "role_policy_attachment" {
   policy_arn = aws_iam_policy.log_group_policy.arn
   role       = var.agentless_gatway_iam_role_name
 }
+```
+
+## Troubleshooting
+
+To validate that the DSF agentless gateway has the appropriate permissions to access the desired S3 Bucket, you can [SSH](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-ssh.html) to the gateway and run the following commands in a terminal:
+
+```console
+export $(cat /etc/sysconfig/jsonar)
+$JSONAR_BASEDIR/bin/aws logs describe-log-streams --log-group-name "/aws/rds/instance/customappmysqlprod/audit" --region=us-east-2
 ```
