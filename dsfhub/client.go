@@ -44,6 +44,11 @@ type UpdateAuditResponse struct {
 	Errors []APIError `json:"errors,omitempty"`
 }
 
+type ResourcesWrapper struct {
+	Data   []ResourceData `json:"data"`
+	Errors []APIError     `json:"errors,omitempty"`
+}
+
 type ResourceWrapper struct {
 	Data   ResourceData `json:"data"`
 	Errors []APIError   `json:"errors,omitempty"`

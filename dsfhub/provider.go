@@ -59,10 +59,14 @@ func Provider() *schema.Provider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
-			"dsfhub_cloud_account":  dataSourceCloudAccount(),
-			"dsfhub_data_source":    dataSourceDSFDataSource(),
-			"dsfhub_log_aggregator": dataSourceLogAggregator(),
-			"dsfhub_secret_manager": dataSourceSecretManager(),
+			"dsfhub_cloud_account":   dataSourceCloudAccount(),
+			"dsfhub_cloud_accounts":  dataSourceCloudAccounts(),
+			"dsfhub_data_source":     dataSourceDSFDataSource(),
+			"dsfhub_data_sources":    dataSourceDSFDataSources(),
+			"dsfhub_log_aggregator":  dataSourceLogAggregator(),
+			"dsfhub_log_aggregators": dataSourceLogAggregators(),
+			"dsfhub_secret_manager":  dataSourceSecretManager(),
+			"dsfhub_secret_managers": dataSourceSecretManagers(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{

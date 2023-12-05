@@ -76,6 +76,33 @@ func (c *Client) ReadCloudAccount(cloudAccountId string) (*ResourceWrapper, erro
 	return &readCloudAccountResponse, nil
 }
 
+// ReadCloudAccounts gets all CloudAccounts
+func (c *Client) ReadCloudAccounts() (*ResourcesWrapper, error) {
+	resp, err := c.MakeCall(http.MethodGet, endpointCloudAccounts, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error reading CloudAccounts | err: %s\n", err)
+	}
+
+	// Read the body
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+
+	// Dump JSON
+	log.Printf("[DEBUG] ReadCloudAcounts JSON response: %s\n", string(responseBody))
+
+	// Parse the JSON
+	var readCloudAccountsResponse ResourcesWrapper
+	err = json.Unmarshal([]byte(responseBody), &readCloudAccountsResponse)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing ReadCloudAccounts JSON response: %s err: %s\n", responseBody, err)
+	}
+	if readCloudAccountsResponse.Errors != nil {
+		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
+	}
+
+	return &readCloudAccountsResponse, nil
+}
+
 // UpdateCloudAccount will update a specific CloudAccount record in DSF referenced by the cloudAccountId
 func (c *Client) UpdateCloudAccount(cloudAccountId string, cloudAccountIdData ResourceWrapper) (*ResourceWrapper, error) {
 	log.Printf("[INFO] Updating CloudAccount with cloudAccountId: %s)\n", cloudAccountId)

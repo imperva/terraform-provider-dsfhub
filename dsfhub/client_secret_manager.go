@@ -76,6 +76,35 @@ func (c *Client) ReadSecretManager(secretManagerId string) (*ResourceWrapper, er
 	return &readSecretManagerResponse, nil
 }
 
+// ReadSecretManagers gets all secretManagers
+func (c *Client) ReadSecretManagers() (*ResourcesWrapper, error) {
+	log.Printf("[INFO] Getting SecretManagers\n")
+
+	resp, err := c.MakeCall(http.MethodGet, endpointSecretManagers, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error reading SecretManagers | err: %s\n", err)
+	}
+
+	// Read the body
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+
+	// Dump JSON
+	log.Printf("[DEBUG] DSF SecretManagers JSON response: %s\n", string(responseBody))
+
+	// Parse the JSON
+	var readSecretManagersResponse ResourcesWrapper
+	err = json.Unmarshal([]byte(responseBody), &readSecretManagersResponse)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing SecretManagers JSON response: %s err: %s\n", responseBody, err)
+	}
+	if readSecretManagersResponse.Errors != nil {
+		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
+	}
+
+	return &readSecretManagersResponse, nil
+}
+
 // UpdateSecretManager will update a specific secret-manager record in DSF referenced by the dataSourceId
 func (c *Client) UpdateSecretManager(secretManagerId string, secretManager ResourceWrapper) (*ResourceWrapper, error) {
 	log.Printf("[INFO] Updating SecretManager with secretManagerId: %s)\n", secretManagerId)

@@ -116,7 +116,7 @@ resource "dsfhub_data_source" "bulk-database-import" {
 
 For exising assets that are already managed by DSF, you can import them using the [DSF-CLI](https://github.com/imperva/dsf-cli) into Terraform state using the following command.  Execute the following command in the same directory where you have the bulk import tf file shown above.
 
-```bash
+```
 for ASSET_ID in $(dsf data_source read | jq -r '.data[].id'); do terraform import "dsfhub_data_source.bulk-database-import[\"$ASSET_ID\"]" "${ASSET_ID}"; done
 ```
 

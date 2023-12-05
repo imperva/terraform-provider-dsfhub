@@ -49,7 +49,7 @@ func (c *Client) CreateDSFDataSource(dsfDataSource ResourceWrapper) (*ResourceWr
 
 // ReadDSFDataSource gets the DSF data source by ID
 func (c *Client) ReadDSFDataSource(dataSourceId string) (*ResourceWrapper, error) {
-	log.Printf("[INFO] Getting DSFDataSource for dataSourceId: %s)\n", dataSourceId)
+	log.Printf("[INFO] Getting DSFDataSource for dataSourceId: %s\n", dataSourceId)
 
 	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s", url.PathEscape(dataSourceId))
 	resp, err := c.MakeCall(http.MethodGet, reqURL, nil)
@@ -76,6 +76,36 @@ func (c *Client) ReadDSFDataSource(dataSourceId string) (*ResourceWrapper, error
 	}
 
 	return &readDSFDataSourceDataResponse, nil
+}
+
+// ReadDSFDataSources all DSFDataSources
+func (c *Client) ReadDSFDataSources() (*ResourcesWrapper, error) {
+	log.Printf("[INFO] Getting DSFDataSources\n")
+
+	resp, err := c.MakeCall(http.MethodGet, endpointDsfDataSource, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error reading DSFDataSources | err: %s", err)
+	}
+
+	// Read the body
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+
+	// Dump JSON
+	log.Printf("[DEBUG] ReadDSFDataSources JSON response: %s\n", string(responseBody))
+
+	// Parse the JSON
+	var readDSFDataSourcesDataResponse ResourcesWrapper
+	err = json.Unmarshal([]byte(responseBody), &readDSFDataSourcesDataResponse)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing DSFDataSource JSON response: %v err: %s", responseBody, err)
+	}
+
+	if readDSFDataSourcesDataResponse.Errors != nil {
+		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
+	}
+
+	return &readDSFDataSourcesDataResponse, nil
 }
 
 // UpdateDSFDataSource will update a specific data source in DSF referenced by the dataSourceId

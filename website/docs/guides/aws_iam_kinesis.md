@@ -76,6 +76,15 @@ resource "aws_iam_policy" "kinesis_policy" {
 
 resource "aws_iam_role_policy_attachment" "role_policy_attachment" {
   policy_arn = aws_iam_policy.kinesis_policy.arn
-  role       = aws_iam_role.assume_role_policy.name
+  role       = aws_iam_role.agentless_gatway_role_name.name
 }
+```
+
+## Troubleshooting
+
+To validate that the DSF agentless gateway has the appropriate permissions to access the desired kinesis stream, you can [SSH](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-ssh.html) to the gateway and run the following commands in a terminal:
+
+```console
+export $(cat /etc/sysconfig/jsonar)
+$JSONAR_BASEDIR/bin/aws kinesis describe-stream --stream-name "your-cluster-stream-name-ABCDEFG1234567890" --region=us-east-2
 ```

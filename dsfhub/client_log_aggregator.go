@@ -75,6 +75,35 @@ func (c *Client) ReadLogAggregator(logAggregatorId string) (*ResourceWrapper, er
 	return &readLogAggregatorResponse, nil
 }
 
+// ReadLogAggregators all LogAggregators
+func (c *Client) ReadLogAggregators() (*ResourcesWrapper, error) {
+	log.Printf("[INFO] Getting LogAggregators\n")
+
+	resp, err := c.MakeCall(http.MethodGet, endpointLogAggregators, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error reading LogAggregators | err: %s\n", err)
+	}
+
+	// Read the body
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+
+	// Dump JSON
+	log.Printf("[DEBUG] ReadLogAggregators JSON response: %s\n", string(responseBody))
+
+	// Parse the JSON
+	var readLogAggregatorsResponse ResourcesWrapper
+	err = json.Unmarshal([]byte(responseBody), &readLogAggregatorsResponse)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing LogAggregators JSON response: %s err: %s\n", responseBody, err)
+	}
+	if readLogAggregatorsResponse.Errors != nil {
+		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
+	}
+
+	return &readLogAggregatorsResponse, nil
+}
+
 // UpdateLogAggregator will update a specific LogAggregator record in DSF referenced by the logAggregatorId
 func (c *Client) UpdateLogAggregator(logAggregatorId string, logAggregatorData ResourceWrapper) (*ResourceWrapper, error) {
 	log.Printf("[INFO] Updating LogAggregator with logAggregatorId: %s)\n", logAggregatorId)
