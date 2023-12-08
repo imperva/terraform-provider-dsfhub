@@ -62,13 +62,13 @@ variable "db_name" {
 variable "db_allocated_storage" {
   description = "The allocated storage in gibibytes. If max_allocated_storage is configured, this argument represents the initial storage allocation and differences from the configuration will be ignored automatically when Storage Autoscaling occurs. If replicate_source_db is set, the value is ignored during the creation of the instance."
   type = number
-  default = 10
+  default = 20
 }
 
 variable "db_engine_version" {
-  description = "Database engine version, i.e. \"8.0.33\""
+  description = "Database engine version, i.e. \"15.00.4043\""
   type = string
-  default = "8.0.33"
+  default = "15.00.4043.16.v1"
 }
 
 variable "db_instance_class" {
@@ -78,9 +78,9 @@ variable "db_instance_class" {
 }
 
 variable "db_major_engine_version" {
-  description = "Specifies the major version of the engine that this option group should be associated with, i.e. \"8.0\""
+  description = "Specifies the major version of the engine that this option group should be associated with, i.e. \"15.00\""
   type = string
-  default = "8.0"
+  default = "15.00"
 }
 
 variable "db_master_username" {
@@ -133,6 +133,74 @@ resource "aws_s3_bucket" "mssql_audit_bucket" {
   bucket_prefix = "mssql-rds-audit-s3-bucket-"
 }
 
+### AWS IAM Role granting MSSQL access to write to the S3 bucket ###
+resource "aws_iam_role" "sql_server_role" {
+  assume_role_policy    = jsonencode(
+    {
+      Statement = [
+        {
+          Action    = "sts:AssumeRole"
+          Effect    = "Allow"
+          Principal = {
+            Service = "rds.amazonaws.com"
+          }
+          Sid       = ""
+        },
+      ]
+      Version   = "2012-10-17"
+    }
+  )
+  force_detach_policies = false
+  max_session_duration  = 3600
+  name_prefix =     "mssql-rds-audit-s3-iam-role-"
+  path                  = "/service-role/"
+}
+
+resource "aws_iam_policy" "sql_audit" {
+  description = "RDS SQL Server Audit Logs"
+  name_prefix = "sqlAudit-"
+  path        = "/service-role/"
+  policy      = jsonencode(
+    {
+      Statement = [
+        {
+          Action   = "s3:ListAllMyBuckets"
+          Effect   = "Allow"
+          Resource = "*"
+        },
+        {
+          Action   = [
+            "s3:GetBucketLocation",
+            "s3:GetBucketACL",
+            "s3:ListBucket",
+          ]
+          Effect   = "Allow"
+          Resource = [ aws_s3_bucket.mssql_audit_bucket.arn,
+          ]
+        },
+        {
+          Action   = [
+            "s3:ListMultipartUploadParts",
+            "s3:AbortMultipartUpload",
+            "s3:PutObject",
+          ]
+          Effect   = "Allow"
+          Resource = [
+            "${aws_s3_bucket.mssql_audit_bucket.arn}/*",
+          ]
+        },
+      ]
+      Version   = "2012-10-17"
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "attach-sql-audit-policy" {
+  role       = aws_iam_role.sql_server_role.name
+  policy_arn = aws_iam_policy.sql_audit.arn
+}
+
+### Create option_group and MSSQL aws_db_instance
 resource "aws_db_option_group" "mssql_option_group" {
   engine_name              = "sqlserver-ex"
   major_engine_version     = var.db_major_engine_version
