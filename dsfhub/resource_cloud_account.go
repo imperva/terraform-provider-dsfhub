@@ -431,6 +431,13 @@ func resourceCloudAccount() *schema.Resource {
 				Optional:    true,
 				Default:     nil,
 			},
+			"server_ip": {
+				Type:        schema.TypeString,
+				Description: "IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
 			"server_type": {
 				Type:        schema.TypeString,
 				Description: "The type of server or data service to be created as a data source. The list of available data sources is documented at: https://docs.imperva.com/bundle/v4.11-sonar-user-guide/page/84552.htm",
@@ -542,6 +549,7 @@ func resourceCloudAccountRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("proxy", cloudAccountReadResponse.Data.AssetData.Proxy)
 	d.Set("region", cloudAccountReadResponse.Data.AssetData.Region)
 	d.Set("server_host_name", cloudAccountReadResponse.Data.AssetData.ServerHostName)
+	d.Set("server_ip", cloudAccountReadResponse.Data.AssetData.ServerIP)
 	d.Set("server_type", cloudAccountReadResponse.Data.ServerType)
 	if cloudAccountReadResponse.Data.AssetData.ServerPort != nil {
 		var serverPort string

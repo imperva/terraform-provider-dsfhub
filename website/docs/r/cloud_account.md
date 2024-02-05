@@ -85,6 +85,7 @@ resource "dsfhub_cloud_account" "example_aws_cloud_account" {
 - `proxy` (String) Proxy to use for AWS calls if aws_proxy_config is populated the proxy field will get populated from the http value there
 - `region` (String) For cloud systems with regions, the default region or region used with this asset
 - `server_host_name` (String) Hostname (or IP if name is unknown)
+- `server_ip` (String) IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.
 - `server_port` (String) Port used by the source server
 - `service_endpoints` (Block Set) Specify particular endpoints for a given service in the form of <service name>: "endpoint" (see [below for nested schema](#nestedblock--service_endpoints))
 - `used_for` (String) Designates how this asset is used / the environment that the asset is supporting.
