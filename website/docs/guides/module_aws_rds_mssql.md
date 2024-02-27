@@ -219,7 +219,7 @@ resource "aws_db_option_group" "mssql_option_group" {
     }
     option_settings {
       name  = "IAM_ROLE_ARN"
-      value = aws_iam_role.mssql_role.arn
+      value = aws_iam_role.sql_server_role.arn
     }
     option_settings {
       name  = "S3_BUCKET_ARN"

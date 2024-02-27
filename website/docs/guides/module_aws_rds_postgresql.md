@@ -202,6 +202,36 @@ resource "aws_db_instance" "postgresql_db" {
 }
 ```
 
+## dsfhub_data_source resource for AWS RDS POSTGRESQL
+
+The following is an example of the dsfhub_data_source resource used to onboard the RDS Postgresql database to the DSFHUB.
+
+```hcl
+# ### Resource example for AWS ###
+resource "dsfhub_data_source" "rds-postgresql-db" {
+  depends_on = [aws_db_instance.postgresql_db]
+  server_type = "AWS RDS POSTGRESQL"
+
+  admin_email = var.admin_email
+  asset_display_name  = aws_db_instance.postgresql_db.identifier
+  asset_id            = aws_db_instance.postgresql_db.arn
+  gateway_id          = var.gateway_id
+  server_host_name    = aws_db_instance.postgresql_db.arn
+  region              = var.region
+  server_port         = aws_db_instance.postgresql_db.port
+  version             = var.db_engine_version
+  parent_asset_id     = var.dsf_cloud_account_asset_id
+  audit_pull_enabled  = true
+
+  asset_connection {
+    auth_mechanism  = "password"
+    password        = var.db_master_password
+    reason          = "default"
+    username        = var.db_master_username
+  }
+}
+```
+
 <details>
 <summary>Granting Agentless Gateway rds:RebootDBInstance IAM Permission</summary>
 
