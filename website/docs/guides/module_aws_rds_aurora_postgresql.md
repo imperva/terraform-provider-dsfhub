@@ -468,10 +468,10 @@ The following is an example of the dsfhub_data_source resource used to onboard t
 ```hcl
 ### DSFHUB Resources - Primary Cluster Region Example ###
 resource "dsfhub_data_source" "rds-postgresql-cluster-primary" {
-  depends_on = [aws_rds_cluster.primary]
+  depends_on  = [aws_rds_cluster.primary]
   server_type = "AWS RDS AURORA POSTGRESQL CLUSTER"
 
-  admin_email = var.admin_email
+  admin_email         = var.admin_email
   asset_display_name  = aws_rds_cluster.primary.cluster_identifier
   asset_id            = aws_rds_cluster.primary.arn
   gateway_id          = var.gateway_id_primary
@@ -492,10 +492,10 @@ resource "dsfhub_data_source" "rds-postgresql-cluster-primary" {
 
 # ### DSFHUB Resources - Secondary Cluster Region Example ###
 resource "dsfhub_data_source" "rds-postgresql-cluster-secondary" {
-  depends_on = [aws_db_instance.postgresql_db]
-  server_type = "AWS RDS AURORA POSTGRESQL  CLUSTER"
+  depends_on  = [aws_rds_cluster.secondary]
+  server_type = "AWS RDS AURORA POSTGRESQL CLUSTER"
 
-  admin_email = var.admin_email
+  admin_email         = var.admin_email
   asset_display_name  = aws_rds_cluster.secondary.cluster_identifier
   asset_id            = aws_rds_cluster.secondary.arn
   gateway_id          = var.gateway_id_secondary
