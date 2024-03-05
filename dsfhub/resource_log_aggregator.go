@@ -216,6 +216,13 @@ func resourceLogAggregator() *schema.Resource {
 							Optional:    true,
 							Default:     nil,
 						},
+						"content_type": {
+							Type:        schema.TypeString,
+							Description: "Content-Type to append to the HTTP headers in the curl call",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
 						"credential_fields": {
 							Type:        schema.TypeSet,
 							Description: "Document containing values to build a profile from. Filling this will create a profile using the given profile name",
@@ -680,6 +687,7 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("audit_pull_enabled", logAggregatorReadResponse.Data.AssetData.AuditPullEnabled)
 	d.Set("audit_type", logAggregatorReadResponse.Data.AssetData.AuditType)
 	d.Set("available_regions", logAggregatorReadResponse.Data.AssetData.AvailableRegions)
+	d.Set("content_type", logAggregatorReadResponse.Data.AssetData.ContentType)
 	d.Set("credential_endpoint", logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint)
 	d.Set("criticality", logAggregatorReadResponse.Data.AssetData.Criticality)
 	d.Set("gateway_id", logAggregatorReadResponse.Data.GatewayID)
