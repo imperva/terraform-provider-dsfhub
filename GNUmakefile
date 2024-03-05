@@ -6,7 +6,15 @@ NAMESPACE=terraform-providers
 PKG_NAME=dsfhub
 BINARY=terraform-provider-${PKG_NAME}
 VERSION=1.2.42
-OS_ARCH=darwin_amd64
+
+OS_MAKE_NAME="OS"
+OS_NAME := $(shell uname -s | tr A-Z a-z)
+OS_ARCH := $(shell uname -m | tr A-Z a-z)
+
+os:
+	@echo "--- $(OS_MAKE_NAME) ---"
+	@echo "OS_NAME: $(OS_NAME)"
+	@echo "OS_ARCH: $(OS_ARCH)"
 
 default: install
 
@@ -68,5 +76,5 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
-.PHONY: build test testacc vet fmt fmtcheck errcheck  test-compile website website-test
+.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile website website-test os
 
