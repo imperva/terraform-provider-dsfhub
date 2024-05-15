@@ -47,9 +47,9 @@ resource "dsfhub_log_aggregator" "example_aws_s3" {
 	# max_concurrent_conn = var.max_concurrent_conn	# Maximum number of concurrent connections that sensitive data management should use at once.
 	# owned_by = var.owned_by	# Email of Owner / person responsible for the asset; can be different from the person in the managed_by field. Defaults to admin_email.
 	# parent_asset_id = var.parent_asset_id	# The name of an asset that this asset is part of (/related to). E.g. an AWS resource will generally have an AWS account asset as its parent. Also used to connect some log aggregating asset with the sources of their logs. E.g. An AWS LOG GROUP asset can have an AWS RDS as its parent, indicating that that is the log group for that RDS.
-	# provider = "aws-rds-mssql"	# The type of AWS RDS instance that the S3 asset is receiving audit logs from
 	# proxy = var.proxy	# 
 	# region = var.region	# For cloud systems with regions, the default region or region used with this asset
+	# s3_provider = "aws-rds-mssql"	# The type of AWS RDS instance that the S3 asset is receiving audit logs from. Accepted value: \"aws-rds-mssql\", required only for AWS RDS MS SQL SERVER auditing workflow.
 	# sdm_enabled = var.sdm_enabled	# Sensitive data management (SDM) is enabled if this parameter is set to True.
 	# service_endpoint = var.service_endpoint	# Specify a particular endpoint for a given service
 	# ssl = var.ssl	# 

@@ -102,6 +102,7 @@ resource "dsfhub_log_aggregator" "example_aws_log_group_default" {
 - `project` (String) Project separates different resources of multiple users and control access to specific resources
 - `proxy` (String) Proxy to use for AWS calls if aws_proxy_config is populated the proxy field will get populated from the http value there
 - `region` (String) For cloud systems with regions, the default region or region used with this asset
+- `s3_provider` (String) The type of AWS RDS instance that the S3 asset is receiving audit logs from. Accepted value: \"aws-rds-mssql\", required only for AWS RDS MS SQL SERVER auditing workflow.
 - `server_host_name` (String) Hostname (or IP if name is unknown)
 - `server_ip` (String) IP address of the service where this asset is located. If no IP is available populate this field with other information that would identify the system e.g. hostname or AWS ARN, etc.
 - `server_port` (String) Port used by the source server
