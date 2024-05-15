@@ -61,7 +61,6 @@ resource "dsfhub_data_source" "example_cloudera" {
 
 ### Optional
 
-- `ad_provider` (String) The type of AWS RDS instance that the S3 asset is receiving audit logs from
 - `asset_connection` (Block Set) N/A (see [below for nested schema](#nestedblock--asset_connection))
 - `asset_source` (String) The source platform/vendor/system of the asset data. Usually the service responsible for creating that asset document
 - `audit_info` (Block Set) Normally auto-populated when enabling the audit policy, it is a sub-document in JSON format containing configuration information for audit management. See documentation for values that can be added manually depending on asset type. Editing this value does NOT enable the audit policy. (see [below for nested schema](#nestedblock--audit_info))
