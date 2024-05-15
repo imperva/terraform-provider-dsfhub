@@ -130,7 +130,7 @@ type AssetData struct {
 	OwnedBy                string      `json:"owned_by,omitempty"`
 	ParentAssetID          string      `json:"parent_asset_id,omitempty"`
 	Project                string      `json:"project,omitempty"`
-	ADProvider             string      `json:"provider,omitempty"`
+	S3Provider             string      `json:"provider,omitempty"`
 	ProviderUrl            string      `json:"provider_url,omitempty"`
 	Proxy                  string      `json:"proxy,omitempty"`
 	PubsubSubscription     string      `json:"pubsub_subscription,omitempty"`

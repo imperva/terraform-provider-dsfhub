@@ -1605,16 +1605,16 @@ var assetSchemaJson = `{
             "required": true,
             "type": "string"
         },
-        "ProvIDer": {
+        "S3Provider": {
             "defaultValue": "aws-rds-mssql",
             "description": "The type of AWS RDS instance that the S3 asset is receiving audit logs from",
             "displayName": "Provider",
             "example": "aws-rds-mssql",
-            "id": "provider",
+            "id": "s3_provider",
             "required": false,
             "type": "string"
         },
-        "ProvIDerUrl": {
+        "ProviderUrl": {
             "defaultValue": null,
             "description": "",
             "displayName": "Provider URL",
