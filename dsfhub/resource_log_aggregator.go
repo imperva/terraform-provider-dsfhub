@@ -542,6 +542,13 @@ func resourceLogAggregator() *schema.Resource {
 				Optional:    true,
 				Default:     nil,
 			},
+			"s3_provider": {
+				Type:        schema.TypeString,
+				Description: "Accepted value: \"aws-rds-mssql\", required only for AWS RDS MS SQL SERVER auditing workflow.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
 			"server_host_name": {
 				Type:        schema.TypeString,
 				Description: "Hostname (or IP if name is unknown)",
@@ -691,6 +698,7 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("proxy", logAggregatorReadResponse.Data.AssetData.Proxy)
 	d.Set("pubsub_subscription", logAggregatorReadResponse.Data.AssetData.PubsubSubscription)
 	d.Set("region", logAggregatorReadResponse.Data.AssetData.Region)
+	d.Set("s3_provider", logAggregatorReadResponse.Data.AssetData.S3Provider)
 	d.Set("server_host_name", logAggregatorReadResponse.Data.AssetData.ServerHostName)
 	d.Set("server_type", logAggregatorReadResponse.Data.ServerType)
 	if logAggregatorReadResponse.Data.AssetData.ServerPort != nil {

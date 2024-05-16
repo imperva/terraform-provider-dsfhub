@@ -31,7 +31,7 @@ func (c *Client) CreateLogAggregator(logAggregator ResourceWrapper) (*ResourceWr
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
 	// Dump JSON
-	log.Printf("[DEBUG] Add CloudAccount JSON response: %s\n", string(responseBody))
+	log.Printf("[DEBUG] Add LogAggregator JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var createLogAggregatorResponse ResourceWrapper

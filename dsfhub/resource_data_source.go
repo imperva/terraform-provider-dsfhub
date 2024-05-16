@@ -1137,13 +1137,6 @@ func resourceDSFDataSource() *schema.Resource {
 				Optional:    true,
 				Default:     nil,
 			},
-			"ad_provider": {
-				Type:        schema.TypeString,
-				Description: "The type of AWS RDS instance that the S3 asset is receiving audit logs from",
-				Required:    false,
-				Optional:    true,
-				Default:     nil,
-			},
 			"provider_url": {
 				Type:        schema.TypeString,
 				Description: "",
