@@ -72,7 +72,7 @@ func resourceLogAggregator() *schema.Resource {
 				Required:     false,
 				Optional:     true,
 				Default:      nil,
-				ValidateFunc: validation.StringInSlice([]string{"BIGQUERY", "BIGTABLE", "BUCKET", "MSSQL", "MYSQL", "POSTGRESQL", "SPANNER"}, false),
+				// ValidateFunc: validation.StringInSlice([]string{"BIGQUERY", "BIGTABLE", "BUCKET", "MSSQL", "MYSQL", "POSTGRESQL", "SPANNER"}, false),
 			},
 			"available_regions": {
 				Type:        schema.TypeString,
