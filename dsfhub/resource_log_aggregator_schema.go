@@ -161,3 +161,9 @@ var requiredLogAggregatorJson = `{
 		}
 	}
 }`
+
+var slowQueryAuditTypes = []string{
+	"AWS_RDS_AURORA_MYSQL_SLOW", 
+	"AWS_RDS_MYSQL_SLOW",
+	"AWS_NEPTUNE_SLOW",
+};

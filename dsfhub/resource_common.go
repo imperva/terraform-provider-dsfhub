@@ -386,6 +386,15 @@ func getSchema() AssetSchema {
 	return assetSchema
 }
 
+func contains(l []string, x string) bool {
+	for _, a := range l {
+		if a == x {
+			return true
+		}
+	}
+	return false
+}
+
 // ConnectionData resource hash functions
 func resourceConnectionDataAmazonSecretHash(v interface{}) int {
 	var buf bytes.Buffer
