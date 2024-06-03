@@ -67,12 +67,12 @@ func resourceLogAggregator() *schema.Resource {
 				Computed:    true,
 			},
 			"audit_type": {
-				Type:         schema.TypeString,
-				Description:  "Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details.  Example: \"BIGQUERY\",\"BIGTABLE\",\"BUCKET\",\"MSSQL\",\"MYSQL\",\"POSTGRESQL\",\"SPANNER\"",
-				Required:     false,
-				Optional:     true,
-				Default:      nil,
-				ValidateFunc: validation.StringInSlice([]string{"BIGQUERY", "BIGTABLE", "BUCKET", "MSSQL", "MYSQL", "POSTGRESQL", "SPANNER"}, false),
+				Type:        schema.TypeString,
+				Description: "Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details.  Example: \"BIGQUERY\",\"BIGTABLE\",\"BUCKET\",\"MSSQL\",\"MYSQL\",\"POSTGRESQL\",\"SPANNER\"",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+				// ValidateFunc: validation.StringInSlice([]string{"BIGQUERY", "BIGTABLE", "BUCKET", "MSSQL", "MYSQL", "POSTGRESQL", "SPANNER"}, false),
 			},
 			"available_regions": {
 				Type:        schema.TypeString,
@@ -636,23 +636,50 @@ func resourceLogAggregatorCreate(d *schema.ResourceData, m interface{}) error {
 	d.SetId(logAggregatorId)
 
 	auditPullEnabled := d.Get("audit_pull_enabled").(bool)
+	auditType := d.Get("audit_type").(string)
+	assetId := d.Get("asset_id").(string)
 	parentAssetId := d.Get("parent_asset_id")
-	if parentAssetId != nil && auditPullEnabled == true {
+
+	if auditPullEnabled {
 		wait := 6 * time.Second
-		parentAssetId := d.Get("parent_asset_id").(string)
-		log.Printf("[INFO] Disabling and enabling audit for DSF data source parentAssetId: %s \n", parentAssetId)
-		_, err1 := client.DisableAuditDSFDataSource(parentAssetId)
-		if err1 != nil {
-			log.Printf("[INFO] Error disabling audit for parentAssetId: %s\n", parentAssetId)
-			return err1
+
+		// if using one of slow_query audit types, enable audit on log aggregator
+		if contains(slowQueryAuditTypes, auditType) {
+			log.Printf("[INFO] Disabling and enabling audit for DSF data source assetId: %s \n", assetId)
+
+			_, err1 := client.DisableAuditDSFDataSource(assetId)
+			if err1 != nil {
+				log.Printf("[INFO] Error disabling audit for assetId: %s\n", assetId)
+				return err1
+			}
+			time.Sleep(wait)
+
+			_, err2 := client.EnableAuditDSFDataSource(assetId)
+			if err2 != nil {
+				log.Printf("[INFO] Error enabling audit for assetId: %s\n", assetId)
+				return err2
+			}
+			time.Sleep(wait)
+			// if not, enable audit against parent
+		} else if parentAssetId != nil {
+			parentAssetId := d.Get("parent_asset_id").(string)
+
+			log.Printf("[INFO] Disabling and enabling audit for DSF data source parentAssetId: %s \n", parentAssetId)
+			_, err1 := client.DisableAuditDSFDataSource(parentAssetId)
+			if err1 != nil {
+				log.Printf("[INFO] Error disabling audit for parentAssetId: %s\n", parentAssetId)
+				return err1
+			}
+			time.Sleep(wait)
+
+			_, err2 := client.EnableAuditDSFDataSource(parentAssetId)
+			if err2 != nil {
+				log.Printf("[INFO] Error enabling audit for parentAssetId: %s\n", parentAssetId)
+				return err2
+			}
+			time.Sleep(wait)
 		}
-		time.Sleep(wait)
-		_, err2 := client.EnableAuditDSFDataSource(parentAssetId)
-		if err2 != nil {
-			log.Printf("[INFO] Error enabling audit for parentAssetId: %s\n", parentAssetId)
-			return err2
-		}
-		time.Sleep(wait)
+
 	}
 
 	// Set the rest of the state from the resource read
