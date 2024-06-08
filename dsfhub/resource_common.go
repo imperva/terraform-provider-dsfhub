@@ -361,8 +361,12 @@ func populateStructField(structField *reflect.Value, schemaField SchemaField, d 
 			//	value := d.Get(schemaField.ID).(string)
 			//	log.Printf("[DEBUG] reflect.Interface %v Type:%v\n", schemaField.ID, reflect.TypeOf(value))
 			//	structField.SetString(string(value))
-			//case reflect.Slice:
-			//	// Handle slices or arrays here
+			case reflect.Slice:
+				value := d.Get(schemaField.ID).([]interface{})
+				for _, v := range value {
+					log.Printf("[DEBUG] slice value v: %v\n", v)
+				}
+				structField.Set(reflect.ValueOf(value))
 			//case reflect.Map:
 			//	// Handle maps here
 			default:

@@ -91,7 +91,7 @@ type AssetData struct {
 	AuditPullEnabled       bool              `json:"audit_pull_enabled,omitempty"`
 	AuditType              string            `json:"audit_type,omitempty"`
 	AvailabilityZones      string            `json:"availability_zones,omitempty"`
-	AvailableRegions       string            `json:"available_regions,omitempty"`
+	AvailableRegions       []interface{}     `json:"available_regions,omitempty"`
 	AwsProxyConfig         *AwsProxyConfig   `json:"aws_proxy_config,omitempty"`
 	CaCertsPath            string            `json:"ca_certs_path,omitempty"`
 	CaFile                 string            `json:"ca_file,omitempty"`
