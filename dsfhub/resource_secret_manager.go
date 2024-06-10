@@ -35,6 +35,8 @@ func resourceSecretManager() *schema.Resource {
 				Description: "Amazon Resource Name - format is arn:partition:service:region:account-id and used as the asset_id",
 				Required:    false,
 				Optional:    true,
+				Computed:    true,
+				Default:     nil,
 			},
 			"asset_display_name": {
 				Type:        schema.TypeString,
