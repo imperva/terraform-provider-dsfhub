@@ -27,7 +27,7 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 					structField := structDataFieldKeys.FieldByName(curStructField.Name)
 					populateStructField(&structField, schemaField, d)
 				} else {
-					log.Printf("[DEBUG] Unknown type for Data field d.GetOk(%v)\n", schemaField.ID)
+					log.Printf("[DEBUG] Data field %v not provided in terraform config - not found by d.GetOk(%v)\n", schemaField.ID, schemaField.ID)
 				}
 			}
 		} else {
@@ -92,7 +92,7 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 						}
 					}
 				} else {
-					log.Printf("[DEBUG] Unknown type for AssetData field d.GetOk(%v)\n", schemaField.ID)
+					log.Printf("[DEBUG] AssetData field %v not provided in terraform config - not found by d.GetOk(%v)\n", schemaField.ID, schemaField.ID)
 				}
 			}
 		} else {
