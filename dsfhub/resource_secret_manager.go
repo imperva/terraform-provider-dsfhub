@@ -60,6 +60,7 @@ func resourceSecretManager() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
