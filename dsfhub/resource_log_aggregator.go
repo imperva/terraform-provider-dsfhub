@@ -67,11 +67,11 @@ func resourceLogAggregator() *schema.Resource {
 				Computed:    true,
 			},
 			"audit_type": {
-				Type:         schema.TypeString,
-				Description:  "Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details.  Example: \"BIGQUERY\",\"BIGTABLE\",\"BUCKET\",\"MSSQL\",\"MYSQL\",\"POSTGRESQL\",\"SPANNER\"",
-				Required:     false,
-				Optional:     true,
-				Default:      nil,
+				Type:        schema.TypeString,
+				Description: "Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details.  Example: \"BIGQUERY\",\"BIGTABLE\",\"BUCKET\",\"MSSQL\",\"MYSQL\",\"POSTGRESQL\",\"SPANNER\"",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
 				//ValidateFunc: validation.StringInSlice([]string{"BIGQUERY", "BIGTABLE", "BUCKET", "MSSQL", "MYSQL", "POSTGRESQL", "SPANNER"}, false),
 			},
 			"available_regions": {

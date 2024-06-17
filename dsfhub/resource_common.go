@@ -100,7 +100,7 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 		}
 	}
 
-	// Check to see if AWS serverType, populate arn from asset_id   
+	// Check to see if AWS serverType, populate arn from asset_id
 	arn_state := d.Get("arn").(string)
 	isAwsServerType := strings.HasPrefix(dsfDataSource.Data.ServerType, "AWS")
 	// fmt.Println(arn_state)
@@ -111,7 +111,7 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 			dsfDataSource.Data.AssetData.Arn = arn_state
 		}
 	}
-    
+
 	//  Iterate through asset_connection blocks in resource input
 	var connectionsAry = make([]AssetConnection, 0)
 	connections := d.Get("asset_connection").(*schema.Set)
