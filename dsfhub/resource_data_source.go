@@ -3,10 +3,10 @@ package dsfhub
 import (
 	"bytes"
 	"fmt"
+	"log"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"log"
-	"time"
 )
 
 func resourceDSFDataSource() *schema.Resource {
@@ -94,7 +94,8 @@ func resourceDSFDataSource() *schema.Resource {
 				Description: "If true, sonargateway will collect the audit logs for this system if it can.",
 				Required:    false,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
+				Default:     nil,
 			},
 			// "audit_state": {
 			// 	Type:         schema.TypeString,
@@ -1307,6 +1308,7 @@ func resourceDSFDataSourceCreate(d *schema.ResourceData, m interface{}) error {
 	dsfDataSource := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&dsfDataSource, serverType, d)
+	// auditPullEnabled set to false as connect/disconnect logic handled below
 	dsfDataSource.Data.AssetData.AuditPullEnabled = false
 	log.Printf("[INFO] Creating DSF data source for serverType: %s and gatewayId: %s \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
 	dsfDataSourceResponse, err := client.CreateDSFDataSource(dsfDataSource)
@@ -1316,33 +1318,12 @@ func resourceDSFDataSourceCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
+	// Connect/disconnect asset to gateway
+	connectDisconnectGateway(d, dsfDataSource, m)
+
+	// Set ID
 	dsfDataSourceId := dsfDataSourceResponse.Data.AssetData.AssetID
 	d.SetId(dsfDataSourceId)
-
-	auditPullEnabled := d.Get("audit_pull_enabled").(bool)
-	if auditPullEnabled == true {
-		wait := 6 * time.Second
-		log.Printf("[INFO] Disabling and enabling audit for DSF data source dsfDataSourceId: %s and gatewayId: %s \n", dsfDataSourceId, dsfDataSource.Data.GatewayID)
-		_, err1 := client.DisableAuditDSFDataSource(dsfDataSourceId)
-		if err1 != nil {
-			log.Printf("[INFO] Error disabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
-			return err1
-		}
-		time.Sleep(wait)
-		_, err2 := client.EnableAuditDSFDataSource(dsfDataSourceId)
-		if err2 != nil {
-			log.Printf("[INFO] Error enabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
-			return err2
-		}
-		time.Sleep(wait)
-	} else if auditPullEnabled == false {
-		log.Printf("[INFO] Disabling DSF data source for serverType: %s and gatewayId: %s \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
-		_, err := client.DisableAuditDSFDataSource(dsfDataSourceId)
-		if err != nil {
-			log.Printf("[INFO] Error disabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
-			return err
-		}
-	}
 
 	// Set the rest of the state from the resource read
 	return resourceDSFDataSourceRead(d, m)
@@ -1650,7 +1631,6 @@ func resourceDSFDataSourceUpdate(d *schema.ResourceData, m interface{}) error {
 	dsfDataSource := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&dsfDataSource, serverType, d)
-	dsfDataSource.Data.AssetData.AuditPullEnabled = false
 
 	log.Printf("[INFO] Updating DSF data source for serverType: %s and gatewayId: %s assetId: %s\n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, dsfDataSource.Data.AssetData.AssetID)
 	_, err := client.UpdateDSFDataSource(dsfDataSourceId, dsfDataSource)
@@ -1660,32 +1640,11 @@ func resourceDSFDataSourceUpdate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	d.SetId(dsfDataSourceId)
+	// Connect/disconnect asset to gateway
+	connectDisconnectGateway(d, dsfDataSource, m)
 
-	auditPullEnabled := d.Get("audit_pull_enabled").(bool)
-	if auditPullEnabled == true {
-		wait := 6 * time.Second
-		log.Printf("[INFO] Disabling and enabling audit for DSF data source dsfDataSourceId: %s and gatewayId: %s \n", dsfDataSourceId, dsfDataSource.Data.GatewayID)
-		_, err1 := client.DisableAuditDSFDataSource(dsfDataSourceId)
-		if err1 != nil {
-			log.Printf("[INFO] Error disabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
-			return err1
-		}
-		time.Sleep(wait)
-		_, err2 := client.EnableAuditDSFDataSource(dsfDataSourceId)
-		if err2 != nil {
-			log.Printf("[INFO] Error enabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
-			return err2
-		}
-		time.Sleep(wait)
-	} else if auditPullEnabled == false {
-		log.Printf("[INFO] Disabling DSF data source for serverType: %s and gatewayId: %s \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
-		_, err := client.DisableAuditDSFDataSource(dsfDataSourceId)
-		if err != nil {
-			log.Printf("[INFO] Error disabling audit for dsfDataSourceId: %s\n", dsfDataSourceId)
-			return err
-		}
-	}
+	// Set ID
+	d.SetId(dsfDataSourceId)
 
 	// Set the rest of the state from the resource read
 	return resourceDSFDataSourceRead(d, m)

@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"log"
-	"time"
 )
 
 func resourceLogAggregator() *schema.Resource {
@@ -627,7 +626,8 @@ func resourceLogAggregatorCreate(d *schema.ResourceData, m interface{}) error {
 	logAggregator := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&logAggregator, serverType, d)
-
+	// auditPullEnabled set to false as connect/disconnect logic handled below
+	logAggregator.Data.AssetData.AuditPullEnabled = false
 	log.Printf("[INFO] Creating LogAggregator for serverType: %s and gatewayId: %s\n", logAggregator.Data.ServerType, logAggregator.Data.GatewayID)
 	createLogAggregatorResponse, err := client.CreateLogAggregator(logAggregator)
 
@@ -636,55 +636,12 @@ func resourceLogAggregatorCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
+	// Connect/disconnect asset to gateway
+	connectDisconnectGateway(d, logAggregator, m)
+
+	// Set ID
 	logAggregatorId := createLogAggregatorResponse.Data.ID
 	d.SetId(logAggregatorId)
-
-	auditPullEnabled := d.Get("audit_pull_enabled").(bool)
-	auditType := d.Get("audit_type").(string)
-	assetId := d.Get("asset_id").(string)
-	parentAssetId := d.Get("parent_asset_id")
-
-	if auditPullEnabled {
-		wait := 6 * time.Second
-
-		// if using one of slow_query audit types, enable audit on log aggregator
-		if contains(slowQueryAuditTypes, auditType) {
-			log.Printf("[INFO] Disabling and enabling audit for DSF data source assetId: %s \n", assetId)
-
-			_, err1 := client.DisableAuditDSFDataSource(assetId)
-			if err1 != nil {
-				log.Printf("[INFO] Error disabling audit for assetId: %s\n", assetId)
-				return err1
-			}
-			time.Sleep(wait)
-
-			_, err2 := client.EnableAuditDSFDataSource(assetId)
-			if err2 != nil {
-				log.Printf("[INFO] Error enabling audit for assetId: %s\n", assetId)
-				return err2
-			}
-			time.Sleep(wait)
-			// if not, enable audit against parent
-		} else if parentAssetId != nil {
-			parentAssetId := d.Get("parent_asset_id").(string)
-
-			log.Printf("[INFO] Disabling and enabling audit for DSF data source parentAssetId: %s \n", parentAssetId)
-			_, err1 := client.DisableAuditDSFDataSource(parentAssetId)
-			if err1 != nil {
-				log.Printf("[INFO] Error disabling audit for parentAssetId: %s\n", parentAssetId)
-				return err1
-			}
-			time.Sleep(wait)
-
-			_, err2 := client.EnableAuditDSFDataSource(parentAssetId)
-			if err2 != nil {
-				log.Printf("[INFO] Error enabling audit for parentAssetId: %s\n", parentAssetId)
-				return err2
-			}
-			time.Sleep(wait)
-		}
-
-	}
 
 	// Set the rest of the state from the resource read
 	return resourceLogAggregatorRead(d, m)
@@ -704,7 +661,7 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if logAggregatorReadResponse != nil {
-		log.Printf("[INFO] Reading CloudAcount with logAggregatorId: %s | err: %s\n", logAggregatorId, err)
+		log.Printf("[INFO] Reading LogAggregator with logAggregatorId: %s | err: %s\n", logAggregatorId, err)
 	}
 
 	log.Printf("[DEBUG] logAggregatorReadResponse: %s\n", logAggregatorReadResponse.Data.ID)
@@ -859,6 +816,10 @@ func resourceLogAggregatorUpdate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
+	// Connect/disconnect asset to gateway
+	connectDisconnectGateway(d, logAggregator, m)
+
+	// Set ID
 	d.SetId(logAggregatorId)
 
 	// Set the rest of the state from the resource read

@@ -8,6 +8,7 @@ import (
 	"log"
 	"reflect"
 	"strings"
+	"time"
 )
 
 func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema.ResourceData) {
@@ -397,6 +398,73 @@ func contains(l []string, x string) bool {
 		}
 	}
 	return false
+}
+
+func connectDisconnectGateway(d *schema.ResourceData, dsfDataSource ResourceWrapper, m interface{}) error {
+	// func connectDisconnectGateway(d *schema.ResourceData, dsfDataSource ResourceWrapper, m interface{}) {
+	client := m.(*Client)
+
+	// give enough time for connect/disconnect gateway playbook to complete
+	wait := 6 * time.Second
+
+	assetId := d.Get("asset_id").(string)
+	auditPullEnabled := d.Get("audit_pull_enabled").(bool)
+	auditType := d.Get("audit_type").(string)
+	auditPullEnabledChanged := d.HasChange("audit_pull_enabled")
+	auditTypeChanged := d.HasChange("audit_type")
+
+	log.Printf("[DEBUG] connectDisconnectGateway - assetId: %v", assetId)
+	log.Printf("[DEBUG] connectDisconnectGateway - auditPullEnabled: %v", auditPullEnabled)
+	log.Printf("[DEBUG] connectDisconnectGateway - auditType: %v", auditType)
+	log.Printf("[DEBUG] connectDisconnectGateway - auditPullEnabledChanged: %v", auditPullEnabledChanged)
+	log.Printf("[DEBUG] connectDisconnectGateway - auditTypeChanged: %v", auditTypeChanged)
+
+	// if audit_pull_enabled has been changed, connect/disconnect from gateway as needed
+	if auditPullEnabledChanged {
+		if auditPullEnabled {
+			// connect gateway
+			_, err := client.EnableAuditDSFDataSource(assetId)
+			if err != nil {
+				log.Printf("[INFO] Error enabling audit for assetId: %s\n", assetId)
+				return err
+			}
+			time.Sleep(wait)
+
+			// disconnect gateway
+		} else {
+			_, err := client.DisableAuditDSFDataSource(assetId)
+			if err != nil {
+				log.Printf("[INFO] Error disabling audit for assetId: %s\n", assetId)
+				return err
+			}
+			time.Sleep(wait)
+		}
+		// if asset is already connected, check whether relevant fields have been updated and reconnect to gateway
+	} else if auditPullEnabled {
+		if auditTypeChanged {
+			origAuditType, newAuditType := d.GetChange("audit_type")
+			log.Printf("[INFO] auditType value has changed from %s to %s, reconnecting asset to gateway\n", origAuditType, newAuditType)
+
+			// disconnect
+			_, err1 := client.DisableAuditDSFDataSource(assetId)
+			if err1 != nil {
+				log.Printf("[INFO] Error disabling audit for assetId: %s\n", assetId)
+				return err1
+			}
+			time.Sleep(wait)
+
+			// reconnect
+			_, err2 := client.EnableAuditDSFDataSource(assetId)
+			if err2 != nil {
+				log.Printf("[INFO] Error enabling audit for assetId: %s\n", assetId)
+				return err2
+			}
+			time.Sleep(wait)
+		}
+	} else {
+		log.Printf("[INFO] Asset %s does not need to be connected to or disconnected from gateway", assetId)
+	}
+	return nil
 }
 
 // ConnectionData resource hash functions
