@@ -75,11 +75,15 @@ func resourceLogAggregator() *schema.Resource {
 				// ValidateFunc: validation.StringInSlice([]string{"BIGQUERY", "BIGTABLE", "BUCKET", "MSSQL", "MYSQL", "POSTGRESQL", "SPANNER"}, false),
 			},
 			"available_regions": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeList,
 				Description: "A list of regions to use in discovery actions that iterate through region",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 			"aws_proxy_config": {
 				Type:        schema.TypeSet,

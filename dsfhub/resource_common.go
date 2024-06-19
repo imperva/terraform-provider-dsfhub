@@ -27,7 +27,7 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 					structField := structDataFieldKeys.FieldByName(curStructField.Name)
 					populateStructField(&structField, schemaField, d)
 				} else {
-					log.Printf("[DEBUG] Unknown type for Data field d.GetOk(%v)\n", schemaField.ID)
+					log.Printf("[DEBUG] Data field %v not provided in terraform config - not found by d.GetOk(%v)\n", schemaField.ID, schemaField.ID)
 				}
 			}
 		} else {
@@ -92,7 +92,7 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 						}
 					}
 				} else {
-					log.Printf("[DEBUG] Unknown type for AssetData field d.GetOk(%v)\n", schemaField.ID)
+					log.Printf("[DEBUG] AssetData field %v not provided in terraform config - not found by d.GetOk(%v)\n", schemaField.ID, schemaField.ID)
 				}
 			}
 		} else {
@@ -361,8 +361,12 @@ func populateStructField(structField *reflect.Value, schemaField SchemaField, d 
 			//	value := d.Get(schemaField.ID).(string)
 			//	log.Printf("[DEBUG] reflect.Interface %v Type:%v\n", schemaField.ID, reflect.TypeOf(value))
 			//	structField.SetString(string(value))
-			//case reflect.Slice:
-			//	// Handle slices or arrays here
+			case reflect.Slice:
+				value := d.Get(schemaField.ID).([]interface{})
+				for _, v := range value {
+					log.Printf("[DEBUG] slice value v: %v\n", v)
+				}
+				structField.Set(reflect.ValueOf(value))
 			//case reflect.Map:
 			//	// Handle maps here
 			default:
