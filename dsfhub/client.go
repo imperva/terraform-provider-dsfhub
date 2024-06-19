@@ -93,6 +93,7 @@ type AssetData struct {
 	AvailabilityZones      string            `json:"availability_zones,omitempty"`
 	AvailableRegions       []interface{}     `json:"available_regions,omitempty"`
 	AwsProxyConfig         *AwsProxyConfig   `json:"aws_proxy_config,omitempty"`
+	BucketAccountId        string            `json:"bucket_account_id,omitempty"`
 	CaCertsPath            string            `json:"ca_certs_path,omitempty"`
 	CaFile                 string            `json:"ca_file,omitempty"`
 	ClusterEngine          string            `json:"cluster_engine,omitempty"`

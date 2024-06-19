@@ -1272,6 +1272,15 @@ var assetSchemaJson = `{
             "required": false,
             "type": "map"
         },
+        "BucketAccountId": {
+            "defaultValue": null,
+            "description": "AWS account ID",
+            "displayName": "Bucket Account ID",
+            "example": "123456789101",
+            "id": "bucket_account_id",
+            "required": false,
+            "type": "string" 
+        },
         "CaCertsPath": {
             "defaultValue": null,
             "description": "Certificate authority certificates path; what location should the sysetm look for certificate information from. Equivalent to --capath in a curl call",

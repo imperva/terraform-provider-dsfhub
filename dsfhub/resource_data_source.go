@@ -44,14 +44,14 @@ func resourceDSFDataSource() *schema.Resource {
 			// 	Required:    false,
 			// 	Optional:    true,
 			// },
-			//"arn": {
-			//	Type:        schema.TypeString,
-			//	Description: "Amazon Resource Name - format is arn:partition:service:region:account-id:resource-type:resource-id and used as the asset_id",
-			//	Required:    false,
-			//	Optional:    true,
-			//	Computed:    true,
-			//	Default:     nil,
-			//},
+			"arn": {
+				Type:        schema.TypeString,
+				Description: "Amazon Resource Name - format is arn:partition:service:region:account-id:resource-type:resource-id and used as the asset_id",
+				Required:    false,
+				Optional:    true,
+				Computed:    true,
+				Default:     nil,
+			},
 			"asset_display_name": {
 				Type:        schema.TypeString,
 				Description: "User-friendly name of the asset, defined by user.",
@@ -1351,7 +1351,7 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("admin_email", dsfDataSourceReadResponse.Data.AssetData.AdminEmail)
 	//d.Set("application", dsfDataSourceReadResponse.Data.AssetData.Application)
 	//d.Set("archive", dsfDataSourceReadResponse.Data.AssetData.Archive)
-	//d.Set("arn", dsfDataSourceReadResponse.Data.AssetData.Arn)
+	d.Set("arn", dsfDataSourceReadResponse.Data.AssetData.Arn)
 	d.Set("asset_display_name", dsfDataSourceReadResponse.Data.AssetData.AssetDisplayName)
 	d.Set("asset_id", dsfDataSourceReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", dsfDataSourceReadResponse.Data.AssetData.AssetSource)

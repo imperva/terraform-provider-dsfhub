@@ -30,12 +30,14 @@ func resourceSecretManager() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 			},
-			//"arn": {
-			//	Type:        schema.TypeString,
-			//	Description: "Amazon Resource Name - format is arn:partition:service:region:account-id and used as the asset_id",
-			//	Required:    false,
-			//	Optional:    true,
-			//},
+			"arn": {
+				Type:        schema.TypeString,
+				Description: "Amazon Resource Name - format is arn:partition:service:region:account-id and used as the asset_id",
+				Required:    false,
+				Optional:    true,
+				Computed:    true,
+				Default:     nil,
+			},
 			"asset_display_name": {
 				Type:        schema.TypeString,
 				Description: "User-friendly name of the asset, defined by user.",
@@ -539,7 +541,7 @@ func resourceSecretManagerRead(d *schema.ResourceData, m interface{}) error {
 	// Set returned and computed values
 	d.Set("admin_email", secretManagerReadResponse.Data.AssetData.AdminEmail)
 	d.Set("application", secretManagerReadResponse.Data.AssetData.Application)
-	//d.Set("arn", secretManagerReadResponse.Data.AssetData.Arn)
+	d.Set("arn", secretManagerReadResponse.Data.AssetData.Arn)
 	d.Set("asset_display_name", secretManagerReadResponse.Data.AssetData.AssetDisplayName)
 	d.Set("asset_id", secretManagerReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", secretManagerReadResponse.Data.AssetData.AssetSource)

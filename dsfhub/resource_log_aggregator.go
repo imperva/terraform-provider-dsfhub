@@ -30,14 +30,14 @@ func resourceLogAggregator() *schema.Resource {
 			//	Required:    false,
 			//	Optional:    true,
 			//},
-			//"arn": {
-			//	Type:        schema.TypeString,
-			//	Description: "Amazon Resource Name - format is arn:partition:service:region:account-id and used as the asset_id",
-			//	Required:    false,
-			//	Optional:    true,
-			//	Computed:    true,
-			//	Default:     nil,
-			//},
+			"arn": {
+				Type:        schema.TypeString,
+				Description: "Amazon Resource Name - format is arn:partition:service:region:account-id and used as the asset_id",
+				Required:    false,
+				Optional:    true,
+				Computed:    true,
+				Default:     nil,
+			},
 			"asset_display_name": {
 				Type:        schema.TypeString,
 				Description: "User-friendly name of the asset, defined by user.",
@@ -435,6 +435,13 @@ func resourceLogAggregator() *schema.Resource {
 					},
 				},
 			},
+			"bucket_account_id": {
+				Type:        schema.TypeString,
+				Description: "S3 bucket Account ID",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
 			"credentials_endpoint": {
 				Type:        schema.TypeString,
 				Description: "A specific sts endpoint to use",
@@ -668,13 +675,14 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 	// Set returned and computed values
 	d.Set("admin_email", logAggregatorReadResponse.Data.AssetData.AdminEmail)
 	//d.Set("application", logAggregatorReadResponse.Data.AssetData.Application)
-	//d.Set("arn", logAggregatorReadResponse.Data.AssetData.Arn)
+	d.Set("arn", logAggregatorReadResponse.Data.AssetData.Arn)
 	d.Set("asset_display_name", logAggregatorReadResponse.Data.AssetData.AssetDisplayName)
 	d.Set("asset_id", logAggregatorReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", logAggregatorReadResponse.Data.AssetData.AssetSource)
 	d.Set("audit_pull_enabled", logAggregatorReadResponse.Data.AssetData.AuditPullEnabled)
 	d.Set("audit_type", logAggregatorReadResponse.Data.AssetData.AuditType)
 	d.Set("available_regions", logAggregatorReadResponse.Data.AssetData.AvailableRegions)
+	d.Set("bucket_account_id", logAggregatorReadResponse.Data.AssetData.BucketAccountId)
 	d.Set("credential_endpoint", logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint)
 	d.Set("criticality", logAggregatorReadResponse.Data.AssetData.Criticality)
 	d.Set("gateway_id", logAggregatorReadResponse.Data.GatewayID)

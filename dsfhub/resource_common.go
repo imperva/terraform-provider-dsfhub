@@ -102,8 +102,15 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 	}
 
 	// Check to see if AWS serverType, populate arn from asset_id
-	if ok := strings.HasPrefix(dsfDataSource.Data.ServerType, "AWS"); ok {
-		dsfDataSource.Data.AssetData.Arn = dsfDataSource.Data.AssetData.AssetID
+	arn_state := d.Get("arn").(string)
+	isAwsServerType := strings.HasPrefix(dsfDataSource.Data.ServerType, "AWS")
+	// fmt.Println(arn_state)
+	if isAwsServerType {
+		if arn_state == "" {
+			dsfDataSource.Data.AssetData.Arn = dsfDataSource.Data.AssetData.AssetID
+		} else {
+			dsfDataSource.Data.AssetData.Arn = arn_state
+		}
 	}
 
 	//  Iterate through asset_connection blocks in resource input
