@@ -816,6 +816,14 @@ func resourceLogAggregatorUpdate(d *schema.ResourceData, m interface{}) error {
 	serverType := d.Get("server_type").(string)
 	createResource(&logAggregator, serverType, d)
 
+	log.Printf("[DEBUG] AuditPullEnabled value in logAggregator is: '%v'", logAggregator.Data.AssetData.AuditPullEnabled)
+	// Do not change audit_pull_enabled in initial update payload as it is handled below
+	auditPullEnabledChanged := d.HasChange("audit_pull_enabled")
+	if auditPullEnabledChanged {
+		origAuditPullEnabled, _ := d.GetChange("audit_pull_enabled")
+		logAggregator.Data.AssetData.AuditPullEnabled = origAuditPullEnabled.(bool)
+	}
+
 	log.Printf("[INFO] Updating LogAggregator for serverType: %s and gatewayId: %s assetId: %s\n", logAggregator.Data.ServerType, logAggregator.Data.GatewayID, logAggregator.Data.AssetData.AssetID)
 	_, err := client.UpdateLogAggregator(logAggregatorId, logAggregator)
 

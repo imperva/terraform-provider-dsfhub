@@ -1632,6 +1632,13 @@ func resourceDSFDataSourceUpdate(d *schema.ResourceData, m interface{}) error {
 	serverType := d.Get("server_type").(string)
 	createResource(&dsfDataSource, serverType, d)
 
+	// Do not change audit_pull_enabled in initial update payload as it is handled below
+	auditPullEnabledChanged := d.HasChange("audit_pull_enabled")
+	if auditPullEnabledChanged {
+		origAuditPullEnabled, _ := d.GetChange("audit_pull_enabled")
+		dsfDataSource.Data.AssetData.AuditPullEnabled = origAuditPullEnabled.(bool)
+	}
+
 	log.Printf("[INFO] Updating DSF data source for serverType: %s and gatewayId: %s assetId: %s\n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, dsfDataSource.Data.AssetData.AssetID)
 	_, err := client.UpdateDSFDataSource(dsfDataSourceId, dsfDataSource)
 
