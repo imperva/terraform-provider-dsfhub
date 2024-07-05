@@ -158,6 +158,13 @@ func resourceDSFDataSource() *schema.Resource {
 					},
 				},
 			},
+			"bucket_account_id": {
+				Type:        schema.TypeString,
+				Description: "S3 bucket Account ID",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
 			"ca_certs_path": {
 				Type:        schema.TypeString,
 				Description: "Certificate authority certificates path; what location should the sysetm look for certificate information from. Equivalent to --capath in a curl call",
@@ -1360,6 +1367,7 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("audit_type", dsfDataSourceReadResponse.Data.AssetData.AuditType)
 	d.Set("availability_zones", dsfDataSourceReadResponse.Data.AssetData.AvailabilityZones)
 	d.Set("available_regions", dsfDataSourceReadResponse.Data.AssetData.AvailableRegions)
+	d.Set("bucket_account_id", dsfDataSourceReadResponse.Data.AssetData.BucketAccountId)
 	d.Set("ca_certs_path", dsfDataSourceReadResponse.Data.AssetData.CaCertsPath)
 	d.Set("ca_file", dsfDataSourceReadResponse.Data.AssetData.CaFile)
 	d.Set("cluster_engine", dsfDataSourceReadResponse.Data.AssetData.ClusterEngine)
