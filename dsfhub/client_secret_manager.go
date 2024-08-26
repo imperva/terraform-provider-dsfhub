@@ -22,7 +22,7 @@ func (c *Client) CreateSecretManager(secretManager ResourceWrapper) (*ResourceWr
 		return nil, fmt.Errorf("failed to JSON marshal SecreManager: %s\n", err)
 	}
 
-	resp, err := c.MakeCall(http.MethodPost, endpointSecretManagers, secretManagerJSON)
+	resp, err := c.MakeCallWithQueryParams(http.MethodPost, endpointSecretManagers, secretManagerJSON, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error adding SecretManager of serverType: %s and gatewayID: %s | err: %s\n", secretManager.Data.ServerType, secretManager.Data.GatewayID, err)
 	}
@@ -51,7 +51,7 @@ func (c *Client) ReadSecretManager(secretManagerId string) (*ResourceWrapper, er
 	log.Printf("[INFO] Getting SecretManager for secretManagerId: %s)\n", secretManagerId)
 
 	reqURL := fmt.Sprintf(endpointSecretManagers+"/%s", url.PathEscape(secretManagerId))
-	resp, err := c.MakeCall(http.MethodGet, reqURL, nil)
+	resp, err := c.MakeCallWithQueryParams(http.MethodGet, reqURL, nil, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error reading SecretManager for secretManagerId: %s | err: %s\n", secretManagerId, err)
 	}
@@ -80,7 +80,7 @@ func (c *Client) ReadSecretManager(secretManagerId string) (*ResourceWrapper, er
 func (c *Client) ReadSecretManagers() (*ResourcesWrapper, error) {
 	log.Printf("[INFO] Getting SecretManagers\n")
 
-	resp, err := c.MakeCall(http.MethodGet, endpointSecretManagers, nil)
+	resp, err := c.MakeCallWithQueryParams(http.MethodGet, endpointSecretManagers, nil, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error reading SecretManagers | err: %s\n", err)
 	}
@@ -116,7 +116,7 @@ func (c *Client) UpdateSecretManager(secretManagerId string, secretManager Resou
 	}
 
 	reqURL := fmt.Sprintf(endpointSecretManagers+"/%s", url.PathEscape(secretManagerId))
-	resp, err := c.MakeCall(http.MethodPut, reqURL, secretManagerJSON)
+	resp, err := c.MakeCallWithQueryParams(http.MethodPut, reqURL, secretManagerJSON, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error updating SecretManager with secretManagerId: %s | err: %s\n", secretManagerId, err)
 	}
@@ -146,7 +146,7 @@ func (c *Client) DeleteSecretManager(secretManagerId string) (*ResourceResponse,
 	log.Printf("[INFO] Deleting SecretManager with secretManagerId: %s\n", secretManagerId)
 
 	reqURL := fmt.Sprintf(endpointSecretManagers+"/%s", url.PathEscape(secretManagerId))
-	resp, err := c.MakeCall(http.MethodDelete, reqURL, nil)
+	resp, err := c.MakeCallWithQueryParams(http.MethodDelete, reqURL, nil, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting SecretManager for secretManagerId: %s, %s\n", secretManagerId, err)
 	}

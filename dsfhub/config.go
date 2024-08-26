@@ -15,6 +15,9 @@ type Config struct {
 
 	// InsecureSSL
 	InsecureSSL bool
+
+	// Params including syncType
+	Params map[string]string
 }
 
 var missingAPITokenMessage = "DSF HUB API Token must be provided"
