@@ -52,7 +52,7 @@ func (c *Client) ReadDSFDataSource(dataSourceId string) (*ResourceWrapper, error
 	log.Printf("[INFO] Getting DSFDataSource for dataSourceId: %s\n", dataSourceId)
 
 	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s", url.PathEscape(dataSourceId))
-	resp, err := c.MakeCallWithQueryParams(http.MethodGet, reqURL, nil, c.config.Params)
+	resp, err := c.MakeCall(http.MethodGet, reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error reading DSFDataSource for dataSourceId: %s | err: %s", dataSourceId, err)
 	}
@@ -82,7 +82,7 @@ func (c *Client) ReadDSFDataSource(dataSourceId string) (*ResourceWrapper, error
 func (c *Client) ReadDSFDataSources() (*ResourcesWrapper, error) {
 	log.Printf("[INFO] Getting DSFDataSources\n")
 
-	resp, err := c.MakeCallWithQueryParams(http.MethodGet, endpointDsfDataSource, nil, c.config.Params)
+	resp, err := c.MakeCall(http.MethodGet, endpointDsfDataSource, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error reading DSFDataSources | err: %s", err)
 	}
@@ -151,7 +151,7 @@ func (c *Client) DeleteDSFDataSource(dataSourceId string) (*ResourceResponse, er
 	log.Printf("[INFO] Deleting DSFDataSource with dataSourceId: %s\n", dataSourceId)
 
 	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s", url.PathEscape(dataSourceId))
-	resp, err := c.MakeCallWithQueryParams(http.MethodDelete, reqURL, nil, c.config.Params)
+	resp, err := c.MakeCall(http.MethodDelete, reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting DSFDataSource for dataSourceId: %s, %s", dataSourceId, err)
 	}
@@ -182,7 +182,7 @@ func (c *Client) EnableAuditDSFDataSource(dataSourceId string) (*UpdateAuditResp
 	log.Printf("[INFO] Enabling audit for dataSourceId: %v\n", dataSourceId)
 
 	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s/operations/enable-audit-collection", url.PathEscape(dataSourceId))
-	resp, err := c.MakeCallWithQueryParams(http.MethodPost, reqURL, nil, c.config.Params)
+	resp, err := c.MakeCall(http.MethodPost, reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error enabling audit for dataSourceId: %s | err: %s\n", dataSourceId, err)
 	}
@@ -211,7 +211,7 @@ func (c *Client) DisableAuditDSFDataSource(dataSourceId string) (*UpdateAuditRes
 	log.Printf("[INFO] Disabling audit for dataSourceId: %v\n", dataSourceId)
 
 	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s/operations/disable-audit-collection", url.PathEscape(dataSourceId))
-	resp, err := c.MakeCallWithQueryParams(http.MethodPost, reqURL, nil, c.config.Params)
+	resp, err := c.MakeCall(http.MethodPost, reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error disabling audit for dataSourceId: %s | err: %s\n", dataSourceId, err)
 	}

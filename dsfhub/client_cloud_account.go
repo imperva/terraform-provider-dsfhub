@@ -51,7 +51,7 @@ func (c *Client) ReadCloudAccount(cloudAccountId string) (*ResourceWrapper, erro
 	log.Printf("[INFO] Getting CloudAccount for cloudAccountId: %s)\n", cloudAccountId)
 
 	reqURL := fmt.Sprintf(endpointCloudAccounts+"/%s", url.PathEscape(cloudAccountId))
-	resp, err := c.MakeCallWithQueryParams(http.MethodGet, reqURL, nil, c.config.Params)
+	resp, err := c.MakeCall(http.MethodGet, reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error reading CloudAccount for cloudAccountId: %s | err: %s\n", cloudAccountId, err)
 	}
@@ -78,7 +78,7 @@ func (c *Client) ReadCloudAccount(cloudAccountId string) (*ResourceWrapper, erro
 
 // ReadCloudAccounts gets all CloudAccounts
 func (c *Client) ReadCloudAccounts() (*ResourcesWrapper, error) {
-	resp, err := c.MakeCallWithQueryParams(http.MethodGet, endpointCloudAccounts, nil, c.config.Params)
+	resp, err := c.MakeCall(http.MethodGet, endpointCloudAccounts, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error reading CloudAccounts | err: %s\n", err)
 	}
@@ -144,7 +144,7 @@ func (c *Client) DeleteCloudAccount(cloudAccountId string) (*ResourceResponse, e
 	log.Printf("[INFO] Deleting CloudAccount with cloudAccountId: %s\n", cloudAccountId)
 
 	reqURL := fmt.Sprintf(endpointCloudAccounts+"/%s", url.PathEscape(cloudAccountId))
-	resp, err := c.MakeCallWithQueryParams(http.MethodDelete, reqURL, nil, c.config.Params)
+	resp, err := c.MakeCall(http.MethodDelete, reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting CloudAccount for cloudAccountId: %s, %s\n", cloudAccountId, err)
 	}
