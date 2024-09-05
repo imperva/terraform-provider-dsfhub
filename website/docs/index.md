@@ -21,8 +21,8 @@ The following arguments are supported:
 * `dsfhub_token` - (Required) The [DSF API Token](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/84555.htm) for API operations. You can retrieve this from the DSF management hub console. Can be set via `DSFHUB_TOKEN` shell [environment variable](https://en.wikipedia.org/wiki/Environment_variable).
 * `insecure_ssl` - (Optional) The boolean flag that instructs the provider to allow for insecure SSL API calls to a DSF Hub instance to support tests against instances with self-signed certificates. Can be set via `INSECURE_SSL` shell [environment variable](https://en.wikipedia.org/wiki/Environment_variable).
 * `sync_type` - (Optional) Determines whether to sync asset creation/update operations with the Agentless gateways. Defaults to SYNC_GW_BLOCKING. Can be set via `SYNC_TYPE` shell [environment variable](https://en.wikipedia.org/wiki/Environment_variable). Available values: 
-  - SYNC_GW_BLOCKING: The operation is synchronous and blocks until all gateways have been updated.
-  - SYNC_GW_NON_BLOCKING: The operation is asynchronous and returns immediately. Use this option if the asset sync is expected to fail (e.g., an Agentless Gateway being down).
+  - SYNC_GW_BLOCKING: The operation is synchronous and blocks until all gateways have been updated. This means that, if syncing the assets to Agentless Gateways fails, the provider will throw an error and not continue. This may result in a difference between the state of which Terraform is aware and the assets that were actually imported.
+  - SYNC_GW_NON_BLOCKING: The operation is asynchronous and returns immediately.
   - DO_NOT_SYNC_GW: The operation is synchronous and does not update the gateways.
 
 For example,
