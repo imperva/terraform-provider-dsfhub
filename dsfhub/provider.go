@@ -22,7 +22,7 @@ func init() {
 			"insecure SSL API calls to the DSF Hub, or support for self-signed certificates.\n" +
 			"Example: 'true/false'. Can be set via TF_VAR_insecure_ssl environment variable.",
 
-		"sync_type": "Determines whether to sync this operation with the gateways. Available values:\n" +
+		"sync_type": "Determines whether to sync asset creation/update operations with the Agentless gateways. Available values:\n" +
 			"SYNC_GW_BLOCKING: The operation is synchronous and blocks until all gateways have been updated.\n" +
 			"SYNC_GW_NON_BLOCKING: The operation is asynchronous and returns immediately.\n" +
 			"DO_NOT_SYNC_GW: The operation is synchronous and does not update the gateways.\n" +

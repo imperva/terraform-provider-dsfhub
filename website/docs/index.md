@@ -20,6 +20,11 @@ The following arguments are supported:
 * `dsfhub_host` - (Required) The DSF host endpoint for [DSF HUB API](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/84552.htm) operations. Example: 'https://1.2.3.4:8443'. Can be set via `TF_VAR_dsfhub_host` shell [environment variable](https://en.wikipedia.org/wiki/Environment_variable).
 * `dsfhub_token` - (Required) The [DSF API Token](https://docs.imperva.com/bundle/v4.13-sonar-user-guide/page/84555.htm) for API operations. You can retrieve this from the DSF management hub console. Can be set via `TF_VAR_dsfhub_token` shell [environment variable](https://en.wikipedia.org/wiki/Environment_variable).
 * `insecure_ssl` - (Optional) The boolean flag that instructs the provider to allow for insecure SSL API calls to a DSF Hub instance to support tests against instances with self-signed certificates.
+* `sync_type` - (Optional) Determines whether to sync asset creation/update operations with the Agentless gateways. Defaults to SYNC_GW_BLOCKING. Available values: 
+  - SYNC_GW_BLOCKING: The operation is synchronous and blocks until all gateways have been updated.
+  - SYNC_GW_NON_BLOCKING: The operation is asynchronous and returns immediately.
+  - DO_NOT_SYNC_GW: The operation is synchronous and does not update the gateways.
+
 
 ```hcl
 # Specify path for provider
