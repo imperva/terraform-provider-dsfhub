@@ -429,6 +429,9 @@ func connectDisconnectGateway(d *schema.ResourceData, dsfDataSource ResourceWrap
 	// if audit_pull_enabled has been changed, connect/disconnect from gateway as needed
 	if auditPullEnabledChanged {
 		if auditPullEnabled {
+			// allow time for asset syncs to gateways to finish
+			time.Sleep(wait)
+			
 			// connect gateway
 			_, err := client.EnableAuditDSFDataSource(assetId)
 			if err != nil {
