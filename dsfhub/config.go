@@ -2,6 +2,7 @@ package dsfhub
 
 import (
 	"errors"
+	"slices"
 	"strings"
 )
 
@@ -36,8 +37,7 @@ func (c *Config) Client() (interface{}, error) {
 		return nil, errors.New(missingDSFHostMessage)
 	}
 	// Check sync_type param
-	syncType, exists := c.Params["syncType"]
-	if exists {
+	if syncType, exists := c.Params["syncType"]; exists {
 		if ! IsValidSyncType(syncType) {
 			return nil, errors.New(invalidSyncTypeMessage)
 		}
@@ -57,10 +57,5 @@ func (c *Config) Client() (interface{}, error) {
 }
 
 func IsValidSyncType (sync_type string) bool {
-	for _, valid_sync_type := range validSyncTypes {
-		if sync_type == valid_sync_type {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(validSyncTypes, sync_type)
 }
