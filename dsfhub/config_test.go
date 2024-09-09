@@ -88,7 +88,6 @@ func TestInvalidSyncType(t *testing.T) {
 	}))
 	defer server.Close()
 
-	
 	invalidSyncType := "BAD_SYNC_TYPE"
 	log.Printf("[INFO] Configuring client with sync_type: '%v'\n", invalidSyncType)
 	log.Printf("[DEBUG] Test server URL %v \n", server.URL)
