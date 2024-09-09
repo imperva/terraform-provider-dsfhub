@@ -21,7 +21,7 @@ func (c *Client) CreateLogAggregator(logAggregator ResourceWrapper) (*ResourceWr
 		return nil, fmt.Errorf("failed to JSON marshal LogAggregator: %s\n", err)
 	}
 
-	resp, err := c.MakeCall(http.MethodPost, endpointLogAggregators, logAggregatorJSON)
+	resp, err := c.MakeCallWithQueryParams(http.MethodPost, endpointLogAggregators, logAggregatorJSON, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error adding LogAggregator of serverType: %s and gatewayID: %s | err: %s\n", logAggregator.Data.ServerType, logAggregator.Data.GatewayID, err)
 	}
@@ -115,7 +115,7 @@ func (c *Client) UpdateLogAggregator(logAggregatorId string, logAggregatorData R
 	}
 
 	reqURL := fmt.Sprintf(endpointLogAggregators+"/%s", url.PathEscape(logAggregatorId))
-	resp, err := c.MakeCall(http.MethodPut, reqURL, logAggregatorJSON)
+	resp, err := c.MakeCallWithQueryParams(http.MethodPut, reqURL, logAggregatorJSON, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error updating LogAggregator with logAggregatorId: %s | err: %s\n", logAggregatorId, err)
 	}

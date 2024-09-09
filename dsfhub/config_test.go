@@ -75,3 +75,30 @@ func TestValidDSFHUBToken(t *testing.T) {
 		t.Error("Client should not be nil")
 	}
 }
+
+func TestInvalidSyncType(t *testing.T) {
+	log.Printf("======================== BEGIN TEST ========================")
+	log.Printf("[INFO] Running test TestInvalidSyncType \n")
+
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		if req.URL.String() != "/dsf/api/v2/gateways" {
+			t.Errorf("Should have have hit /gateways endpoint. Got: %s", req.URL.String())
+		}
+		rw.Write([]byte(`{ "data": [ { "applianceId": 1, "applianceType": "DSF_HUB", "id": "a1b2c3-4d5e-6f7g-8h9i-9adf5a7d8a72-172.16.1.123", "name": "ba-dsf-4.12-hub", "hostname": "172.16.1.123", "serverType": "IMPERVA WAREHOUSE", "sonar": { "jsonarUid": "a1b2c3-4d5e-6f7g-8h9i-678910" } } ] }`))
+	}))
+	defer server.Close()
+
+	
+	invalidSyncType := "BAD_SYNC_TYPE"
+	log.Printf("[INFO] Configuring client with sync_type: '%v'\n", invalidSyncType)
+	log.Printf("[DEBUG] Test server URL %v \n", server.URL)
+
+	config := Config{DSFHUBToken: "good", DSFHUBHost: server.URL, Params: map[string]string{"syncType": invalidSyncType}}
+	client, err := config.Client()
+	if err == nil {
+		t.Errorf("Should have received an error, got a client: %q", client)
+	}
+	if err.Error() != invalidSyncTypeMessage {
+		t.Errorf("Should have invalid sync_type message, got: %s", err)
+	}
+}

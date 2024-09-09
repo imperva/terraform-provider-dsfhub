@@ -22,7 +22,7 @@ func (c *Client) CreateCloudAccount(cloudAccount ResourceWrapper) (*ResourceWrap
 		return nil, fmt.Errorf("failed to JSON marshal CloudAccount: %s\n", err)
 	}
 
-	resp, err := c.MakeCall(http.MethodPost, endpointCloudAccounts, cloudAccountJSON)
+	resp, err := c.MakeCallWithQueryParams(http.MethodPost, endpointCloudAccounts, cloudAccountJSON, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error adding CloudAccount of serverType: %s and gatewayID: %s | err: %s\n", cloudAccount.Data.ServerType, cloudAccount.Data.GatewayID, err)
 	}
@@ -114,7 +114,7 @@ func (c *Client) UpdateCloudAccount(cloudAccountId string, cloudAccountIdData Re
 	}
 
 	reqURL := fmt.Sprintf(endpointCloudAccounts+"/%s", url.PathEscape(cloudAccountId))
-	resp, err := c.MakeCall(http.MethodPut, reqURL, cloudAccountJSON)
+	resp, err := c.MakeCallWithQueryParams(http.MethodPut, reqURL, cloudAccountJSON, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error updating CloudAccount with cloudAccountId: %s | err: %s\n", cloudAccountId, err)
 	}

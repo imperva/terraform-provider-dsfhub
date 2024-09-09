@@ -22,7 +22,7 @@ func (c *Client) CreateSecretManager(secretManager ResourceWrapper) (*ResourceWr
 		return nil, fmt.Errorf("failed to JSON marshal SecreManager: %s\n", err)
 	}
 
-	resp, err := c.MakeCall(http.MethodPost, endpointSecretManagers, secretManagerJSON)
+	resp, err := c.MakeCallWithQueryParams(http.MethodPost, endpointSecretManagers, secretManagerJSON, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error adding SecretManager of serverType: %s and gatewayID: %s | err: %s\n", secretManager.Data.ServerType, secretManager.Data.GatewayID, err)
 	}
@@ -116,7 +116,7 @@ func (c *Client) UpdateSecretManager(secretManagerId string, secretManager Resou
 	}
 
 	reqURL := fmt.Sprintf(endpointSecretManagers+"/%s", url.PathEscape(secretManagerId))
-	resp, err := c.MakeCall(http.MethodPut, reqURL, secretManagerJSON)
+	resp, err := c.MakeCallWithQueryParams(http.MethodPut, reqURL, secretManagerJSON, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error updating SecretManager with secretManagerId: %s | err: %s\n", secretManagerId, err)
 	}

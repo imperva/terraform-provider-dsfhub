@@ -22,7 +22,7 @@ func (c *Client) CreateDSFDataSource(dsfDataSource ResourceWrapper) (*ResourceWr
 		return nil, fmt.Errorf("failed to JSON marshal dsfDataSource: %s", err)
 	}
 
-	resp, err := c.MakeCall(http.MethodPost, endpointDsfDataSource, dsfDataSourceJSON)
+	resp, err := c.MakeCallWithQueryParams(http.MethodPost, endpointDsfDataSource, dsfDataSourceJSON, c.config.Params)
 	if err != nil {
 		log.Printf("[INFO] err.Error(): %s\n", err.Error())
 		return nil, fmt.Errorf("error adding DSFDataSource for serverType: %s and gatewayId: %s | err: %s", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, err)
@@ -120,7 +120,7 @@ func (c *Client) UpdateDSFDataSource(dataSourceId string, dsfDataSourceData Reso
 	}
 
 	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s", url.PathEscape(dataSourceId))
-	resp, err := c.MakeCall(http.MethodPut, reqURL, dsfDataSourceJSON)
+	resp, err := c.MakeCallWithQueryParams(http.MethodPut, reqURL, dsfDataSourceJSON, c.config.Params)
 	if err != nil {
 		return nil, fmt.Errorf("error updating DSFDataSource for dataSourceId: %s | err: %s", dataSourceId, err)
 	}

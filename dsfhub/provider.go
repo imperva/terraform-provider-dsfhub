@@ -21,6 +21,12 @@ func init() {
 		"insecure_ssl": "The boolean flag that instructs the provider to allow for " +
 			"insecure SSL API calls to the DSF Hub, or support for self-signed certificates.\n" +
 			"Example: 'true/false'. Can be set via TF_VAR_insecure_ssl environment variable.",
+
+		"sync_type": "Determines whether to sync asset creation/update operations with the Agentless gateways. Available values:\n" +
+			"SYNC_GW_BLOCKING: The operation is synchronous and blocks until all gateways have been updated. This means that, if syncing the assets to Agentless Gateways fails, the provider will throw an error and not continue. This may result in a difference between the state of which Terraform is aware and the assets that were actually imported.\n" +
+			"SYNC_GW_NON_BLOCKING: The operation is asynchronous and returns immediately.\n" +
+			"DO_NOT_SYNC_GW: The operation is synchronous and does not update the gateways.\n" +
+			"Default: SYNC_GW_BLOCKING",
 	}
 }
 
@@ -29,6 +35,9 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		DSFHUBToken: d.Get("dsfhub_token").(string),
 		DSFHUBHost:  d.Get("dsfhub_host").(string),
 		InsecureSSL: d.Get("insecure_ssl").(bool),
+		Params: map[string]string{
+			"syncType": d.Get("sync_type").(string),
+		},
 	}
 
 	return config.Client()
@@ -55,6 +64,12 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("INSECURE_SSL", true),
 				Description: descriptions["insecure_ssl"],
+			},
+			"sync_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SYNC_TYPE", "SYNC_GW_BLOCKING"),
+				Description: descriptions["sync_type"],
 			},
 		},
 
