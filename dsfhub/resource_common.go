@@ -431,7 +431,7 @@ func connectDisconnectGateway(d *schema.ResourceData, dsfDataSource ResourceWrap
 		if auditPullEnabled {
 			// allow time for asset syncs to gateways to finish
 			time.Sleep(wait)
-			
+
 			// connect gateway
 			_, err := client.EnableAuditDSFDataSource(assetId)
 			if err != nil {
