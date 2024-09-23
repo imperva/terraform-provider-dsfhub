@@ -27,7 +27,8 @@ var ignoreDataSourceParamsByServerType = map[string]map[string]bool{
 	"AZURE MS SQL SERVER":               {"arn": true, "asset_display_name": true},
 	"AZURE MYSQL":                       {"arn": true, "asset_display_name": true},
 	"AZURE POSTGRESQL":                  {"arn": true, "asset_display_name": true},
-	"AZURE SQL MANAGED INSTANCE":        {"arn": true, "asset_display_name": true},
+	"AZURE POSTGRESQL FLEXIBLE":         {"arn": true, "asset_display_name": true},
+    "AZURE SQL MANAGED INSTANCE":        {"arn": true, "asset_display_name": true},
 	"AZURE STORAGE ACCOUNT":             {"arn": true, "asset_display_name": true},
 }
 
@@ -617,6 +618,23 @@ var requiredDataSourceFieldsJson = `{
                 "server_host_name",
                 "admin_email",
                 "location"
+            ]
+        },
+        "AZURE POSTGRESQL FLEXIBLE": {
+            "auth_mechanisms": {
+                "password": [
+                "reason",
+                "password",
+                "username"
+                ]
+            },
+            "required": [
+                "server_host_name",
+                "admin_email",
+                "asset_display_name",
+                "asset_id",
+                "location",
+                "gateway_id"
             ]
         },
         "AZURE SQL MANAGED INSTANCE": {
