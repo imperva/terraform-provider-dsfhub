@@ -1029,7 +1029,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Default:     nil,
 			},
 			"enabled_logs_exports": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeList,
 				Description: "",
 				Required:    false,
 				Optional:    true,
