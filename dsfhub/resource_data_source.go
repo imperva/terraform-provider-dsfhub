@@ -114,11 +114,15 @@ func resourceDSFDataSource() *schema.Resource {
 				Default: nil,
 			},
 			"availability_zones": {
-				Type:        schema.TypeString,
-				Description: "",
+				Type:        schema.TypeList,
+				Description: "List of regions where the cluster is available",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 			"available_regions": {
 				Type:        schema.TypeList,
@@ -192,6 +196,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
 			},
 			"cluster_member_id": {
 				Type:        schema.TypeString,
@@ -206,6 +211,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
 			},
 			"asset_connection": {
 				Type:        schema.TypeSet,
@@ -991,11 +997,15 @@ func resourceDSFDataSource() *schema.Resource {
 				Default:     nil,
 			},
 			"db_instances_display_name": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeList,
 				Description: "",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 			"duration_threshold": {
 				Type:        schema.TypeInt,
@@ -1023,7 +1033,10 @@ func resourceDSFDataSource() *schema.Resource {
 				Description: "",
 				Required:    false,
 				Optional:    true,
-				Default:     nil,
+				Computed:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 			"entitlement_enabled": {
 				Type:        schema.TypeBool,
@@ -1072,6 +1085,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
 			},
 			"is_multi_zones": {
 				Type:        schema.TypeBool,
@@ -1281,6 +1295,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
 			},
 			"virtual_hostname": {
 				Type:        schema.TypeString,
