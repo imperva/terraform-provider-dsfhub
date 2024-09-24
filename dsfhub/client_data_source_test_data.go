@@ -667,7 +667,7 @@ var dataSourceTestDataJson = `{
                     },
                     "audit_pull_enabled": true,
                     "audit_type": "LOG_GROUP",
-                    "available_regions": "string",
+                    "available_regions": ["string"],
                     "aws_proxy_config": {
                         "http": "< proxy >",
                         "https": "< proxy >"
