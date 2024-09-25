@@ -90,7 +90,7 @@ type AssetData struct {
 	AuditInfo              *AuditInfo        `json:"audit_info,omitempty"`
 	AuditPullEnabled       bool              `json:"audit_pull_enabled,omitempty"`
 	AuditType              string            `json:"audit_type,omitempty"`
-	AvailabilityZones      string            `json:"availability_zones,omitempty"`
+	AvailabilityZones      []interface{}     `json:"availability_zones,omitempty"`
 	AvailableRegions       []interface{}     `json:"available_regions,omitempty"`
 	AwsProxyConfig         *AwsProxyConfig   `json:"aws_proxy_config,omitempty"`
 	BucketAccountId        string            `json:"bucket_account_id,omitempty"`
@@ -108,11 +108,11 @@ type AssetData struct {
 	Criticality            int               `json:"criticality,omitempty"`
 	DatabaseName           string            `json:"database_name,omitempty"`
 	DbEngine               string            `json:"db_engine,omitempty"`
-	DbInstancesDisplayName string            `json:"db_instances_display_name,omitempty"`
+	DbInstancesDisplayName []interface{}     `json:"db_instances_display_name,omitempty"`
 	DurationThreshold      int               `json:"duration_threshold,omitempty"`
 	EnableAuditManagement  bool              `json:"enable_audit_management,omitempty"`
 	EnableAuditMonitoring  bool              `json:"enable_audit_monitoring,omitempty"`
-	EnabledLogsExports     string            `json:"enabled_logs_exports,omitempty"`
+	EnabledLogsExports     []interface{}     `json:"enabled_logs_exports,omitempty"`
 	//Endpoint               string            `json:"endpoint,omitempty"`
 	EntitlementEnabled     bool        `json:"entitlement_enabled,omitempty"`
 	GatewayService         string      `json:"gateway_service,omitempty"`

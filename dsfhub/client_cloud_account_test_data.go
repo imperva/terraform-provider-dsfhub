@@ -57,7 +57,7 @@ var cloudAccountTestDataJson = `{
                     "arn": "string",
                     "asset_display_name": "string",
                     "asset_source": "string",
-                    "available_regions": "string",
+                    "available_regions": ["string"],
                     "aws_proxy_config": {
                         "http": "< proxy >",
                         "https": "< proxy >"
