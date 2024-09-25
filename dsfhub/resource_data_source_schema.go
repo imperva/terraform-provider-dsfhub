@@ -28,7 +28,7 @@ var ignoreDataSourceParamsByServerType = map[string]map[string]bool{
 	"AZURE MYSQL":                       {"arn": true, "asset_display_name": true},
 	"AZURE POSTGRESQL":                  {"arn": true, "asset_display_name": true},
 	"AZURE POSTGRESQL FLEXIBLE":         {"arn": true, "asset_display_name": true},
-    "AZURE SQL MANAGED INSTANCE":        {"arn": true, "asset_display_name": true},
+	"AZURE SQL MANAGED INSTANCE":        {"arn": true, "asset_display_name": true},
 	"AZURE STORAGE ACCOUNT":             {"arn": true, "asset_display_name": true},
 }
 
