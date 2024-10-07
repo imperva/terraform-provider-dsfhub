@@ -3,9 +3,10 @@ package dsfhub
 import (
 	"bytes"
 	"fmt"
+	"log"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"log"
 )
 
 func resourceCloudAccount() *schema.Resource {
@@ -321,8 +322,10 @@ func resourceCloudAccount() *schema.Resource {
 						},
 						"region": {
 							Type:        schema.TypeString,
-							Description: "Default AWS region for this asset",
-							Required:    true,
+							Description: "Default region for this asset",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
 						},
 						"role_name": {
 							Type:        schema.TypeString,

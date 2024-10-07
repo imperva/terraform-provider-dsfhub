@@ -104,7 +104,6 @@ var requiredCloudAccountJson = `{
                 "gateway_id",
                 "asset_display_name",
                 "asset_id",
-                "server_host_name",
                 "admin_email"
             ]
         },
