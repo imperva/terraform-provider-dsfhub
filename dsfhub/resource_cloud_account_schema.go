@@ -110,11 +110,9 @@ var requiredCloudAccountJson = `{
         "GCP": {
             "auth_mechanisms": {
                 "default": [
-                    "reason",
                     "reason"
                 ],
                 "service_account": [
-                    "reason",
                     "reason",
                     "key_file"
                 ]
@@ -123,7 +121,6 @@ var requiredCloudAccountJson = `{
                 "gateway_id",
                 "asset_display_name",
                 "asset_id",
-                "server_host_name",
                 "admin_email"
             ]
         }
