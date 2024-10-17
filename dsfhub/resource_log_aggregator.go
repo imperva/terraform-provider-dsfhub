@@ -644,7 +644,7 @@ func resourceLogAggregatorCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	// Connect/disconnect asset to gateway
-	connectDisconnectGateway(d, logAggregator, m)
+	connectDisconnectGateway(d, "log_aggregator", m)
 
 	// Set ID
 	logAggregatorId := createLogAggregatorResponse.Data.ID
@@ -825,7 +825,7 @@ func resourceLogAggregatorUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	// Connect/disconnect asset to gateway
-	connectDisconnectGateway(d, logAggregator, m)
+	connectDisconnectGateway(d, "log_aggregator", m)
 
 	// Set ID
 	d.SetId(logAggregatorId)

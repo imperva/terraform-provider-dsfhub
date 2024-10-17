@@ -1341,7 +1341,7 @@ func resourceDSFDataSourceCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	// Connect/disconnect asset to gateway
-	connectDisconnectGateway(d, dsfDataSource, m)
+	connectDisconnectGateway(d, "data_source", m)
 
 	// Set ID
 	dsfDataSourceId := dsfDataSourceResponse.Data.AssetData.AssetID
@@ -1664,7 +1664,7 @@ func resourceDSFDataSourceUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	// Connect/disconnect asset to gateway
-	connectDisconnectGateway(d, dsfDataSource, m)
+	connectDisconnectGateway(d, "data_source", m)
 
 	// Set ID
 	d.SetId(dsfDataSourceId)

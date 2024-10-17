@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -408,11 +410,59 @@ func contains(l []string, x string) bool {
 	return false
 }
 
-func connectDisconnectGateway(d *schema.ResourceData, dsfDataSource ResourceWrapper, m interface{}) error {
-	// func connectDisconnectGateway(d *schema.ResourceData, dsfDataSource ResourceWrapper, m interface{}) {
+func waitUntilAuditState(desiredState bool, resourceType string, assetId string, m interface{}) error {
 	client := m.(*Client)
 
-	// give enough time for connect/disconnect gateway playbook to complete
+	pendingState := strconv.FormatBool(!desiredState)
+	targetState := strconv.FormatBool(desiredState)
+
+	stateChangeConf := &retry.StateChangeConf{
+		Pending: []string{
+			pendingState,
+		},
+		Target: []string{
+			targetState,
+		},
+		Refresh:    auditStateRefreshFunc(*client, resourceType, assetId),
+		Timeout:    8 * time.Minute,
+		Delay:      10 * time.Second,
+		MinTimeout: 5 * time.Second,
+	}
+
+	_, err := stateChangeConf.WaitForState()
+	if err != nil {
+		return fmt.Errorf("error waiting for audit collection state to update to %v for asset %v", desiredState, assetId)
+	}
+
+	return nil
+}
+
+func auditStateRefreshFunc(client Client, resourceType string, assetId string) retry.StateRefreshFunc {
+	return func() (any, string, error) {
+		if resourceType == "data_source" {
+			log.Printf("[INFO] checking audit state for data_source asset %v", assetId)
+			resp, err := client.ReadDSFDataSource(assetId)
+			if err != nil {
+				return 0, "", err
+			}
+			return resp, strconv.FormatBool(resp.Data.AssetData.AuditPullEnabled), nil
+		} else if resourceType == "log_aggregator" {
+			log.Printf("[INFO] checking audit state for log_aggregator asset %v", assetId)
+			resp, err := client.ReadLogAggregator(assetId)
+			if err != nil {
+				return 0, "", err
+			}
+			return resp, strconv.FormatBool(resp.Data.AssetData.AuditPullEnabled), nil
+		} else {
+			return nil, "", fmt.Errorf("invalid resourceType: %v", resourceType)
+		}
+	}
+}
+
+func connectDisconnectGateway(d *schema.ResourceData, resourceType string, m interface{}) error {
+	client := m.(*Client)
+
+	// give enough time for asset sync playbook to complete
 	wait := 6 * time.Second
 
 	assetId := d.Get("asset_id").(string)
@@ -439,7 +489,7 @@ func connectDisconnectGateway(d *schema.ResourceData, dsfDataSource ResourceWrap
 				log.Printf("[INFO] Error enabling audit for assetId: %s\n", assetId)
 				return err
 			}
-			time.Sleep(wait)
+			waitUntilAuditState(auditPullEnabled, resourceType, assetId, m)
 
 			// disconnect gateway
 		} else {
@@ -448,7 +498,7 @@ func connectDisconnectGateway(d *schema.ResourceData, dsfDataSource ResourceWrap
 				log.Printf("[INFO] Error disabling audit for assetId: %s\n", assetId)
 				return err
 			}
-			time.Sleep(wait)
+			waitUntilAuditState(auditPullEnabled, resourceType, assetId, m)
 		}
 		// if asset is already connected, check whether relevant fields have been updated and reconnect to gateway
 	} else if auditPullEnabled {
@@ -462,7 +512,7 @@ func connectDisconnectGateway(d *schema.ResourceData, dsfDataSource ResourceWrap
 				log.Printf("[INFO] Error disabling audit for assetId: %s\n", assetId)
 				return err1
 			}
-			time.Sleep(wait)
+			waitUntilAuditState(false, resourceType, assetId, m)
 
 			// reconnect
 			_, err2 := client.EnableAuditDSFDataSource(assetId)
@@ -470,7 +520,7 @@ func connectDisconnectGateway(d *schema.ResourceData, dsfDataSource ResourceWrap
 				log.Printf("[INFO] Error enabling audit for assetId: %s\n", assetId)
 				return err2
 			}
-			time.Sleep(wait)
+			waitUntilAuditState(true, resourceType, assetId, m)
 		}
 	} else {
 		log.Printf("[INFO] Asset %s does not need to be connected to or disconnected from gateway", assetId)
