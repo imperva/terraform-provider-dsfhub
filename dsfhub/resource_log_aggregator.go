@@ -2,18 +2,21 @@ package dsfhub
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	"log"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"log"
 )
 
 func resourceLogAggregator() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceLogAggregatorCreate,
-		Read:   resourceLogAggregatorRead,
-		Update: resourceLogAggregatorUpdate,
-		Delete: resourceLogAggregatorDelete,
+		CreateContext: resourceLogAggregatorCreateContext,
+		ReadContext:   resourceLogAggregatorReadContext,
+		UpdateContext: resourceLogAggregatorUpdateContext,
+		DeleteContext: resourceLogAggregatorDeleteContext,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -625,36 +628,52 @@ func resourceLogAggregator() *schema.Resource {
 	}
 }
 
-func resourceLogAggregatorCreate(d *schema.ResourceData, m interface{}) error {
+func resourceLogAggregatorCreateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	client := m.(*Client)
+
+	// check provided fields against schema
 	if isOk, err := checkResourceRequiredFields(requiredLogAggregatorJson, ignoreLogAggregatorParamsByServerType, d); !isOk {
-		return err
+		return diag.FromErr(err)
 	}
+	// convert provided fields into API payload
 	logAggregator := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&logAggregator, serverType, d)
+
 	// auditPullEnabled set to false as connect/disconnect logic handled below
 	logAggregator.Data.AssetData.AuditPullEnabled = false
+
+	// create resource
 	log.Printf("[INFO] Creating LogAggregator for serverType: %s and gatewayId: %s\n", logAggregator.Data.ServerType, logAggregator.Data.GatewayID)
 	createLogAggregatorResponse, err := client.CreateLogAggregator(logAggregator)
-
 	if err != nil {
 		log.Printf("[ERROR] adding LogAggregator for serverType: %s and gatewayId: %s | err: %s", serverType, logAggregator.Data.GatewayID, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	// Connect/disconnect asset to gateway
-	connectDisconnectGateway(d, "log_aggregator", m)
+	err = connectDisconnectGateway(ctx, d, "log_aggregator", m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", d.Get("asset_id")),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
 
 	// Set ID
 	logAggregatorId := createLogAggregatorResponse.Data.ID
 	d.SetId(logAggregatorId)
 
 	// Set the rest of the state from the resource read
-	return resourceLogAggregatorRead(d, m)
+	log.Printf("[DEBUG] Writing log aggregator asset details to state")
+	resourceLogAggregatorReadContext(ctx, d, m)
+
+	return diags
 }
 
-func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
+func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
 	logAggregatorId := d.Id()
 
@@ -664,7 +683,7 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 
 	if err != nil {
 		log.Printf("[ERROR] Reading logAggregatorReadResponse with logAggregatorId: %s | err: %s\n", logAggregatorId, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	if logAggregatorReadResponse != nil {
@@ -806,35 +825,54 @@ func resourceLogAggregatorRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceLogAggregatorUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceLogAggregatorUpdateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	client := m.(*Client)
+
+	// check provided fields against schema
 	logAggregatorId := d.Id()
 	if isOk, err := checkResourceRequiredFields(requiredLogAggregatorJson, ignoreLogAggregatorParamsByServerType, d); !isOk {
-		return err
+		return diag.FromErr(err)
 	}
+
+	// convert provided fields into API payload
 	logAggregator := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&logAggregator, serverType, d)
 
+	// auditPullEnabled set to current value from state
+	auditPullEnabled, _ := d.GetChange("audit_pull_enabled")
+	logAggregator.Data.AssetData.AuditPullEnabled = auditPullEnabled.(bool)
+
+	// update resource
 	log.Printf("[INFO] Updating LogAggregator for serverType: %s and gatewayId: %s assetId: %s\n", logAggregator.Data.ServerType, logAggregator.Data.GatewayID, logAggregator.Data.AssetData.AssetID)
 	_, err := client.UpdateLogAggregator(logAggregatorId, logAggregator)
-
 	if err != nil {
 		log.Printf("[ERROR] Updating LogAggregator for serverType: %s and gatewayId: %s assetId: %s | err:%s\n", logAggregator.Data.ServerType, logAggregator.Data.GatewayID, logAggregator.Data.AssetData.AssetID, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	// Connect/disconnect asset to gateway
-	connectDisconnectGateway(d, "log_aggregator", m)
+	err = connectDisconnectGateway(ctx, d, "log_aggregator", m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", d.Get("asset_id")),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
 
 	// Set ID
 	d.SetId(logAggregatorId)
 
 	// Set the rest of the state from the resource read
-	return resourceLogAggregatorRead(d, m)
+	log.Printf("[DEBUG] Writing log aggregator asset details to state")
+	resourceLogAggregatorReadContext(ctx, d, m)
+
+	return diags
 }
 
-func resourceLogAggregatorDelete(d *schema.ResourceData, m interface{}) error {
+func resourceLogAggregatorDeleteContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
 	logAggregatorId := d.Id()
 

@@ -2,19 +2,21 @@ package dsfhub
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceDSFDataSource() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceDSFDataSourceCreate,
-		Read:   resourceDSFDataSourceRead,
-		Update: resourceDSFDataSourceUpdate,
-		Delete: resourceDSFDataSourceDelete,
+		CreateContext: resourceDSFDataSourceCreateContext,
+		ReadContext:   resourceDSFDataSourceReadContext,
+		UpdateContext: resourceDSFDataSourceUpdateContext,
+		DeleteContext: resourceDSFDataSourceDeleteContext,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -1322,45 +1324,61 @@ func resourceDSFDataSource() *schema.Resource {
 	}
 }
 
-func resourceDSFDataSourceCreate(d *schema.ResourceData, m interface{}) error {
+func resourceDSFDataSourceCreateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	client := m.(*Client)
+
+	// check provided fields against schema
 	if isOk, err := checkResourceRequiredFields(requiredDataSourceFieldsJson, ignoreDataSourceParamsByServerType, d); !isOk {
-		return err
+		return diag.FromErr(err)
 	}
+
+	// convert provided fields into API payload
 	dsfDataSource := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&dsfDataSource, serverType, d)
+
 	// auditPullEnabled set to false as connect/disconnect logic handled below
 	dsfDataSource.Data.AssetData.AuditPullEnabled = false
+
+	// create resource
 	log.Printf("[INFO] Creating DSF data source for serverType: %s and gatewayId: %s \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
 	dsfDataSourceResponse, err := client.CreateDSFDataSource(dsfDataSource)
-
 	if err != nil {
 		log.Printf("[INFO] Creating DSF data source for serverType: %s and gatewayId: %s assetId: %s\n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, dsfDataSource.Data.AssetData.AssetID)
-		return err
+		return diag.FromErr(err)
 	}
 
 	// Connect/disconnect asset to gateway
-	connectDisconnectGateway(d, "data_source", m)
+	err = connectDisconnectGateway(ctx, d, "data_source", m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", d.Get("asset_id")),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
 
 	// Set ID
 	dsfDataSourceId := dsfDataSourceResponse.Data.AssetData.AssetID
 	d.SetId(dsfDataSourceId)
 
 	// Set the rest of the state from the resource read
-	return resourceDSFDataSourceRead(d, m)
+	log.Printf("[DEBUG] Writing data source asset details to state")
+	resourceDSFDataSourceReadContext(ctx, d, m)
+
+	return diags
 }
 
-func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
+func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
 	dsfDataSourceId := d.Id()
 
 	log.Printf("[INFO] Reading DSF data source with dsfDataSourceId: %s\n", dsfDataSourceId)
 	dsfDataSourceReadResponse, err := client.ReadDSFDataSource(dsfDataSourceId)
-
 	if err != nil {
 		log.Printf("[ERROR] Reading dsfDataSourceReadResponse | err: %s\n", err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	if dsfDataSourceReadResponse != nil {
@@ -1493,7 +1511,7 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 		//connection["azure_storage_account"] = v.ConnectionData.AzureStorageAccount
 		//connection["azure_storage_container"] = v.ConnectionData.AzureStorageContainer
 		//connection["azure_storage_secret_key"] = v.ConnectionData.AzureStorageSecretKey
-		connection["base_dn"] = v.ConnectionData.BaseDn
+		connection["base_dn"] = nil //v.ConnectionData.BaseDn
 		connection["bucket"] = v.ConnectionData.Bucket
 		connection["ca_certs_path"] = v.ConnectionData.CaCertsPath
 		connection["ca_file"] = v.ConnectionData.CaFile
@@ -1645,35 +1663,54 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceDSFDataSourceUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceDSFDataSourceUpdateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	client := m.(*Client)
+
+	// check provided fields against schema
 	dsfDataSourceId := d.Id()
 	if isOk, err := checkResourceRequiredFields(requiredDataSourceFieldsJson, ignoreDataSourceParamsByServerType, d); !isOk {
-		return err
+		return diag.FromErr(err)
 	}
+
+	// convert provided fields into API payload
 	dsfDataSource := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&dsfDataSource, serverType, d)
 
+	// auditPullEnabled set to current value from state
+	auditPullEnabled, _ := d.GetChange("audit_pull_enabled")
+	dsfDataSource.Data.AssetData.AuditPullEnabled = auditPullEnabled.(bool)
+
+	// update resource
 	log.Printf("[INFO] Updating DSF data source for serverType: %s and gatewayId: %s assetId: %s\n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, dsfDataSource.Data.AssetData.AssetID)
 	_, err := client.UpdateDSFDataSource(dsfDataSourceId, dsfDataSource)
-
 	if err != nil {
 		log.Printf("[ERROR] Updating data source for serverType: %s and gatewayId: %s assetId: %s | err:%s\n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, dsfDataSource.Data.AssetData.AssetID, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	// Connect/disconnect asset to gateway
-	connectDisconnectGateway(d, "data_source", m)
+	err = connectDisconnectGateway(ctx, d, "data_source", m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", d.Get("asset_id")),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
 
 	// Set ID
 	d.SetId(dsfDataSourceId)
 
 	// Set the rest of the state from the resource read
-	return resourceDSFDataSourceRead(d, m)
+	log.Printf("[DEBUG] Writing data source asset details to state")
+	resourceDSFDataSourceReadContext(ctx, d, m)
+
+	return diags
 }
 
-func resourceDSFDataSourceDelete(d *schema.ResourceData, m interface{}) error {
+func resourceDSFDataSourceDeleteContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
 	dsfDataSourceId := d.Id()
 
