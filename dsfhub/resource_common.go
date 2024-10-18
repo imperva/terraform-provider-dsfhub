@@ -2,6 +2,7 @@ package dsfhub
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -341,7 +342,7 @@ func checkResourceRequiredFields(requiredFieldsJson string, ignoreParamsByServer
 		}
 	}
 	if len(missingParams) > 0 {
-		return false, fmt.Errorf("[DEBUG] Missing required fields for dsf_data_source with serverType '%s', missing fields: %s\n", serverType, "\""+strings.Join(missingParams, ", ")+"\"")
+		return false, fmt.Errorf("[DEBUG] Missing required fields for dsfhub_data_source with serverType '%s', missing fields: %s\n", serverType, "\""+strings.Join(missingParams, ", ")+"\"")
 	} else {
 		return true, nil
 	}
@@ -410,7 +411,7 @@ func contains(l []string, x string) bool {
 	return false
 }
 
-func waitUntilAuditState(desiredState bool, resourceType string, assetId string, m interface{}) error {
+func waitUntilAuditState(ctx context.Context, desiredState bool, resourceType string, assetId string, m interface{}) error {
 	client := m.(*Client)
 
 	pendingState := strconv.FormatBool(!desiredState)
@@ -424,14 +425,15 @@ func waitUntilAuditState(desiredState bool, resourceType string, assetId string,
 			targetState,
 		},
 		Refresh:    auditStateRefreshFunc(*client, resourceType, assetId),
-		Timeout:    8 * time.Minute,
+		Timeout:    1 * time.Minute, // TODO: revert to ~8mins
 		Delay:      10 * time.Second,
 		MinTimeout: 5 * time.Second,
 	}
 
-	_, err := stateChangeConf.WaitForState()
+	_, err := stateChangeConf.WaitForStateContext(ctx)
 	if err != nil {
-		return fmt.Errorf("error waiting for audit collection state to update to %v for asset %v", desiredState, assetId)
+		log.Printf("[ERROR] error waiting for audit collection state to update to %v for asset %v", desiredState, assetId)
+		return err
 	}
 
 	return nil
@@ -459,12 +461,7 @@ func auditStateRefreshFunc(client Client, resourceType string, assetId string) r
 	}
 }
 
-func connectDisconnectGateway(d *schema.ResourceData, resourceType string, m interface{}) error {
-	client := m.(*Client)
-
-	// give enough time for asset sync playbook to complete
-	wait := 6 * time.Second
-
+func connectDisconnectGateway(ctx context.Context, d *schema.ResourceData, resourceType string, m interface{}) error {
 	assetId := d.Get("asset_id").(string)
 	auditPullEnabled := d.Get("audit_pull_enabled").(bool)
 	auditType := d.Get("audit_type").(string)
@@ -480,51 +477,78 @@ func connectDisconnectGateway(d *schema.ResourceData, resourceType string, m int
 	// if audit_pull_enabled has been changed, connect/disconnect from gateway as needed
 	if auditPullEnabledChanged {
 		if auditPullEnabled {
-			// allow time for asset syncs to gateways to finish
-			time.Sleep(wait)
-
-			// connect gateway
-			_, err := client.EnableAuditDSFDataSource(assetId)
+			err := connectGateway(ctx, m, assetId, resourceType)
 			if err != nil {
-				log.Printf("[INFO] Error enabling audit for assetId: %s\n", assetId)
 				return err
 			}
-			waitUntilAuditState(auditPullEnabled, resourceType, assetId, m)
-
-			// disconnect gateway
 		} else {
-			_, err := client.DisableAuditDSFDataSource(assetId)
+			err := disconnectGateway(ctx, m, assetId, resourceType)
 			if err != nil {
-				log.Printf("[INFO] Error disabling audit for assetId: %s\n", assetId)
 				return err
 			}
-			waitUntilAuditState(auditPullEnabled, resourceType, assetId, m)
 		}
 		// if asset is already connected, check whether relevant fields have been updated and reconnect to gateway
 	} else if auditPullEnabled {
 		if auditTypeChanged {
 			origAuditType, newAuditType := d.GetChange("audit_type")
 			log.Printf("[INFO] auditType value has changed from %s to %s, reconnecting asset to gateway\n", origAuditType, newAuditType)
-
-			// disconnect
-			_, err1 := client.DisableAuditDSFDataSource(assetId)
-			if err1 != nil {
-				log.Printf("[INFO] Error disabling audit for assetId: %s\n", assetId)
-				return err1
+			err := reconnectGateway(ctx, m, assetId, resourceType)
+			if err != nil {
+				return err
 			}
-			waitUntilAuditState(false, resourceType, assetId, m)
-
-			// reconnect
-			_, err2 := client.EnableAuditDSFDataSource(assetId)
-			if err2 != nil {
-				log.Printf("[INFO] Error enabling audit for assetId: %s\n", assetId)
-				return err2
-			}
-			waitUntilAuditState(true, resourceType, assetId, m)
 		}
 	} else {
 		log.Printf("[INFO] Asset %s does not need to be connected to or disconnected from gateway", assetId)
 	}
+	return nil
+}
+
+func connectGateway(ctx context.Context, m interface{}, assetId string, resourceType string) error {
+	client := m.(*Client)
+	_, err := client.EnableAuditDSFDataSource(assetId)
+	if err != nil {
+		log.Printf("[INFO] Error enabling audit for assetId: %s\n", assetId)
+		return err
+	}
+
+	err2 := waitUntilAuditState(ctx, true, resourceType, assetId, m)
+	if err2 != nil {
+		return err2
+	}
+
+	return nil
+}
+
+func disconnectGateway(ctx context.Context, m interface{}, assetId string, resourceType string) error {
+	client := m.(*Client)
+	_, err := client.DisableAuditDSFDataSource(assetId)
+	if err != nil {
+		log.Printf("[INFO] Error disabling audit for assetId: %s\n", assetId)
+		return err
+	}
+
+	err = waitUntilAuditState(ctx, false, resourceType, assetId, m)
+	if err != nil {
+		log.Printf("[INFO] Error while waiting for audit state to update for assetId: %s\n", assetId)
+		return err
+	}
+
+	return nil
+}
+
+func reconnectGateway(ctx context.Context, m interface{}, assetId string, resourceType string) error {
+	log.Printf("[INFO] Re-enabling audit for assetId: %s\n", assetId)
+
+	err := disconnectGateway(ctx, m, assetId, resourceType)
+	if err != nil {
+		return err
+	}
+
+	err = connectGateway(ctx, m, assetId, resourceType)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
