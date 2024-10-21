@@ -1391,7 +1391,10 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("admin_email", dsfDataSourceReadResponse.Data.AssetData.AdminEmail)
 	//d.Set("application", dsfDataSourceReadResponse.Data.AssetData.Application)
 	//d.Set("archive", dsfDataSourceReadResponse.Data.AssetData.Archive)
-	d.Set("arn", dsfDataSourceReadResponse.Data.AssetData.Arn)
+	
+	if dsfDataSourceReadResponse.Data.AssetData.Arn != "" {
+		d.Set("arn", dsfDataSourceReadResponse.Data.AssetData.Arn)
+	}
 	d.Set("asset_display_name", dsfDataSourceReadResponse.Data.AssetData.AssetDisplayName)
 	d.Set("asset_id", dsfDataSourceReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", dsfDataSourceReadResponse.Data.AssetData.AssetSource)
@@ -1446,7 +1449,9 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("sdm_enabled", dsfDataSourceReadResponse.Data.AssetData.SdmEnabled)
 	d.Set("searches", dsfDataSourceReadResponse.Data.AssetData.Searches)
 	d.Set("server_host_name", dsfDataSourceReadResponse.Data.AssetData.ServerHostName)
-	d.Set("server_ip", dsfDataSourceReadResponse.Data.AssetData.ServerIP)
+	if dsfDataSourceReadResponse.Data.AssetData.ServerIP != "" {
+		d.Set("server_ip", dsfDataSourceReadResponse.Data.AssetData.ServerIP)
+	}
 	if dsfDataSourceReadResponse.Data.AssetData.ServerPort != nil {
 		var serverPort string
 		if serverPortNum, ok := dsfDataSourceReadResponse.Data.AssetData.ServerPort.(float64); ok {
@@ -1511,7 +1516,9 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 		//connection["azure_storage_account"] = v.ConnectionData.AzureStorageAccount
 		//connection["azure_storage_container"] = v.ConnectionData.AzureStorageContainer
 		//connection["azure_storage_secret_key"] = v.ConnectionData.AzureStorageSecretKey
-		connection["base_dn"] = nil //v.ConnectionData.BaseDn
+		if v.ConnectionData.BaseDn != "" {
+			connection["base_dn"] = v.ConnectionData.BaseDn
+		}
 		connection["bucket"] = v.ConnectionData.Bucket
 		connection["ca_certs_path"] = v.ConnectionData.CaCertsPath
 		connection["ca_file"] = v.ConnectionData.CaFile
@@ -1583,14 +1590,18 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 		//connection["secure_connection"] = v.ConnectionData.SecureConnection
 		connection["self_signed_cert"] = v.ConnectionData.SelfSignedCert
 		connection["self_signed"] = v.ConnectionData.SelfSigned
-		connection["server_ip"] = v.ConnectionData.ServerIp
+		if v.ConnectionData.ServerIp != "" {
+			connection["server_ip"] = v.ConnectionData.ServerIp
+		}
 		connection["server_port"] = v.ConnectionData.ServerPort
 		connection["service_key"] = v.ConnectionData.ServiceKey
 		connection["snowflake_role"] = v.ConnectionData.SnowflakeRole
 		connection["ssl_server_cert"] = v.ConnectionData.SslServerCert
 		connection["ssl"] = v.ConnectionData.Ssl
 		//connection["store_aws_credentials"] = v.ConnectionData.StoreAwsCredentials
-		connection["subscription_id"] = v.ConnectionData.SubscriptionID
+		if v.ConnectionData.SubscriptionID != "" {
+			connection["subscription_id"] = v.ConnectionData.SubscriptionID
+		}
 		connection["tenant_id"] = v.ConnectionData.TenantID
 		connection["thrift_transport"] = v.ConnectionData.ThriftTransport
 		connection["tmp_user"] = v.ConnectionData.TmpUser
@@ -1714,10 +1725,9 @@ func resourceDSFDataSourceDeleteContext(ctx context.Context, d *schema.ResourceD
 	client := m.(*Client)
 	dsfDataSourceId := d.Id()
 
-	log.Printf("[INFO] Deleting data-source with dsfDataSourceId: %s", dsfDataSourceId)
-
-	dsfDataSourceDeleteResponse, err := client.DeleteDSFDataSource(dsfDataSourceId)
-	if dsfDataSourceDeleteResponse != nil {
+	_, err := client.DeleteDSFDataSource(dsfDataSourceId)
+	// if an error is returned, assume it has already been deleted
+	if err != nil {
 		log.Printf("[INFO] DSF data source has already been deleted with dsfDataSourceId: %s | err: %s\n", dsfDataSourceId, err)
 	}
 	return nil
@@ -1824,9 +1834,9 @@ func resourceDataSourceConnectionHash(v interface{}) int {
 	//	buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	//}
 
-	//if v, ok := m["base_dn"]; ok {
-	//	buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	//}
+	// if v, ok := m["base_dn"]; ok {
+	// 	buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	// }
 
 	if v, ok := m["bucket"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
