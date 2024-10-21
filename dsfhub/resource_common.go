@@ -304,7 +304,7 @@ func checkResourceRequiredFields(requiredFieldsJson string, ignoreParamsByServer
 	serverType := d.Get("server_type").(string)
 	serverTypeObj, found := requiredFields.ServerType[serverType]
 	if !found {
-		return false, fmt.Errorf("[DEBUG] Unsupported serverType: %s\n", serverType)
+		return false, fmt.Errorf("unsupported serverType: %s\n", serverType)
 	}
 	for _, field := range serverTypeObj.Required {
 		curField := d.Get(field)
@@ -326,7 +326,7 @@ func checkResourceRequiredFields(requiredFieldsJson string, ignoreParamsByServer
 		log.Printf("[DEBUG] Checking for authMechanism: %s\n", authMechanism)
 		authMechanismFields, found := serverTypeObj.AuthMechanisms[authMechanism]
 		if !found {
-			return false, fmt.Errorf("[DEBUG] Unsupported authMechanism '%v' for serverType '%v'\n", authMechanism, serverType)
+			return false, fmt.Errorf("unsupported authMechanism '%v' for serverType '%v'\n", authMechanism, serverType)
 		}
 		for _, field := range authMechanismFields {
 			log.Printf("[DEBUG] Checking for field: '%s', value: '%s'\n", field, connection[field])
@@ -342,7 +342,7 @@ func checkResourceRequiredFields(requiredFieldsJson string, ignoreParamsByServer
 		}
 	}
 	if len(missingParams) > 0 {
-		return false, fmt.Errorf("[DEBUG] Missing required fields for dsfhub_data_source with serverType '%s', missing fields: %s\n", serverType, "\""+strings.Join(missingParams, ", ")+"\"")
+		return false, fmt.Errorf("missing required fields for dsfhub_data_source with serverType '%s', missing fields: %s\n", serverType, "\""+strings.Join(missingParams, ", ")+"\"")
 	} else {
 		return true, nil
 	}
