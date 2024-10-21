@@ -1391,7 +1391,7 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("admin_email", dsfDataSourceReadResponse.Data.AssetData.AdminEmail)
 	//d.Set("application", dsfDataSourceReadResponse.Data.AssetData.Application)
 	//d.Set("archive", dsfDataSourceReadResponse.Data.AssetData.Archive)
-	
+
 	if dsfDataSourceReadResponse.Data.AssetData.Arn != "" {
 		d.Set("arn", dsfDataSourceReadResponse.Data.AssetData.Arn)
 	}
