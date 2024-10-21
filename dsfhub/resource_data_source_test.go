@@ -150,23 +150,23 @@ func testAccDSFDataSourceDestroy(state *terraform.State) error {
 func testAccDSFDataSource_AwsRdsOracle(resourceName string, gatewayId string, assetId string, auditType string, auditPullEnabled bool) string {
 	return fmt.Sprintf(`
 resource "dsfhub_data_source" "%[1]s" {
-	server_type 				= "AWS RDS ORACLE"
+	server_type					= "AWS RDS ORACLE"
 
-	admin_email 				= "test@example.com"
-	asset_display_name 	= "%[3]s"
-	asset_id 						= "%[3]s"
-	audit_pull_enabled 	= %[5]t
-	audit_type          = "%[4]s"
-	gateway_id 					= "%[2]s"
-	server_host_name 		= "test.com"
-	server_ip 					= "test.com"
-	server_port 				= "1521"
-	service_name 				= "ORCL"
+	admin_email					= "test@example.com"
+	asset_display_name	= "%[3]s"
+	asset_id						= "%[3]s"
+	audit_pull_enabled	= %[5]t
+	audit_type					= "%[4]s"
+	gateway_id					= "%[2]s"
+	server_host_name		= "test.com"
+	server_ip						= "test.com"
+	server_port					= "1521"
+	service_name				= "ORCL"
 
 	asset_connection {
-		auth_mechanism 	= "password"
-		password 				= "password"
-		reason 					= "default"
+		auth_mechanism	= "password"
+		password				= "password"
+		reason					= "default"
 		username				= "username"
 	}
 }
