@@ -86,7 +86,7 @@ func testAccCloudAccountDestroy(state *terraform.State) error {
 	log.Printf("[INFO] Running test testAccCloudAccountDestroy \n")
 	client := testAccProvider.Meta().(*Client)
 	for _, res := range state.RootModule().Resources {
-		if res.Type != "dsf_data_source" {
+		if res.Type != "dsfhub_data_source" {
 			continue
 		}
 		cloudAccountId := res.Primary.ID

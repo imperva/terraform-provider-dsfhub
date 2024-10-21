@@ -86,7 +86,7 @@ func testAccLogAggregatorDestroy(state *terraform.State) error {
 	log.Printf("[INFO] Running test testAccLogAggregatorDestroy \n")
 	client := testAccProvider.Meta().(*Client)
 	for _, res := range state.RootModule().Resources {
-		if res.Type != "dsf_data_source" {
+		if res.Type != "dsfhub_log_aggregator" {
 			continue
 		}
 		logAggregatorId := res.Primary.ID
