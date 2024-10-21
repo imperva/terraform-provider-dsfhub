@@ -425,7 +425,7 @@ func waitUntilAuditState(ctx context.Context, desiredState bool, resourceType st
 			targetState,
 		},
 		Refresh:    auditStateRefreshFunc(*client, resourceType, assetId),
-		Timeout:    1 * time.Minute, // TODO: revert to ~8mins
+		Timeout:    8 * time.Minute,
 		Delay:      10 * time.Second,
 		MinTimeout: 5 * time.Second,
 	}
