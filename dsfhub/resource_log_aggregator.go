@@ -702,7 +702,9 @@ func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("audit_type", logAggregatorReadResponse.Data.AssetData.AuditType)
 	d.Set("available_regions", logAggregatorReadResponse.Data.AssetData.AvailableRegions)
 	d.Set("bucket_account_id", logAggregatorReadResponse.Data.AssetData.BucketAccountId)
-	d.Set("credential_endpoint", logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint)
+	if logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint != "" {
+		d.Set("credential_endpoint", logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint)
+	}
 	d.Set("criticality", logAggregatorReadResponse.Data.AssetData.Criticality)
 	d.Set("gateway_id", logAggregatorReadResponse.Data.GatewayID)
 	d.Set("gateway_service", logAggregatorReadResponse.Data.AssetData.GatewayService)
@@ -818,7 +820,7 @@ func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceDat
 
 		connections.Add(connection)
 	}
-	d.Set("ca_connection", connections)
+	d.Set("asset_connection", connections)
 
 	log.Printf("[INFO] Finished reading logAggregator with logAggregatorId: %s\n", logAggregatorId)
 

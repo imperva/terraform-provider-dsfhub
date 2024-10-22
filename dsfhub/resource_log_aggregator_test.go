@@ -3,36 +3,46 @@ package dsfhub
 import (
 	"fmt"
 	"log"
+	"os"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-const logAggregatorResourceName = "log_aggregator"
-const logAggregatorType = "aws"
-const logAggregatorResourceTypeAndName = logAggregatorResourceName + "." + logAggregatorType
+const dsfLogAggregatorResourceType = "dsfhub_log_aggregator"
 
-func TestAccLogAggregator_basic(t *testing.T) {
-	log.Printf("======================== BEGIN TEST ========================")
-	log.Printf("[INFO] Running test TestAccLogAggregator_basic \n")
+func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Fatal("GATEWAY_ID must be set")
+	}
+
+	const (
+		assetId = "arn:aws:logs:us-east-2:123456789012:log-group:/aws/rds/instance/my-database/audit:*"
+		resourceName = "my-database-log-group"
+		serverHostName = "my-database.xxxxk8rsfzja.us-east-2.rds.amazonaws.com"
+		parentAssetId = "arn:aws:iam::123456789012"
+		parentResourceName = "my-cloud-account"
+	)
+
+	// resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+	parentResourceTypeAndName := fmt.Sprintf("%s.%s", dsfCloudAccountResourceType, parentResourceName)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccLogAggregatorDestroy,
 		Steps: []resource.TestStep{
+			// Failed: missing parent_asset_id
 			{
-				Config: testAccCheckLogAggregatorConfigBasic(t),
-				Check: resource.ComposeTestCheckFunc(
-					testCheckLogAggregatorExists(logAggregatorResourceName),
-					resource.TestCheckResourceAttr(logAggregatorResourceTypeAndName, logAggregatorResourceName, logAggregatorType),
-				),
+				Config: testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, ""),
+				ExpectError: regexp.MustCompile("Error: missing required fields for dsfhub_data_source"),
 			},
+			// Onboard with AWS parent asset
 			{
-				ResourceName:      logAggregatorResourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-				ImportStateIdFunc: testAccLogAggregatorId,
+				Config: testAccDSFCloudAccountConfig_Aws(parentResourceName, gatewayId, parentAssetId, "default") + 
+				testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, parentResourceTypeAndName + ".asset_id"),
 			},
 		},
 	})
@@ -41,7 +51,7 @@ func TestAccLogAggregator_basic(t *testing.T) {
 func testAccLogAggregatorId(state *terraform.State) (string, error) {
 	log.Printf("[INFO] Running test testAccLogAggregatorId \n")
 	for _, rs := range state.RootModule().Resources {
-		if rs.Type != logAggregatorType {
+		if rs.Type != dsfLogAggregatorResourceType {
 			continue
 		}
 		return fmt.Sprintf("%s", rs.Primary.ID), nil
@@ -69,19 +79,6 @@ func testCheckLogAggregatorExists(dataSourceId string) resource.TestCheckFunc {
 	}
 }
 
-func testAccCheckLogAggregatorConfigBasic(t *testing.T) string {
-	log.Printf("[INFO] Running test testAccCheckLogAggregatorConfigBasic \n")
-	return fmt.Sprintf(`
-resource "%s" "my_test_data_source" {
-	admin_email = "%s"
-	arn = "%s"
-	asset_display_name = "%s"
-	gateway_id = %s
-	server_host_name = "%s"
-	server_type = "%s"
-}`, logAggregatorResourceName, testAdminEmail, testArn, testAssetDisplayName, testGatewayId, testServerHostName, testDSServerType)
-}
-
 func testAccLogAggregatorDestroy(state *terraform.State) error {
 	log.Printf("[INFO] Running test testAccLogAggregatorDestroy \n")
 	client := testAccProvider.Meta().(*Client)
@@ -99,4 +96,34 @@ func testAccLogAggregatorDestroy(state *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+// Configs
+func testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName string, gatewayId string, assetId string, parentAssetId string) string {	
+	// handle reference to other assets
+	var parentAssetIdVal string 
+	isRef, _ := regexp.Match("([A-Za-z0-9-_]+).([A-Za-z0-9-_]+).asset_id", []byte(parentAssetId)) //e.g. dsfhub_cloud_account.my-cloud-account.asset_id
+	if isRef {
+		parentAssetIdVal = parentAssetId
+	} else {
+		parentAssetIdVal = fmt.Sprintf("\"%s\"", parentAssetId)
+	}
+
+	return fmt.Sprintf(`
+resource "` + dsfLogAggregatorResourceType + `" "%[1]s" {
+	server_type = "AWS LOG GROUP"
+
+	admin_email = "` + testAdminEmail + `"
+	arn	= "%[3]s"
+	asset_display_name = "%[3]s"
+	asset_id = "%[3]s"
+	gateway_id = "%[2]s"
+	parent_asset_id = ` + parentAssetIdVal + `
+
+	asset_connection {
+		auth_mechanism = "default"
+		reason = "default"
+		region = "us-east-2"
+	}
+}`, resourceName, gatewayId, assetId, parentAssetId)
 }
