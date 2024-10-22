@@ -63,7 +63,7 @@ func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
 		Steps: []resource.TestStep{
 			// onboard and connect to gateway
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, resourceName, "UNIFIED", true),
+				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, resourceName, "UNIFIED", "true"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-odbc@oracle_unified.service"),
@@ -71,7 +71,7 @@ func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
 			},
 			// update audit_type -> reconnect asset to gateway
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, resourceName, "UNIFIED_AGGREGATED", true),
+				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, resourceName, "UNIFIED_AGGREGATED", "true"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-odbc@oracle_unified_aggregated.service"),
@@ -79,7 +79,7 @@ func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
 			},
 			// disconnect asset
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, resourceName, "UNIFIED_AGGREGATED", false),
+				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, resourceName, "UNIFIED_AGGREGATED", "false"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
@@ -144,7 +144,12 @@ resource "` + dsfDataSourceResourceType + `" "%[1]s" {
 		resourceName, adminEmail, assetId, gatewayId, serverHostName, serverType)
 }
 
-func testAccDSFDataSourceConfig_AwsRdsOracle(resourceName string, gatewayId string, assetId string, auditType string, auditPullEnabled bool) string {
+func testAccDSFDataSourceConfig_AwsRdsOracle(resourceName string, gatewayId string, assetId string, auditType string, auditPullEnabled string) string {
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+	
 	return fmt.Sprintf(`
 resource "` + dsfDataSourceResourceType + `" "%[1]s" {
 	server_type					= "AWS RDS ORACLE"
@@ -152,7 +157,7 @@ resource "` + dsfDataSourceResourceType + `" "%[1]s" {
 	admin_email					= "` + testAdminEmail + `"
 	asset_display_name	= "%[3]s"
 	asset_id						= "%[3]s"
-	audit_pull_enabled	= %[5]t
+	audit_pull_enabled	= %[5]s
 	audit_type					= "%[4]s"
 	gateway_id					= "%[2]s"
 	server_host_name		= "test.com"

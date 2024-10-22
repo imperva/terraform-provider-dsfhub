@@ -22,13 +22,13 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 	const (
 		assetId = "arn:aws:logs:us-east-2:123456789012:log-group:/aws/rds/instance/my-database/audit:*"
 		resourceName = "my-database-log-group"
-		serverHostName = "my-database.xxxxk8rsfzja.us-east-2.rds.amazonaws.com"
-		parentAssetId = "arn:aws:iam::123456789012"
-		parentResourceName = "my-cloud-account"
+		serverHostName = "oracle-rds-db.xxxxx8rsfzja.us-east-2.rds.amazonaws.com"
+		parentAssetId = "arn:aws:rds:us-east-2:123456789012:db:oracle-rds-db"
+		parentResourceName = "my-oracle-db"
 	)
 
-	// resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
-	parentResourceTypeAndName := fmt.Sprintf("%s.%s", dsfCloudAccountResourceType, parentResourceName)
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+	parentResourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, parentResourceName)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -36,13 +36,17 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Failed: missing parent_asset_id
 			{
-				Config: testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, ""),
+				Config: testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, "", true),
 				ExpectError: regexp.MustCompile("Error: missing required fields for dsfhub_data_source"),
 			},
 			// Onboard with AWS parent asset
 			{
-				Config: testAccDSFCloudAccountConfig_Aws(parentResourceName, gatewayId, parentAssetId, "default") + 
-				testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, parentResourceTypeAndName + ".asset_id"),
+				Config: testAccDSFDataSourceConfig_AwsRdsOracle(parentResourceName, gatewayId, parentAssetId, "LOG_GROUP", "") + 
+				testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, parentResourceTypeAndName + ".asset_id", true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-aws@oracle-rds.service"),
+				),
 			},
 		},
 	})
@@ -99,7 +103,7 @@ func testAccLogAggregatorDestroy(state *terraform.State) error {
 }
 
 // Configs
-func testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName string, gatewayId string, assetId string, parentAssetId string) string {	
+func testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool) string {	
 	// handle reference to other assets
 	var parentAssetIdVal string 
 	isRef, _ := regexp.Match("([A-Za-z0-9-_]+).([A-Za-z0-9-_]+).asset_id", []byte(parentAssetId)) //e.g. dsfhub_cloud_account.my-cloud-account.asset_id
@@ -117,6 +121,7 @@ resource "` + dsfLogAggregatorResourceType + `" "%[1]s" {
 	arn	= "%[3]s"
 	asset_display_name = "%[3]s"
 	asset_id = "%[3]s"
+	audit_pull_enabled = %[5]t
 	gateway_id = "%[2]s"
 	parent_asset_id = ` + parentAssetIdVal + `
 
@@ -125,5 +130,5 @@ resource "` + dsfLogAggregatorResourceType + `" "%[1]s" {
 		reason = "default"
 		region = "us-east-2"
 	}
-}`, resourceName, gatewayId, assetId, parentAssetId)
+}`, resourceName, gatewayId, assetId, parentAssetId, auditPullEnabled)
 }
