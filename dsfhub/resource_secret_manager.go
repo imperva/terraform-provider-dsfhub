@@ -2,18 +2,21 @@ package dsfhub
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	"log"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"log"
 )
 
 func resourceSecretManager() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSecretManagerCreate,
-		Read:   resourceSecretManagerRead,
-		Update: resourceSecretManagerUpdate,
-		Delete: resourceSecretManagerDelete,
+		CreateContext: resourceSecretManagerCreateContext,
+		ReadContext:   resourceSecretManagerReadContext,
+		UpdateContext: resourceSecretManagerUpdateContext,
+		DeleteContext: resourceSecretManagerDeleteContext,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -496,31 +499,38 @@ func resourceSecretManager() *schema.Resource {
 	}
 }
 
-func resourceSecretManagerCreate(d *schema.ResourceData, m interface{}) error {
+func resourceSecretManagerCreateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
+
+	// check provided fields against schema
 	if isOk, err := checkResourceRequiredFields(requiredSecretManagerFieldsJson, ignoreSecretManagerParamsByServerType, d); !isOk {
-		return err
+		return diag.FromErr(err)
 	}
+
+	// convert provided fields into API payload
 	secretManager := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&secretManager, serverType, d)
 
+	// create resource
 	log.Printf("[INFO] Creating SecretManager for serverType: %s and gatewayId: %s gatewayId: \n", serverType, secretManager.Data.GatewayID)
 	createSecretManagerResponse, err := client.CreateSecretManager(secretManager)
-
 	if err != nil {
 		log.Printf("[ERROR] adding secret manager for serverType: %s and gatewayId: %s | err: %s\n", serverType, secretManager.Data.GatewayID, err)
-		return err
+		return diag.FromErr(err)
 	}
 
+	// set ID
 	secretManagerId := createSecretManagerResponse.Data.ID
 	d.SetId(secretManagerId)
 
 	// Set the rest of the state from the resource read
-	return resourceSecretManagerRead(d, m)
+	resourceSecretManagerReadContext(ctx, d, m)
+	
+	return nil
 }
 
-func resourceSecretManagerRead(d *schema.ResourceData, m interface{}) error {
+func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
 	secretManagerId := d.Id()
 
@@ -530,7 +540,7 @@ func resourceSecretManagerRead(d *schema.ResourceData, m interface{}) error {
 
 	if err != nil {
 		log.Printf("[ERROR] Reading secretManagerReadResponse with secretManagerId: %s | err: %s\n", secretManagerId, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	if secretManagerReadResponse != nil {
@@ -658,31 +668,38 @@ func resourceSecretManagerRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceSecretManagerUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceSecretManagerUpdateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
+
+	// check provided fields against schema
 	secretManagerId := d.Id()
 	if isOk, err := checkResourceRequiredFields(requiredSecretManagerFieldsJson, ignoreSecretManagerParamsByServerType, d); !isOk {
-		return err
+		return diag.FromErr(err)
 	}
+
+	// convert provided fields into API payload
 	secretManager := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&secretManager, serverType, d)
 
+	// update resource
 	log.Printf("[INFO] Updating DSF data source for serverType: %s and gatewayId: %s assetId: %s\n", secretManager.Data.ServerType, secretManager.Data.GatewayID, secretManager.Data.AssetData.AssetID)
 	_, err := client.UpdateSecretManager(secretManagerId, secretManager)
-
 	if err != nil {
 		log.Printf("[ERROR] Updating secret manager for serverType: %s and gatewayId: %s assetId: %s | err:%s\n", secretManager.Data.ServerType, secretManager.Data.GatewayID, secretManager.Data.AssetData.AssetID, err)
-		return err
+		return diag.FromErr(err)
 	}
 
+	// set ID
 	d.SetId(secretManagerId)
 
 	// Set the rest of the state from the resource read
-	return resourceSecretManagerRead(d, m)
+	resourceSecretManagerReadContext(ctx, d, m)
+
+	return nil
 }
 
-func resourceSecretManagerDelete(d *schema.ResourceData, m interface{}) error {
+func resourceSecretManagerDeleteContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
 	secretManagerId := d.Id()
 
