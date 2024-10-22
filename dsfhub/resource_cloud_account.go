@@ -109,14 +109,13 @@ func resourceCloudAccount() *schema.Resource {
 							Description: "The Access key ID of AWS secret access key used to authenticate",
 							Optional:    true,
 							Default:     nil,
-							Computed:    true,
 						},
 						"access_key": {
 							Type:        schema.TypeString,
 							Description: "The Secret access key used to authenticate",
 							Optional:    true,
 							Default:     nil,
-							Computed:    true,
+							Required:    false,
 						},
 						"amazon_secret": {
 							Type:        schema.TypeSet,
@@ -161,7 +160,6 @@ func resourceCloudAccount() *schema.Resource {
 							Description: "This is also referred to as the Client ID and it’s the unique identifier for the registered application being used to execute Python SDK commands against Azure’s API services. You can find this number under Azure Active Directory -> App Registrations -> Owned Applications",
 							Optional:    true,
 							Default:     nil,
-							Computed:    true,
 						},
 						"auth_mechanism": {
 							Type:         schema.TypeString,
@@ -339,7 +337,8 @@ func resourceCloudAccount() *schema.Resource {
 							Description: "The Secret access key used to authenticate",
 							Required:    false,
 							Optional:    true,
-							Default:     false,
+							Default:     nil,
+							Sensitive:   true,
 						},
 						"ssl": {
 							Type:        schema.TypeBool,
@@ -546,7 +545,9 @@ func resourceCloudAccountRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("asset_id", cloudAccountReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", cloudAccountReadResponse.Data.AssetData.AssetSource)
 	d.Set("available_regions", cloudAccountReadResponse.Data.AssetData.AvailableRegions)
-	d.Set("credential_endpoint", cloudAccountReadResponse.Data.AssetData.CredentialsEndpoint)
+	if cloudAccountReadResponse.Data.AssetData.CredentialsEndpoint != "" {
+		d.Set("credential_endpoint", cloudAccountReadResponse.Data.AssetData.CredentialsEndpoint)
+	}
 	d.Set("criticality", cloudAccountReadResponse.Data.AssetData.Criticality)
 	d.Set("gateway_id", cloudAccountReadResponse.Data.GatewayID)
 	d.Set("jsonar_uid", cloudAccountReadResponse.Data.AssetData.JsonarUID)
@@ -642,7 +643,7 @@ func resourceCloudAccountRead(d *schema.ResourceData, m interface{}) error {
 
 		connections.Add(connection)
 	}
-	d.Set("ca_connection", connections)
+	d.Set("asset_connection", connections)
 
 	log.Printf("[INFO] Finished reading CloudAccount with cloudAccountId: %s\n", cloudAccountId)
 
