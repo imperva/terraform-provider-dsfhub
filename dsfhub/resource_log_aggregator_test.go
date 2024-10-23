@@ -105,13 +105,7 @@ func testAccLogAggregatorDestroy(state *terraform.State) error {
 // Configs
 func testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool) string {	
 	// handle reference to other assets
-	var parentAssetIdVal string 
-	isRef, _ := regexp.Match("([A-Za-z0-9-_]+).([A-Za-z0-9-_]+).asset_id", []byte(parentAssetId)) //e.g. dsfhub_cloud_account.my-cloud-account.asset_id
-	if isRef {
-		parentAssetIdVal = parentAssetId
-	} else {
-		parentAssetIdVal = fmt.Sprintf("\"%s\"", parentAssetId)
-	}
+	parentAssetIdVal := testAccParseResourceReference(parentAssetId)
 
 	return fmt.Sprintf(`
 resource "` + dsfLogAggregatorResourceType + `" "%[1]s" {
