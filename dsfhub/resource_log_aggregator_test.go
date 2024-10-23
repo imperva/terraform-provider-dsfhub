@@ -36,13 +36,13 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Failed: missing parent_asset_id
 			{
-				Config: testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, "", true),
+				Config: testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, "", true, "LOG_GROUP", ""),
 				ExpectError: regexp.MustCompile("Error: missing required fields for dsfhub_data_source"),
 			},
 			// Onboard with AWS parent asset
 			{
 				Config: testAccDSFDataSourceConfig_AwsRdsOracle(parentResourceName, gatewayId, parentAssetId, "LOG_GROUP", "") + 
-				testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, parentResourceTypeAndName + ".asset_id", true),
+				testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, parentResourceTypeAndName + ".asset_id", true, "LOG_GROUP", ""),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-aws@oracle-rds.service"),
@@ -103,12 +103,13 @@ func testAccLogAggregatorDestroy(state *terraform.State) error {
 }
 
 // Configs
-func testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool) string {	
+func testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool, auditType string, dependsOn string) string {	
 	// handle reference to other assets
-	parentAssetIdVal := testAccParseResourceReference(parentAssetId)
+	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
 
 	return fmt.Sprintf(`
 resource "` + dsfLogAggregatorResourceType + `" "%[1]s" {
+	depends_on = [` + dependsOn + `]
 	server_type = "AWS LOG GROUP"
 
 	admin_email = "` + testAdminEmail + `"
@@ -116,6 +117,7 @@ resource "` + dsfLogAggregatorResourceType + `" "%[1]s" {
 	asset_display_name = "%[3]s"
 	asset_id = "%[3]s"
 	audit_pull_enabled = %[5]t
+	audit_type = "%[6]s"
 	gateway_id = "%[2]s"
 	parent_asset_id = ` + parentAssetIdVal + `
 
@@ -124,5 +126,5 @@ resource "` + dsfLogAggregatorResourceType + `" "%[1]s" {
 		reason = "default"
 		region = "us-east-2"
 	}
-}`, resourceName, gatewayId, assetId, parentAssetId, auditPullEnabled)
+}`, resourceName, gatewayId, assetId, parentAssetId, auditPullEnabled, auditType)
 }

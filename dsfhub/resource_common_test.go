@@ -5,10 +5,11 @@ import (
 	"regexp"
 )
 
-// handle reference to other resources
-func testAccParseResourceReference(field string) string {
+func testAccParseResourceAttributeReference(field string) string {
+	var expr string = `dsfhub_[A-Za-z0-9_-].+\.[A-Za-z0-9_-].+` //e.g. dsfhub_cloud_account.my-cloud-account, dsfhub_cloud_account.my-cloud-account.asset_id
 	var ret string 
-	isRef, _ := regexp.Match("([A-Za-z0-9-_]+).([A-Za-z0-9-_]+).asset_id", []byte(field)) //e.g. dsfhub_cloud_account.my-cloud-account.asset_id
+
+	isRef, _ := regexp.Match(expr, []byte(field)) 
 	if isRef {
 		ret = field
 	} else {
