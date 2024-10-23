@@ -16,7 +16,7 @@ const dsfDataSourceResourceType = "dsfhub_data_source"
 func TestAccDSFDataSource_Basic(t *testing.T) {
 	gatewayId := os.Getenv("GATEWAY_ID")
 	if gatewayId == "" {
-		t.Fatal("GATEWAY_ID must be set")
+		t.Skip("GATEWAY_ID environment variable must be set")
 	}
 
 	const resourceName = "basic_test_data_source"
@@ -51,7 +51,7 @@ func TestAccDSFDataSource_Basic(t *testing.T) {
 func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
 	gatewayId := os.Getenv("GATEWAY_ID")
 	if gatewayId == "" {
-		t.Fatal("GATEWAY_ID must be set")
+		t.Skip("GATEWAY_ID environment variable must be set")
 	}
 
 	const resourceName = "rds_oracle_connect_disconnect_gateway"
@@ -98,7 +98,7 @@ func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
 func TestAccDSFDataSource_AwsRdsPostgresqlClusterCloudWatch(t *testing.T) {
 	gatewayId := os.Getenv("GATEWAY_ID")
 	if gatewayId == "" {
-		t.Fatal("GATEWAY_ID must be set")
+		t.Skip("GATEWAY_ID environment variable must be set")
 	}
 
 	const (
@@ -142,7 +142,7 @@ func TestAccDSFDataSource_AwsRdsPostgresqlClusterCloudWatch(t *testing.T) {
 func TestAccDSFDataSource_AwsRdsMysqlClusterCloudWatchSlowQuery(t *testing.T) {
 	gatewayId := os.Getenv("GATEWAY_ID")
 	if gatewayId == "" {
-		t.Fatal("GATEWAY_ID must be set")
+		t.Skip("GATEWAY_ID environment variable must be set")
 	}
 
 	const (

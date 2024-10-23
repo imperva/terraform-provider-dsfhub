@@ -16,7 +16,7 @@ const dsfLogAggregatorResourceType = "dsfhub_log_aggregator"
 func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 	gatewayId := os.Getenv("GATEWAY_ID")
 	if gatewayId == "" {
-		t.Fatal("GATEWAY_ID must be set")
+		t.Skip("GATEWAY_ID environment variable must be set")
 	}
 
 	const (
