@@ -169,6 +169,7 @@ func TestAccDSFDataSource_AwsRdsMysqlClusterCloudWatchSlowQuery(t *testing.T) {
 	)
 
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	//TODO: check that instance asset is connected once fixed: https://onejira.imperva.com/browse/SR-2046
 	// instanceResourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, instanceResourceName)
 	logGroupResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, logGroupResourceName)
 	slowLogGroupResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, slowLogGroupResourceName)
