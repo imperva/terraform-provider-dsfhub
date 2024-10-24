@@ -2,19 +2,21 @@ package dsfhub
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceCloudAccount() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceCloudAccountCreate,
-		Read:   resourceCloudAccountRead,
-		Update: resourceCloudAccountUpdate,
-		Delete: resourceCloudAccountDelete,
+		CreateContext: resourceCloudAccountCreateContext,
+		ReadContext:   resourceCloudAccountReadContext,
+		UpdateContext: resourceCloudAccountUpdateContext,
+		DeleteContext: resourceCloudAccountDeleteContext,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -109,14 +111,13 @@ func resourceCloudAccount() *schema.Resource {
 							Description: "The Access key ID of AWS secret access key used to authenticate",
 							Optional:    true,
 							Default:     nil,
-							Computed:    true,
 						},
 						"access_key": {
 							Type:        schema.TypeString,
 							Description: "The Secret access key used to authenticate",
 							Optional:    true,
 							Default:     nil,
-							Computed:    true,
+							Required:    false,
 						},
 						"amazon_secret": {
 							Type:        schema.TypeSet,
@@ -161,7 +162,6 @@ func resourceCloudAccount() *schema.Resource {
 							Description: "This is also referred to as the Client ID and it’s the unique identifier for the registered application being used to execute Python SDK commands against Azure’s API services. You can find this number under Azure Active Directory -> App Registrations -> Owned Applications",
 							Optional:    true,
 							Default:     nil,
-							Computed:    true,
 						},
 						"auth_mechanism": {
 							Type:         schema.TypeString,
@@ -339,7 +339,8 @@ func resourceCloudAccount() *schema.Resource {
 							Description: "The Secret access key used to authenticate",
 							Required:    false,
 							Optional:    true,
-							Default:     false,
+							Default:     nil,
+							Sensitive:   true,
 						},
 						"ssl": {
 							Type:        schema.TypeBool,
@@ -496,31 +497,36 @@ func resourceCloudAccount() *schema.Resource {
 	}
 }
 
-func resourceCloudAccountCreate(d *schema.ResourceData, m interface{}) error {
+func resourceCloudAccountCreateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
 	if isOk, err := checkResourceRequiredFields(requiredCloudAccountJson, ignoreCloudAccountParamsByServerType, d); !isOk {
-		return err
+		return diag.FromErr(err)
 	}
+
+	// check provided fields against schema
 	cloudAccount := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&cloudAccount, serverType, d)
 
+	// create resource
 	log.Printf("[INFO] Creating CloudAccount for serverType: %s and gatewayId: %s gatewayId: \n", serverType, cloudAccount.Data.GatewayID)
 	createCloudAccountResponse, err := client.CreateCloudAccount(cloudAccount)
-
 	if err != nil {
 		log.Printf("[ERROR] adding CloudAccount for serverType: %s and gatewayId: %s | err: %s", serverType, cloudAccount.Data.GatewayID, err)
-		return err
+		return diag.FromErr(err)
 	}
 
+	// set ID
 	cloudAccountId := createCloudAccountResponse.Data.AssetData.AssetID
 	d.SetId(cloudAccountId)
 
 	// Set the rest of the state from the resource read
-	return resourceCloudAccountRead(d, m)
+	resourceCloudAccountReadContext(ctx, d, m)
+
+	return nil
 }
 
-func resourceCloudAccountRead(d *schema.ResourceData, m interface{}) error {
+func resourceCloudAccountReadContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
 	cloudAccountId := d.Id()
 
@@ -530,7 +536,7 @@ func resourceCloudAccountRead(d *schema.ResourceData, m interface{}) error {
 
 	if err != nil {
 		log.Printf("[ERROR] Reading cloudAccountReadResponse with cloudAccountId: %s | err: %s\n", cloudAccountId, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	if cloudAccountReadResponse != nil {
@@ -546,7 +552,9 @@ func resourceCloudAccountRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("asset_id", cloudAccountReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", cloudAccountReadResponse.Data.AssetData.AssetSource)
 	d.Set("available_regions", cloudAccountReadResponse.Data.AssetData.AvailableRegions)
-	d.Set("credential_endpoint", cloudAccountReadResponse.Data.AssetData.CredentialsEndpoint)
+	if cloudAccountReadResponse.Data.AssetData.CredentialsEndpoint != "" {
+		d.Set("credential_endpoint", cloudAccountReadResponse.Data.AssetData.CredentialsEndpoint)
+	}
 	d.Set("criticality", cloudAccountReadResponse.Data.AssetData.Criticality)
 	d.Set("gateway_id", cloudAccountReadResponse.Data.GatewayID)
 	d.Set("jsonar_uid", cloudAccountReadResponse.Data.AssetData.JsonarUID)
@@ -642,38 +650,45 @@ func resourceCloudAccountRead(d *schema.ResourceData, m interface{}) error {
 
 		connections.Add(connection)
 	}
-	d.Set("ca_connection", connections)
+	d.Set("asset_connection", connections)
 
 	log.Printf("[INFO] Finished reading CloudAccount with cloudAccountId: %s\n", cloudAccountId)
 
 	return nil
 }
 
-func resourceCloudAccountUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceCloudAccountUpdateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
+
+	// check provided fields against schema
 	cloudAccountId := d.Id()
 	if isOk, err := checkResourceRequiredFields(requiredCloudAccountJson, ignoreCloudAccountParamsByServerType, d); !isOk {
-		return err
+		return diag.FromErr(err)
 	}
+
+	// convert provided fields into API payload
 	cloudAccount := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&cloudAccount, serverType, d)
 
+	// update resource
 	log.Printf("[INFO] Updating CloudAccount for serverType: %s and gatewayId: %s assetId: %s\n", cloudAccount.Data.ServerType, cloudAccount.Data.GatewayID, cloudAccount.Data.AssetData.AssetID)
 	_, err := client.UpdateCloudAccount(cloudAccountId, cloudAccount)
-
 	if err != nil {
 		log.Printf("[ERROR] Updating CloudAccount for serverType: %s and gatewayId: %s assetId: %s | err:%s\n", cloudAccount.Data.ServerType, cloudAccount.Data.GatewayID, cloudAccount.Data.AssetData.AssetID, err)
-		return err
+		return diag.FromErr(err)
 	}
 
+	// set ID
 	d.SetId(cloudAccountId)
 
 	// Set the rest of the state from the resource read
-	return resourceCloudAccountRead(d, m)
+	resourceCloudAccountReadContext(ctx, d, m)
+
+	return nil
 }
 
-func resourceCloudAccountDelete(d *schema.ResourceData, m interface{}) error {
+func resourceCloudAccountDeleteContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
 	cloudAccountId := d.Id()
 
