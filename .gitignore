@@ -9,3 +9,4 @@
 examples-dev/*
 .vscode/
 terraform-provider-dsfhub
+vendor/
