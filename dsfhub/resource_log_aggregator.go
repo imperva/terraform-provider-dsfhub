@@ -653,7 +653,7 @@ func resourceLogAggregatorCreateContext(ctx context.Context, d *schema.ResourceD
 	}
 
 	// Connect/disconnect asset to gateway
-	err = connectDisconnectGateway(ctx, d, "log_aggregator", m)
+	err = connectDisconnectGateway(ctx, d, dsfLogAggregatorResourceType, m)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Warning,
@@ -855,7 +855,7 @@ func resourceLogAggregatorUpdateContext(ctx context.Context, d *schema.ResourceD
 	}
 
 	// Connect/disconnect asset to gateway
-	err = connectDisconnectGateway(ctx, d, "log_aggregator", m)
+	err = connectDisconnectGateway(ctx, d, dsfLogAggregatorResourceType, m)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Warning,

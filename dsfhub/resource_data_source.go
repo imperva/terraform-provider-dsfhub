@@ -1350,7 +1350,7 @@ func resourceDSFDataSourceCreateContext(ctx context.Context, d *schema.ResourceD
 	}
 
 	// Connect/disconnect asset to gateway
-	err = connectDisconnectGateway(ctx, d, "data_source", m)
+	err = connectDisconnectGateway(ctx, d, dsfDataSourceResourceType, m)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Warning,
@@ -1702,7 +1702,7 @@ func resourceDSFDataSourceUpdateContext(ctx context.Context, d *schema.ResourceD
 	}
 
 	// Connect/disconnect asset to gateway
-	err = connectDisconnectGateway(ctx, d, "data_source", m)
+	err = connectDisconnectGateway(ctx, d, dsfDataSourceResourceType, m)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Warning,

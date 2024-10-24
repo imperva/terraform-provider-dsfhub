@@ -11,8 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-const dsfLogAggregatorResourceType = "dsfhub_log_aggregator"
-
 func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 	gatewayId := os.Getenv("GATEWAY_ID")
 	if gatewayId == "" {

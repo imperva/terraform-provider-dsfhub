@@ -10,8 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-const dsfCloudAccountResourceType = "dsfhub_cloud_account"
-
 func TestAccDSFCloudAccount_Aws(t *testing.T) {
 	gatewayId := os.Getenv("GATEWAY_ID")
 	if gatewayId == "" {

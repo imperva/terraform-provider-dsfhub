@@ -445,12 +445,12 @@ func auditStateRefreshFunc(client Client, resourceType string, assetId string) r
 		var err error
 
 		switch resourceType {
-		case "data_source":
+		case dsfDataSourceResourceType:
 			{
 				log.Printf("[INFO] checking audit state for data_source asset %v", assetId)
 				result, err = client.ReadDSFDataSource(assetId)
 			}
-		case "log_aggregator":
+		case dsfLogAggregatorResourceType:
 			{
 				log.Printf("[INFO] checking audit state for log_aggregator asset %v", assetId)
 				result, err = client.ReadLogAggregator(assetId)
