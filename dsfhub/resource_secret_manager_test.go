@@ -96,9 +96,9 @@ resource "%s" "my_test_data_source" {
 	server_port = "%s"
 	server_type = "%s"
 	asset_connection {
-		reason         = "%s"
+		reason = "%s"
 		auth_mechanism = "%s"
-		role_name      = "%s"
+		role_name = "%s"
 	}
 }`, dsfSecretManagerResourceType, testAdminEmail, testAssetDisplayName, testSMAssetId, testGatewayId, testServerHostName, testServerIP, testServerPort, testSMServerType, testSMConnectionReason, testSMAuthMechanism, testSMRoleName)
 }
@@ -117,9 +117,9 @@ resource "`+dsfSecretManagerResourceType+`" "%[1]s" {
 	server_port = "%[5]s"
 
 	asset_connection {
-		reason         = "default"
+		reason = "default"
 		auth_mechanism = "%[6]s"
-		role_name      = "%[7]s"
+		role_name = "%[7]s"
 	}
 }`,
 		resourceName, gatewayId, assetId, serverHostName, serverPort, authMechanism, roleName)
