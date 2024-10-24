@@ -113,6 +113,7 @@ func TestAccDSFDataSource_AwsRdsPostgresqlClusterCloudWatch(t *testing.T) {
 	)
 
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	instanceResourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, instanceResourceName)
 	logGroupResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, logGroupResourceName)
 
 	resource.Test(t, resource.TestCase{
@@ -127,6 +128,14 @@ func TestAccDSFDataSource_AwsRdsPostgresqlClusterCloudWatch(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "true"),
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", "gateway-aws@aurora-postgresql.service"),
+				),
+			},
+			// refresh and verify DB assets are connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(instanceResourceTypeAndName, "audit_pull_enabled", "true"),
 				),
 			},
 			// validate import
@@ -160,6 +169,7 @@ func TestAccDSFDataSource_AwsRdsMysqlClusterCloudWatchSlowQuery(t *testing.T) {
 	)
 
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	// instanceResourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, instanceResourceName)
 	logGroupResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, logGroupResourceName)
 	slowLogGroupResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, slowLogGroupResourceName)
 
@@ -169,15 +179,24 @@ func TestAccDSFDataSource_AwsRdsMysqlClusterCloudWatchSlowQuery(t *testing.T) {
 		Steps: []resource.TestStep{
 			// onboard and connect to gateway
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsAuroraMysqlCluster(resourceName, gatewayId, assetId, "LOG_GROUP", resourceName) + 
+				Config: testAccDSFDataSourceConfig_AwsRdsAuroraMysqlCluster(resourceName, gatewayId, assetId, "", resourceName) + 
 					testAccDSFDataSourceConfig_AwsRdsAuroraMysql(instanceResourceName, gatewayId, instanceAssetId, resourceName) + 
 					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName + ".asset_id", true, "LOG_GROUP", "") +
 					testAccDSFLogAggregatorConfig_AwsLogGroup(slowLogGroupResourceName, gatewayId, slowLogGroupAssetId, resourceTypeAndName + ".asset_id", true, "AWS_RDS_AURORA_MYSQL_SLOW", logGroupResourceTypeAndName),
+				// verify log group assets are connected
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "true"),
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", "gateway-aws@aurora-mysql.service"),
 					resource.TestCheckResourceAttr(slowLogGroupResourceTypeAndName, "audit_pull_enabled", "true"),
 					resource.TestCheckResourceAttr(slowLogGroupResourceTypeAndName, "gateway_service", "gateway-aws@aurora-mysql-slow-query.service"),
+				),
+			},
+			// refresh and verify DB assets are connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					// resource.TestCheckResourceAttr(instanceResourceTypeAndName, "audit_pull_enabled", "true"),
 				),
 			},
 			// validate import
