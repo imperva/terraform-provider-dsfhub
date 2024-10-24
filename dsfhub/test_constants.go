@@ -1,19 +1,23 @@
 package dsfhub
 
-const testInvalidDSFHUBHost = "https://invalid.host.com"
-const testAdminEmail = "test@email.com"
-const testArn = "arn:aws:rds:us-east-2:123456789:db:your-db"
-const testServerHostName = "your-db-name.abcde12345.us-east-2.rds.amazonaws.com"
-const testServerIP = "1.2.3.4"
-const testServerPort = "8200"
-const testDSServerType = "AWS RDS MYSQL"
-const testGatewayId = "e33bfbe4-a93a-c4e5-8e9c-6e5558c2e2cd"
+const (
+	testAdminEmail           = "test@email.com"
+	testArn                  = "arn:aws:rds:us-east-2:123456789:db:your-db"
+	testServerHostName       = "your-db-name.abcde12345.us-east-2.rds.amazonaws.com"
+	testOnPremServerHostName = "server.company.com"
+	testServerIP             = "1.2.3.4"
+	testServerPort           = "8200"
 
-const testAssetDisplayName = "arn:aws:rds:us-east-2:123456789:db:your-db"
+	testInvalidDSFHUBHost = "https://invalid.host.com"
+	testDSServerType      = "AWS RDS MYSQL"
+	testGatewayId         = "e33bfbe4-a93a-c4e5-8e9c-6e5558c2e2cd"
 
-const testSMConnectionReason = "default"
-const testSMRoleName = "vault-role-for-ec2"
-const testSMAuthMechanism = "ec2"
-const testSMAssetId = "your-host-name-here"
+	testAssetDisplayName = "arn:aws:rds:us-east-2:123456789:db:your-db"
 
-const testSMServerType = "HASHICORP"
+	testSMConnectionReason = "default"
+	testSMRoleName         = "vault-role-for-ec2"
+	testSMAuthMechanism    = "ec2"
+	testSMAssetId          = "your-host-name-here"
+
+	testSMServerType = "HASHICORP"
+)
