@@ -441,23 +441,30 @@ func waitUntilAuditState(ctx context.Context, desiredState bool, resourceType st
 
 func auditStateRefreshFunc(client Client, resourceType string, assetId string) retry.StateRefreshFunc {
 	return func() (any, string, error) {
-		if resourceType == "data_source" {
-			log.Printf("[INFO] checking audit state for data_source asset %v", assetId)
-			resp, err := client.ReadDSFDataSource(assetId)
-			if err != nil {
-				return 0, "", err
+		var result *ResourceWrapper
+		var err error
+
+		switch resourceType {
+		case "data_source":
+			{
+				log.Printf("[INFO] checking audit state for data_source asset %v", assetId)
+				result, err = client.ReadDSFDataSource(assetId)
 			}
-			return resp, strconv.FormatBool(resp.Data.AssetData.AuditPullEnabled), nil
-		} else if resourceType == "log_aggregator" {
-			log.Printf("[INFO] checking audit state for log_aggregator asset %v", assetId)
-			resp, err := client.ReadLogAggregator(assetId)
-			if err != nil {
-				return 0, "", err
+		case "log_aggregator":
+			{
+				log.Printf("[INFO] checking audit state for log_aggregator asset %v", assetId)
+				result, err = client.ReadLogAggregator(assetId)
 			}
-			return resp, strconv.FormatBool(resp.Data.AssetData.AuditPullEnabled), nil
-		} else {
-			return nil, "", fmt.Errorf("invalid resourceType: %v", resourceType)
+		default:
+			{
+				return nil, "", fmt.Errorf("invalid resourceType: %v", resourceType)
+			}
 		}
+		if err != nil {
+			return 0, "", err
+		}
+
+		return result, strconv.FormatBool(result.Data.AssetData.AuditPullEnabled), nil
 	}
 }
 
