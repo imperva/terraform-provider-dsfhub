@@ -2,36 +2,32 @@ package dsfhub
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"testing"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"log"
-	"testing"
 )
 
-const secretManagerResourceName = "secret_manager"
-const secretManagerType = "HASHICORP"
-const secretManagerResourceTypeAndName = secretManagerResourceName + "." + secretManagerType
+func TestAccDSFSecretManager_Hashicorp(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
 
-func TestAccSecretManager_basic(t *testing.T) {
-	log.Printf("======================== BEGIN TEST ========================")
-	log.Printf("[INFO] Running test TestAccSecretManager_basic \n")
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccSecretManagerDestroy,
+	const (
+		serverPort   = "8200"
+		assetId      = testOnPremServerHostName + ":HASHICORP::" + serverPort
+		resourceName = "example-hashicorp"
+	)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSecretManagerConfigBasic(t),
-				Check: resource.ComposeTestCheckFunc(
-					testCheckSecretManagerExists(secretManagerResourceName),
-					resource.TestCheckResourceAttr(secretManagerResourceTypeAndName, secretManagerResourceName, secretManagerType),
-				),
-			},
-			{
-				ResourceName:      secretManagerResourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-				ImportStateIdFunc: testAccSecretManagerId,
+				Config: testAccDSFSecretManagerConfig_Hashicorp(resourceName, gatewayId, assetId, testOnPremServerHostName, serverPort, "ec2", "vault-role-for-ec2"),
 			},
 		},
 	})
@@ -40,7 +36,7 @@ func TestAccSecretManager_basic(t *testing.T) {
 func testAccSecretManagerId(state *terraform.State) (string, error) {
 	log.Printf("[INFO] Running test testAccSecretManagerId \n")
 	for _, rs := range state.RootModule().Resources {
-		if rs.Type != dsfDataSourceType {
+		if rs.Type != dsfSecretManagerResourceType {
 			continue
 		}
 		return fmt.Sprintf("%s", rs.Primary.ID), nil
@@ -66,26 +62,6 @@ func testCheckSecretManagerExists(secretManagerId string) resource.TestCheckFunc
 		}
 		return nil
 	}
-}
-
-func testAccCheckSecretManagerConfigBasic(t *testing.T) string {
-	log.Printf("[INFO] Running test testAccCheckSecretManagerConfigBasic \n")
-	return fmt.Sprintf(`
-resource "%s" "my_test_data_source" {
-	admin_email = "%s"
-	asset_display_name = "%s"
-	asset_id = "%s"
-	gateway_id = "%s""
-	server_host_name = "%s"
-	server_ip = "%s"
-	server_port = "%s"
-	server_type = "%s"
-	sm_connection {
-		reason         = "%s"
-		auth_mechanism = "%s"
-		role_name      = "%s"
-	}
-}`, secretManagerResourceName, testAdminEmail, testAssetDisplayName, testSMAssetId, testGatewayId, testServerHostName, testServerIP, testServerPort, testSMServerType, testSMConnectionReason, testSMAuthMechanism, testSMRoleName)
 }
 
 func testAccSecretManagerDestroy(state *terraform.State) error {

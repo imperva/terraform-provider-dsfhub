@@ -2,19 +2,21 @@ package dsfhub
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceDSFDataSource() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceDSFDataSourceCreate,
-		Read:   resourceDSFDataSourceRead,
-		Update: resourceDSFDataSourceUpdate,
-		Delete: resourceDSFDataSourceDelete,
+		CreateContext: resourceDSFDataSourceCreateContext,
+		ReadContext:   resourceDSFDataSourceReadContext,
+		UpdateContext: resourceDSFDataSourceUpdateContext,
+		DeleteContext: resourceDSFDataSourceDeleteContext,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -1322,45 +1324,61 @@ func resourceDSFDataSource() *schema.Resource {
 	}
 }
 
-func resourceDSFDataSourceCreate(d *schema.ResourceData, m interface{}) error {
+func resourceDSFDataSourceCreateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	client := m.(*Client)
+
+	// check provided fields against schema
 	if isOk, err := checkResourceRequiredFields(requiredDataSourceFieldsJson, ignoreDataSourceParamsByServerType, d); !isOk {
-		return err
+		return diag.FromErr(err)
 	}
+
+	// convert provided fields into API payload
 	dsfDataSource := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&dsfDataSource, serverType, d)
+
 	// auditPullEnabled set to false as connect/disconnect logic handled below
 	dsfDataSource.Data.AssetData.AuditPullEnabled = false
+
+	// create resource
 	log.Printf("[INFO] Creating DSF data source for serverType: %s and gatewayId: %s \n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID)
 	dsfDataSourceResponse, err := client.CreateDSFDataSource(dsfDataSource)
-
 	if err != nil {
 		log.Printf("[INFO] Creating DSF data source for serverType: %s and gatewayId: %s assetId: %s\n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, dsfDataSource.Data.AssetData.AssetID)
-		return err
+		return diag.FromErr(err)
 	}
 
 	// Connect/disconnect asset to gateway
-	connectDisconnectGateway(d, dsfDataSource, m)
+	err = connectDisconnectGateway(ctx, d, dsfDataSourceResourceType, m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", d.Get("asset_id")),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
 
 	// Set ID
 	dsfDataSourceId := dsfDataSourceResponse.Data.AssetData.AssetID
 	d.SetId(dsfDataSourceId)
 
 	// Set the rest of the state from the resource read
-	return resourceDSFDataSourceRead(d, m)
+	log.Printf("[DEBUG] Writing data source asset details to state")
+	resourceDSFDataSourceReadContext(ctx, d, m)
+
+	return diags
 }
 
-func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
+func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
 	dsfDataSourceId := d.Id()
 
 	log.Printf("[INFO] Reading DSF data source with dsfDataSourceId: %s\n", dsfDataSourceId)
 	dsfDataSourceReadResponse, err := client.ReadDSFDataSource(dsfDataSourceId)
-
 	if err != nil {
 		log.Printf("[ERROR] Reading dsfDataSourceReadResponse | err: %s\n", err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	if dsfDataSourceReadResponse != nil {
@@ -1373,7 +1391,10 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("admin_email", dsfDataSourceReadResponse.Data.AssetData.AdminEmail)
 	//d.Set("application", dsfDataSourceReadResponse.Data.AssetData.Application)
 	//d.Set("archive", dsfDataSourceReadResponse.Data.AssetData.Archive)
-	d.Set("arn", dsfDataSourceReadResponse.Data.AssetData.Arn)
+
+	if dsfDataSourceReadResponse.Data.AssetData.Arn != "" {
+		d.Set("arn", dsfDataSourceReadResponse.Data.AssetData.Arn)
+	}
 	d.Set("asset_display_name", dsfDataSourceReadResponse.Data.AssetData.AssetDisplayName)
 	d.Set("asset_id", dsfDataSourceReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", dsfDataSourceReadResponse.Data.AssetData.AssetSource)
@@ -1428,7 +1449,9 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("sdm_enabled", dsfDataSourceReadResponse.Data.AssetData.SdmEnabled)
 	d.Set("searches", dsfDataSourceReadResponse.Data.AssetData.Searches)
 	d.Set("server_host_name", dsfDataSourceReadResponse.Data.AssetData.ServerHostName)
-	d.Set("server_ip", dsfDataSourceReadResponse.Data.AssetData.ServerIP)
+	if dsfDataSourceReadResponse.Data.AssetData.ServerIP != "" {
+		d.Set("server_ip", dsfDataSourceReadResponse.Data.AssetData.ServerIP)
+	}
 	if dsfDataSourceReadResponse.Data.AssetData.ServerPort != nil {
 		var serverPort string
 		if serverPortNum, ok := dsfDataSourceReadResponse.Data.AssetData.ServerPort.(float64); ok {
@@ -1493,7 +1516,9 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 		//connection["azure_storage_account"] = v.ConnectionData.AzureStorageAccount
 		//connection["azure_storage_container"] = v.ConnectionData.AzureStorageContainer
 		//connection["azure_storage_secret_key"] = v.ConnectionData.AzureStorageSecretKey
-		connection["base_dn"] = v.ConnectionData.BaseDn
+		if v.ConnectionData.BaseDn != "" {
+			connection["base_dn"] = v.ConnectionData.BaseDn
+		}
 		connection["bucket"] = v.ConnectionData.Bucket
 		connection["ca_certs_path"] = v.ConnectionData.CaCertsPath
 		connection["ca_file"] = v.ConnectionData.CaFile
@@ -1565,14 +1590,18 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 		//connection["secure_connection"] = v.ConnectionData.SecureConnection
 		connection["self_signed_cert"] = v.ConnectionData.SelfSignedCert
 		connection["self_signed"] = v.ConnectionData.SelfSigned
-		connection["server_ip"] = v.ConnectionData.ServerIp
+		if v.ConnectionData.ServerIp != "" {
+			connection["server_ip"] = v.ConnectionData.ServerIp
+		}
 		connection["server_port"] = v.ConnectionData.ServerPort
 		connection["service_key"] = v.ConnectionData.ServiceKey
 		connection["snowflake_role"] = v.ConnectionData.SnowflakeRole
 		connection["ssl_server_cert"] = v.ConnectionData.SslServerCert
 		connection["ssl"] = v.ConnectionData.Ssl
 		//connection["store_aws_credentials"] = v.ConnectionData.StoreAwsCredentials
-		connection["subscription_id"] = v.ConnectionData.SubscriptionID
+		if v.ConnectionData.SubscriptionID != "" {
+			connection["subscription_id"] = v.ConnectionData.SubscriptionID
+		}
 		connection["tenant_id"] = v.ConnectionData.TenantID
 		connection["thrift_transport"] = v.ConnectionData.ThriftTransport
 		connection["tmp_user"] = v.ConnectionData.TmpUser
@@ -1645,42 +1674,60 @@ func resourceDSFDataSourceRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceDSFDataSourceUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceDSFDataSourceUpdateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	client := m.(*Client)
+
+	// check provided fields against schema
 	dsfDataSourceId := d.Id()
 	if isOk, err := checkResourceRequiredFields(requiredDataSourceFieldsJson, ignoreDataSourceParamsByServerType, d); !isOk {
-		return err
+		return diag.FromErr(err)
 	}
+
+	// convert provided fields into API payload
 	dsfDataSource := ResourceWrapper{}
 	serverType := d.Get("server_type").(string)
 	createResource(&dsfDataSource, serverType, d)
 
+	// auditPullEnabled set to current value from state
+	auditPullEnabled, _ := d.GetChange("audit_pull_enabled")
+	dsfDataSource.Data.AssetData.AuditPullEnabled = auditPullEnabled.(bool)
+
+	// update resource
 	log.Printf("[INFO] Updating DSF data source for serverType: %s and gatewayId: %s assetId: %s\n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, dsfDataSource.Data.AssetData.AssetID)
 	_, err := client.UpdateDSFDataSource(dsfDataSourceId, dsfDataSource)
-
 	if err != nil {
 		log.Printf("[ERROR] Updating data source for serverType: %s and gatewayId: %s assetId: %s | err:%s\n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, dsfDataSource.Data.AssetData.AssetID, err)
-		return err
+		return diag.FromErr(err)
 	}
 
 	// Connect/disconnect asset to gateway
-	connectDisconnectGateway(d, dsfDataSource, m)
+	err = connectDisconnectGateway(ctx, d, dsfDataSourceResourceType, m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", d.Get("asset_id")),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
 
 	// Set ID
 	d.SetId(dsfDataSourceId)
 
 	// Set the rest of the state from the resource read
-	return resourceDSFDataSourceRead(d, m)
+	log.Printf("[DEBUG] Writing data source asset details to state")
+	resourceDSFDataSourceReadContext(ctx, d, m)
+
+	return diags
 }
 
-func resourceDSFDataSourceDelete(d *schema.ResourceData, m interface{}) error {
+func resourceDSFDataSourceDeleteContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Client)
 	dsfDataSourceId := d.Id()
 
-	log.Printf("[INFO] Deleting data-source with dsfDataSourceId: %s", dsfDataSourceId)
-
-	dsfDataSourceDeleteResponse, err := client.DeleteDSFDataSource(dsfDataSourceId)
-	if dsfDataSourceDeleteResponse != nil {
+	_, err := client.DeleteDSFDataSource(dsfDataSourceId)
+	// if an error is returned, assume it has already been deleted
+	if err != nil {
 		log.Printf("[INFO] DSF data source has already been deleted with dsfDataSourceId: %s | err: %s\n", dsfDataSourceId, err)
 	}
 	return nil
@@ -1787,9 +1834,9 @@ func resourceDataSourceConnectionHash(v interface{}) int {
 	//	buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	//}
 
-	//if v, ok := m["base_dn"]; ok {
-	//	buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	//}
+	// if v, ok := m["base_dn"]; ok {
+	// 	buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	// }
 
 	if v, ok := m["bucket"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
