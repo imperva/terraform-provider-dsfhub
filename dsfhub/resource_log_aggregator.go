@@ -445,6 +445,13 @@ func resourceLogAggregator() *schema.Resource {
 				Optional:    true,
 				Default:     nil,
 			},
+			"content_type": {
+				Type:        schema.TypeString,
+				Description: "content_type should be set to the desired <'parent' asset 'Server Type'>, which is the one that uses this asset as a destination for logs. NOTE: The content_type field will take precedence on the lookup for parent_asset_id field when checking which server is sending logs to this asset.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
 			"credentials_endpoint": {
 				Type:        schema.TypeString,
 				Description: "A specific sts endpoint to use",
@@ -702,6 +709,7 @@ func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("audit_type", logAggregatorReadResponse.Data.AssetData.AuditType)
 	d.Set("available_regions", logAggregatorReadResponse.Data.AssetData.AvailableRegions)
 	d.Set("bucket_account_id", logAggregatorReadResponse.Data.AssetData.BucketAccountId)
+	d.Set("content_type", logAggregatorReadResponse.Data.AssetData.ContentType)
 	if logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint != "" {
 		d.Set("credential_endpoint", logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint)
 	}
