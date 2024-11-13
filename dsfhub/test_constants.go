@@ -20,4 +20,6 @@ const (
 	testSMAssetId          = "your-host-name-here"
 
 	testSMServerType = "HASHICORP"
+
+	testPubsubSubscriptionPrefix = "projects/my-project/subscriptions/"
 )

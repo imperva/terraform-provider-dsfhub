@@ -50,6 +50,334 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 	})
 }
 
+func TestAccDSFLogAggregator_GcpPubsubBasic(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "my-basic-pubsub-subscription"
+		assetId      = testPubsubSubscriptionPrefix + resourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Failed: missing asset_display_name, asset_id, pubsub_subscription
+			{
+				Config:      testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, "", "default", "", "false", "", ""),
+				ExpectError: regexp.MustCompile("Error: missing required fields for dsfhub_data_source"),
+			},
+			// Test different auth_mechanisms
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "false", "", ""),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "service_account", "", "false", "", ""),
+			},
+			// Test connect/disconnect w/ audit_type: "", content_type: ""
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "true", "", ""),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-gcp@postgresql.service"),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "false", "", ""),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDSFLogAggregator_GcpPubsubAlloydbPostgresql(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "my-alloydb-pubsub-subscription"
+		assetId      = testPubsubSubscriptionPrefix + resourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Test connect/disconnect
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "true", "ALLOYDB_POSTGRESQL", "GCP ALLOYDB POSTGRESQL"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-gcp@alloydb-postgresql.service"),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "false", "ALLOYDB_POSTGRESQL", "GCP ALLOYDB POSTGRESQL"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "true", "ALLOYDB_POSTGRESQL", "GCP ALLOYDB POSTGRESQL CLUSTER"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-gcp@alloydb-postgresql.service"),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "false", "ALLOYDB_POSTGRESQL", "GCP ALLOYDB POSTGRESQL CLUSTER"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDSFLogAggregator_GcpPubsubBigQuery(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "my-bigquery-pubsub-subscription"
+		assetId      = testPubsubSubscriptionPrefix + resourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Test connect/disconnect
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "true", "BIGQUERY", "GCP BIGQUERY"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-gcp@bigquery.service"),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "false", "BIGQUERY", "GCP BIGQUERY"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDSFLogAggregator_GcpPubsubBigTable(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "my-bigtable-pubsub-subscription"
+		assetId      = testPubsubSubscriptionPrefix + resourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Test connect/disconnect
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "true", "BIGTABLE", "GCP BIGTABLE"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-gcp@bigtable.service"),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "false", "BIGTABLE", "GCP BIGTABLE"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDSFLogAggregator_GcpPubsubMssqlserver(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "my-mssql-server-pubsub-subscription"
+		assetId      = testPubsubSubscriptionPrefix + resourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Test connect/disconnect
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "true", "MSSQL", "GCP MS SQL SERVER"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-gcp@mssql.service"),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "false", "MSSQL", "GCP MS SQL SERVER"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDSFLogAggregator_GcpPubsubMysql(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "my-mysql-pubsub-subscription"
+		assetId      = testPubsubSubscriptionPrefix + resourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Test connect/disconnect
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "true", "MYSQL", "GCP MYSQL"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-gcp@mysql.service"),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "false", "MYSQL", "GCP MYSQL"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "true", "GCP_MYSQL_SLOW", "GCP MYSQL"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-gcp@mysql-slow-query.service"),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "false", "GCP_MYSQL_SLOW", "GCP MYSQL"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDSFLogAggregator_GcpPubsubPostgresql(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "my-postgresql-pubsub-subscription"
+		assetId      = testPubsubSubscriptionPrefix + resourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Test connect/disconnect
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "true", "POSTGRESQL", "GCP POSTGRESQL"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-gcp@postgresql.service"),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "false", "POSTGRESQL", "GCP POSTGRESQL"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDSFLogAggregator_GcpPubsubSpanner(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "my-spanner-pubsub-subscription"
+		assetId      = testPubsubSubscriptionPrefix + resourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Test connect/disconnect
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "true", "SPANNER", "GCP SPANNER"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-gcp@spanner.service"),
+				),
+			},
+			{
+				Config: testAccDSFLogAggregatorConfig_GcpPubsub(resourceName, gatewayId, assetId, "default", "", "false", "SPANNER", "GCP SPANNER"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
+				),
+			},
+		},
+	})
+}
+
 func testAccLogAggregatorId(state *terraform.State) (string, error) {
 	log.Printf("[INFO] Running test testAccLogAggregatorId \n")
 	for _, rs := range state.RootModule().Resources {
