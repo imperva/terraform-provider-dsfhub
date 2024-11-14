@@ -886,7 +886,7 @@ func resourceLogAggregatorDeleteContext(ctx context.Context, d *schema.ResourceD
 	client := m.(*Client)
 	logAggregatorId := d.Id()
 
-	log.Printf("[INFO] Deleting secret manager with logAggregatorId: %s", logAggregatorId)
+	log.Printf("[INFO] Deleting log aggregator with logAggregatorId: %s", logAggregatorId)
 
 	logAggregatorDeleteResponse, err := client.DeleteLogAggregator(logAggregatorId)
 	if logAggregatorDeleteResponse != nil {
