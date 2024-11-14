@@ -348,7 +348,7 @@ func TestAccDSFLogAggregator_GcpPubsubSpanner(t *testing.T) {
 		t.Skip("GATEWAY_ID environment variable must be set")
 	}
 
-	skipVersions := []string {"4.17"}
+	skipVersions := []string{"4.17"}
 	dsfhubVersion := os.Getenv("DSFHUB_VERSION")
 	if contains(skipVersions, dsfhubVersion) {
 		t.Skipf("Skipping test for DSFHUB_VERSION %s. See SR-2063 for more details.", dsfhubVersion)

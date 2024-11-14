@@ -155,3 +155,30 @@ resource "`+dsfDataSourceResourceType+`" "%[1]s" {
 }	
 `, resourceName, gatewayId, assetId, clusterId)
 }
+
+// Output a terraform config for a GCP MYSQL data source resource.
+func testAccDSFDataSourceConfig_GcpMysql(resourceName string, gatewayId string, assetId string, auditPullEnabled string, logsDestinationAssetId string) string {
+	// handle reference to other assets
+	logsDestinationAssetIdVal := testAccParseResourceAttributeReference(logsDestinationAssetId)
+
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+	return fmt.Sprintf(`
+resource "`+dsfDataSourceResourceType+`" "%[1]s" {
+  server_type = "GCP MYSQL"
+
+  admin_email = "`+testAdminEmail+`"
+  asset_display_name = "%[3]s"
+  asset_id = "%[3]s"
+  audit_pull_enabled = %[4]s
+  gateway_id = "%[2]s"
+  logs_destination_asset_id = `+logsDestinationAssetIdVal+`
+  server_host_name = "4.3.2.1"
+  server_ip = "1.2.3.4"
+  server_port = "3306"
+}
+  `, resourceName, gatewayId, assetId, auditPullEnabled)
+}
