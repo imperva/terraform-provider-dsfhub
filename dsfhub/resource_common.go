@@ -412,6 +412,7 @@ func contains(l []string, x string) bool {
 	return false
 }
 
+// waitUntilAuditState reads an asset periodically to check the status of audit_pull_enabled
 func waitUntilAuditState(ctx context.Context, desiredState bool, resourceType string, assetId string, m interface{}) error {
 	client := m.(*Client)
 
@@ -426,7 +427,7 @@ func waitUntilAuditState(ctx context.Context, desiredState bool, resourceType st
 			targetState,
 		},
 		Refresh:    auditStateRefreshFunc(*client, resourceType, assetId),
-		Timeout:    8 * time.Minute,
+		Timeout:    5 * time.Minute,
 		Delay:      10 * time.Second,
 		MinTimeout: 5 * time.Second,
 	}
@@ -440,6 +441,7 @@ func waitUntilAuditState(ctx context.Context, desiredState bool, resourceType st
 	return nil
 }
 
+// auditStateRefreshFunc reads an asset to check the status of audit_pull_enabled
 func auditStateRefreshFunc(client Client, resourceType string, assetId string) retry.StateRefreshFunc {
 	return func() (any, string, error) {
 		var result *ResourceWrapper
@@ -469,6 +471,76 @@ func auditStateRefreshFunc(client Client, resourceType string, assetId string) r
 	}
 }
 
+// waitForRemoteSyncState reads an asset periodically to check the status of remoteSyncState becomes "SYNCED"
+// posible values for remoteSyncState = ["SYNCED", "NOT_SYNCED", "UNKNOWN"]
+func waitForRemoteSyncState(ctx context.Context, resourceType string, assetId string, m interface{}) error {
+	client := m.(*Client)
+
+	stateChangeConf := &retry.StateChangeConf{
+		Pending: []string{
+			"NOT_SYNCED",
+			"UNKNOWN",
+		},
+		Target: []string{
+			"SYNCED",
+		},
+		Refresh:    remoteSyncStateRefreshFunc(*client, resourceType, assetId),
+		Timeout:    5 * time.Minute,
+		Delay:      10 * time.Second,
+		MinTimeout: 5 * time.Second,
+	}
+
+	_, err := stateChangeConf.WaitForStateContext(ctx)
+	if err != nil {
+		log.Printf("[ERROR] error while waiting for remoteSyncState = \"SYNCED\" for asset %v", assetId)
+		return err
+	}
+
+	return nil
+}
+
+// auditStateRefreshFunc reads an asset to check the status of audit_pull_enabled
+func remoteSyncStateRefreshFunc(client Client, resourceType string, assetId string) retry.StateRefreshFunc {
+	return func() (any, string, error) {
+		var result *ResourceWrapper
+		var err error
+
+		switch resourceType {
+		case dsfDataSourceResourceType:
+			{
+				log.Printf("[INFO] checking remote sync state for data_source asset %v", assetId)
+				result, err = client.ReadDSFDataSource(assetId)
+			}
+		case dsfLogAggregatorResourceType:
+			{
+				log.Printf("[INFO] checking remote sync state for log_aggregator asset %v", assetId)
+				result, err = client.ReadLogAggregator(assetId)
+			}
+		case dsfCloudAccountResourceType:
+			{
+				log.Printf("[INFO] checking remote sync state for cloud_account asset %v", assetId)
+				result, err = client.ReadSecretManager(assetId)
+			}
+		case dsfSecretManagerResourceType:
+			{
+				log.Printf("[INFO] checking remote sync state for secret_manager asset %v", assetId)
+				result, err = client.ReadLogAggregator(assetId)
+			}
+
+		default:
+			{
+				return nil, "", fmt.Errorf("invalid resourceType: %v", resourceType)
+			}
+		}
+		if err != nil {
+			return 0, "", err
+		}
+
+		return result, result.Data.RemoteSyncState, nil
+	}
+}
+
+// connectDisconnectGateway determines whether an asset should be connected to or disconnected from gateway
 func connectDisconnectGateway(ctx context.Context, d *schema.ResourceData, resourceType string, m interface{}) error {
 	assetId := d.Get("asset_id").(string)
 	auditPullEnabled := d.Get("audit_pull_enabled").(bool)
@@ -511,6 +583,7 @@ func connectDisconnectGateway(ctx context.Context, d *schema.ResourceData, resou
 	return nil
 }
 
+// connectGateway connects an asset to gateway
 func connectGateway(ctx context.Context, m interface{}, assetId string, resourceType string) error {
 	client := m.(*Client)
 	_, err := client.EnableAuditDSFDataSource(assetId)
@@ -519,7 +592,8 @@ func connectGateway(ctx context.Context, m interface{}, assetId string, resource
 		return err
 	}
 
-	err2 := waitUntilAuditState(ctx, true, resourceType, assetId, m)
+	// err2 := waitUntilAuditState(ctx, true, resourceType, assetId, m)
+	err2 := waitForRemoteSyncState(ctx, resourceType, assetId, m)
 	if err2 != nil {
 		return err2
 	}
@@ -527,6 +601,7 @@ func connectGateway(ctx context.Context, m interface{}, assetId string, resource
 	return nil
 }
 
+// disconnectGateway disconnects an asset from gateway
 func disconnectGateway(ctx context.Context, m interface{}, assetId string, resourceType string) error {
 	client := m.(*Client)
 	_, err := client.DisableAuditDSFDataSource(assetId)
@@ -535,7 +610,8 @@ func disconnectGateway(ctx context.Context, m interface{}, assetId string, resou
 		return err
 	}
 
-	err = waitUntilAuditState(ctx, false, resourceType, assetId, m)
+	// err = waitUntilAuditState(ctx, false, resourceType, assetId, m)
+	err = waitForRemoteSyncState(ctx, resourceType, assetId, m)
 	if err != nil {
 		log.Printf("[INFO] Error while waiting for audit state to update for assetId: %s\n", assetId)
 		return err
@@ -544,6 +620,7 @@ func disconnectGateway(ctx context.Context, m interface{}, assetId string, resou
 	return nil
 }
 
+// reconnectGateway first disconnects and then reconnects an asset to gateway
 func reconnectGateway(ctx context.Context, m interface{}, assetId string, resourceType string) error {
 	log.Printf("[INFO] Re-enabling audit for assetId: %s\n", assetId)
 

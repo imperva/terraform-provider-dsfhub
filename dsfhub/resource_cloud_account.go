@@ -498,6 +498,7 @@ func resourceCloudAccount() *schema.Resource {
 }
 
 func resourceCloudAccountCreateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	client := m.(*Client)
 	if isOk, err := checkResourceRequiredFields(requiredCloudAccountJson, ignoreCloudAccountParamsByServerType, d); !isOk {
 		return diag.FromErr(err)
@@ -516,6 +517,19 @@ func resourceCloudAccountCreateContext(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
+	// get asset_id
+	assetId := d.Get("asset_id").(string)
+
+	// wait for remoteSyncState
+	err = waitForRemoteSyncState(ctx, dsfCloudAccountResourceType, assetId, m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while waiting for remoteSyncState = \"SYNCED\" for asset: %s", assetId),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
+
 	// set ID
 	cloudAccountId := createCloudAccountResponse.Data.AssetData.AssetID
 	d.SetId(cloudAccountId)
@@ -523,7 +537,7 @@ func resourceCloudAccountCreateContext(ctx context.Context, d *schema.ResourceDa
 	// Set the rest of the state from the resource read
 	resourceCloudAccountReadContext(ctx, d, m)
 
-	return nil
+	return diags
 }
 
 func resourceCloudAccountReadContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -658,6 +672,7 @@ func resourceCloudAccountReadContext(ctx context.Context, d *schema.ResourceData
 }
 
 func resourceCloudAccountUpdateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	client := m.(*Client)
 
 	// check provided fields against schema
@@ -677,6 +692,19 @@ func resourceCloudAccountUpdateContext(ctx context.Context, d *schema.ResourceDa
 	if err != nil {
 		log.Printf("[ERROR] Updating CloudAccount for serverType: %s and gatewayId: %s assetId: %s | err:%s\n", cloudAccount.Data.ServerType, cloudAccount.Data.GatewayID, cloudAccount.Data.AssetData.AssetID, err)
 		return diag.FromErr(err)
+	}
+
+	// get asset_id
+	assetId := d.Get("asset_id").(string)
+
+	// wait for remoteSyncState
+	err = waitForRemoteSyncState(ctx, dsfCloudAccountResourceType, assetId, m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while waiting for remoteSyncState = \"SYNCED\" for asset: %s", assetId),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
 	}
 
 	// set ID
