@@ -6,12 +6,12 @@ import "fmt"
 func testAccDSFDataSourceConfig_Basic(resourceName string, adminEmail string, assetId string, gatewayId string, serverHostName string, serverType string) string {
 	return fmt.Sprintf(`
 resource "`+dsfDataSourceResourceType+`" "%[1]s" {
-  admin_email = "%[2]s"
-  asset_id = "%[3]s"
+  admin_email        = "%[2]s"
+  asset_id           = "%[3]s"
   asset_display_name = "%[3]s"
-  gateway_id = "%[4]s"
-  server_host_name = "%[5]s"
-  server_type = "%[6]s"
+  gateway_id         = "%[4]s"
+  server_host_name   = "%[5]s"
+  server_type        = "%[6]s"
 }`, resourceName, adminEmail, assetId, gatewayId, serverHostName, serverType)
 }
 
