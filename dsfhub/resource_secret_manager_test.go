@@ -17,8 +17,7 @@ func TestAccDSFSecretManager_Hashicorp(t *testing.T) {
 	}
 
 	const (
-		serverPort   = "8200"
-		assetId      = testOnPremServerHostName + ":HASHICORP::" + serverPort
+		assetId      = testOnPremServerHostName + ":HASHICORP::8200"
 		resourceName = "example-hashicorp"
 	)
 
@@ -27,7 +26,7 @@ func TestAccDSFSecretManager_Hashicorp(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDSFSecretManagerConfig_Hashicorp(resourceName, gatewayId, assetId, testOnPremServerHostName, serverPort, "ec2", "vault-role-for-ec2"),
+				Config: testAccDSFSecretManagerConfig_Hashicorp(resourceName, gatewayId, assetId, "ec2", "vault-role-for-ec2"),
 			},
 		},
 	})

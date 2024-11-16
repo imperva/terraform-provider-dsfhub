@@ -26,24 +26,24 @@ resource "%s" "my_test_data_source" {
 }
 
 // Output a terraform config for a HASHICORP secret manager resource.
-func testAccDSFSecretManagerConfig_Hashicorp(resourceName string, gatewayId string, assetId string, serverHostName string, serverPort string, authMechanism string, roleName string) string {
+func testAccDSFSecretManagerConfig_Hashicorp(resourceName string, gatewayId string, assetId string, authMechanism string, roleName string) string {
 	return fmt.Sprintf(`
 resource "`+dsfSecretManagerResourceType+`" "%[1]s" {
   server_type = "HASHICORP"
   
-  admin_email = "`+testAdminEmail+`"
+  admin_email        = "`+testAdminEmail+`"
   asset_display_name = "%[3]s"
-  asset_id = "%[3]s"
-  gateway_id = "%[2]s"
-  server_host_name = "%[4]s"
-  server_ip = "%[4]s"
-  server_port = "%[5]s"
+  asset_id           = "%[3]s"
+  gateway_id         = "%[2]s"
+  server_host_name   = "`+testOnPremServerHostName+`"
+  server_ip          = "1.2.3.4"
+  server_port        = "8200"
 
   asset_connection {
-    reason = "default"
-    auth_mechanism = "%[6]s"
-    role_name = "%[7]s"
+    reason         = "default"
+    auth_mechanism = "%[4]s"
+    role_name      = "%[5]s"
   }
 }`,
-		resourceName, gatewayId, assetId, serverHostName, serverPort, authMechanism, roleName)
+		resourceName, gatewayId, assetId, authMechanism, roleName)
 }
