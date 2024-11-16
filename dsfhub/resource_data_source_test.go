@@ -120,9 +120,11 @@ func TestAccDSFDataSource_AwsRdsAuroraPostgresqlClusterCloudWatch(t *testing.T) 
 		Steps: []resource.TestStep{
 			// onboard and connect to gateway, check that the log group is connected
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsAuroraPostgresqlCluster(resourceName, gatewayId, assetId, "LOG_GROUP", resourceName) +
-					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresql(instanceResourceName, gatewayId, instanceAssetId, resourceName) +
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresqlCluster(resourceName, gatewayId, assetId, "LOG_GROUP", resourceName),
+					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresql(instanceResourceName, gatewayId, instanceAssetId, resourceName),
 					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", true, "LOG_GROUP", ""),
+				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "true"),
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", "gateway-aws@aurora-postgresql.service"),
@@ -178,10 +180,12 @@ func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterCloudWatchSlowQuery(t *testing
 		Steps: []resource.TestStep{
 			// onboard and connect to gateway
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsAuroraMysqlCluster(resourceName, gatewayId, assetId, "", resourceName) +
-					testAccDSFDataSourceConfig_AwsRdsAuroraMysql(instanceResourceName, gatewayId, instanceAssetId, resourceName) +
-					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", true, "LOG_GROUP", "") +
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsAuroraMysqlCluster(resourceName, gatewayId, assetId, "", resourceName),
+					testAccDSFDataSourceConfig_AwsRdsAuroraMysql(instanceResourceName, gatewayId, instanceAssetId, resourceName),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", true, "LOG_GROUP", ""),
 					testAccDSFLogAggregatorConfig_AwsLogGroup(slowLogGroupResourceName, gatewayId, slowLogGroupAssetId, resourceTypeAndName+".asset_id", true, "AWS_RDS_AURORA_MYSQL_SLOW", logGroupResourceTypeAndName),
+				),
 				// verify log group assets are connected
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "true"),
@@ -200,10 +204,12 @@ func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterCloudWatchSlowQuery(t *testing
 			},
 			// disconnect assets
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsAuroraMysqlCluster(resourceName, gatewayId, assetId, "", resourceName) +
-					testAccDSFDataSourceConfig_AwsRdsAuroraMysql(instanceResourceName, gatewayId, instanceAssetId, resourceName) +
-					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", false, "LOG_GROUP", "") +
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsAuroraMysqlCluster(resourceName, gatewayId, assetId, "", resourceName),
+					testAccDSFDataSourceConfig_AwsRdsAuroraMysql(instanceResourceName, gatewayId, instanceAssetId, resourceName),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", false, "LOG_GROUP", ""),
 					testAccDSFLogAggregatorConfig_AwsLogGroup(slowLogGroupResourceName, gatewayId, slowLogGroupAssetId, resourceTypeAndName+".asset_id", false, "AWS_RDS_AURORA_MYSQL_SLOW", logGroupResourceTypeAndName),
+				),
 				// verify log group assets are disconnected
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "false"),
@@ -253,8 +259,10 @@ func TestAccDSFDataSource_GcpMysql(t *testing.T) {
 		Steps: []resource.TestStep{
 			// onboard and connect to gateway, check that the DB asset is connected
 			{
-				Config: testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "true", pubsubResourceTypeAndName+".asset_id") +
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "true", pubsubResourceTypeAndName+".asset_id"),
 					testAccDSFLogAggregatorConfig_GcpPubsub(pubsubResourceName, gatewayId, pubsubAssetId, "default", "", "", "MYSQL", ""),
+				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
 				),
@@ -270,8 +278,10 @@ func TestAccDSFDataSource_GcpMysql(t *testing.T) {
 			},
 			// disconnect asset, check that the DB asset is disconnected
 			{
-				Config: testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "false", pubsubResourceTypeAndName+".asset_id") +
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "false", pubsubResourceTypeAndName+".asset_id"),
 					testAccDSFLogAggregatorConfig_GcpPubsub(pubsubResourceName, gatewayId, pubsubAssetId, "default", "", "", "MYSQL", ""),
+				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 				),
@@ -322,9 +332,11 @@ func TestAccDSFDataSource_GcpMysqlSlowQuery(t *testing.T) {
 		Steps: []resource.TestStep{
 			// onboard and connect to gateway, check that the DB asset is connected
 			{
-				Config: testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "true", auditPubsubResourceTypeAndName+".asset_id") +
-					testAccDSFLogAggregatorConfig_GcpPubsub(auditPubsubResourceName, gatewayId, auditPubsubAssetId, "default", "", "", "MYSQL", "") +
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "true", auditPubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(auditPubsubResourceName, gatewayId, auditPubsubAssetId, "default", "", "", "MYSQL", ""),
 					testAccDSFLogAggregatorConfig_GcpPubsub(slowQueryPubsubResourceName, gatewayId, slowQueryPubsubAssetId, "default", "", "true", "GCP_MYSQL_SLOW", "GCP MYSQL"),
+				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
 				),
@@ -342,9 +354,11 @@ func TestAccDSFDataSource_GcpMysqlSlowQuery(t *testing.T) {
 			},
 			// disconnect asset, check that the DB asset is disconnected
 			{
-				Config: testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "false", auditPubsubResourceTypeAndName+".asset_id") +
-					testAccDSFLogAggregatorConfig_GcpPubsub(auditPubsubResourceName, gatewayId, auditPubsubAssetId, "default", "", "", "MYSQL", "") +
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "false", auditPubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(auditPubsubResourceName, gatewayId, auditPubsubAssetId, "default", "", "", "MYSQL", ""),
 					testAccDSFLogAggregatorConfig_GcpPubsub(slowQueryPubsubResourceName, gatewayId, slowQueryPubsubAssetId, "default", "", "false", "GCP_MYSQL_SLOW", "GCP MYSQL"),
+				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 				),
