@@ -39,8 +39,10 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 			},
 			// Onboard with AWS parent asset
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsOracle(parentResourceName, gatewayId, parentAssetId, "LOG_GROUP", "") +
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsOracle(parentResourceName, gatewayId, parentAssetId, "LOG_GROUP", ""),
 					testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, parentResourceTypeAndName+".asset_id", true, "LOG_GROUP", ""),
+				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-aws@oracle-rds.service"),
