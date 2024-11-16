@@ -21,12 +21,20 @@ func TestAccDSFSecretManager_Hashicorp(t *testing.T) {
 		resourceName = "example-hashicorp"
 	)
 
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfSecretManagerResourceType, resourceName)
+
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDSFSecretManagerConfig_Hashicorp(resourceName, gatewayId, assetId, "ec2", "vault-role-for-ec2"),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
