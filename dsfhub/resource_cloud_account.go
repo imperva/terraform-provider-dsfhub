@@ -182,6 +182,7 @@ func resourceCloudAccount() *schema.Resource {
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
+							Sensitive:   true,
 						},
 						"credential_fields": {
 							Type:        schema.TypeSet,
@@ -706,10 +707,6 @@ func resourceCloudAccountConnectionHash(v interface{}) int {
 	var buf bytes.Buffer
 	m := v.(map[string]interface{})
 
-	if v, ok := m["reason"]; ok {
-		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
-	}
-
 	if v, ok := m["access_id"]; ok {
 		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
 	}
@@ -720,6 +717,10 @@ func resourceCloudAccountConnectionHash(v interface{}) int {
 
 	if v, ok := m["application_id"]; ok {
 		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
+	}
+
+	if v, ok := m["auth_mechanism"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 
 	if v, ok := m["ca_certs_path"]; ok {
@@ -739,6 +740,10 @@ func resourceCloudAccountConnectionHash(v interface{}) int {
 	}
 
 	if v, ok := m["key_file"]; ok {
+		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
+	}
+
+	if v, ok := m["reason"]; ok {
 		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
 	}
 
