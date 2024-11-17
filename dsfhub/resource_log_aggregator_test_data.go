@@ -61,11 +61,11 @@ func testAccDSFLogAggregatorConfig_GcpPubsub(resourceName string, gatewayId stri
 	// handle different asset_connection blocks
 	var assetConnectionBlock string
 	switch authMechanism {
-    case "service_account":
-      assetConnectionBlock = gcpConnectionServiceAccount
-    default:
-      assetConnectionBlock = gcpConnectDefault
-    }
+	case "service_account":
+		assetConnectionBlock = gcpConnectionServiceAccount
+	default:
+		assetConnectionBlock = gcpConnectDefault
+	}
 
 	return fmt.Sprintf(`
 resource "`+dsfLogAggregatorResourceType+`" "%[1]s" {
