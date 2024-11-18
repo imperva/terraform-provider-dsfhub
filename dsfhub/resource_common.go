@@ -412,6 +412,45 @@ func contains(l []string, x string) bool {
 	return false
 }
 
+// readAsset reads an asset of any resource type
+func readAsset(client Client, resourceType string, assetId string) (*ResourceWrapper, error) {
+	var result *ResourceWrapper
+	var err error
+
+	switch resourceType {
+	case dsfDataSourceResourceType:
+		{
+			log.Printf("[INFO] reading data_source asset %v", assetId)
+			result, err = client.ReadDSFDataSource(assetId)
+		}
+	case dsfLogAggregatorResourceType:
+		{
+			log.Printf("[INFO] reading log_aggregator asset %v", assetId)
+			result, err = client.ReadLogAggregator(assetId)
+		}
+	case dsfCloudAccountResourceType:
+		{
+			log.Printf("[INFO] reading cloud_account asset %v", assetId)
+			result, err = client.ReadSecretManager(assetId)
+		}
+	case dsfSecretManagerResourceType:
+		{
+			log.Printf("[INFO] reading secret_manager asset %v", assetId)
+			result, err = client.ReadLogAggregator(assetId)
+		}
+	default:
+		{
+			return nil, fmt.Errorf("invalid resourceType: %v", resourceType)
+		}
+	}
+
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
 // waitUntilAuditState reads an asset periodically to check the status of audit_pull_enabled
 func waitUntilAuditState(ctx context.Context, desiredState bool, resourceType string, assetId string, m interface{}) error {
 	client := m.(*Client)
@@ -447,22 +486,7 @@ func auditStateRefreshFunc(client Client, resourceType string, assetId string) r
 		var result *ResourceWrapper
 		var err error
 
-		switch resourceType {
-		case dsfDataSourceResourceType:
-			{
-				log.Printf("[INFO] checking audit state for data_source asset %v", assetId)
-				result, err = client.ReadDSFDataSource(assetId)
-			}
-		case dsfLogAggregatorResourceType:
-			{
-				log.Printf("[INFO] checking audit state for log_aggregator asset %v", assetId)
-				result, err = client.ReadLogAggregator(assetId)
-			}
-		default:
-			{
-				return nil, "", fmt.Errorf("invalid resourceType: %v", resourceType)
-			}
-		}
+		result, err = readAsset(client, resourceType, assetId)
 		if err != nil {
 			return 0, "", err
 		}
@@ -505,33 +529,7 @@ func remoteSyncStateRefreshFunc(client Client, resourceType string, assetId stri
 		var result *ResourceWrapper
 		var err error
 
-		switch resourceType {
-		case dsfDataSourceResourceType:
-			{
-				log.Printf("[INFO] checking remote sync state for data_source asset %v", assetId)
-				result, err = client.ReadDSFDataSource(assetId)
-			}
-		case dsfLogAggregatorResourceType:
-			{
-				log.Printf("[INFO] checking remote sync state for log_aggregator asset %v", assetId)
-				result, err = client.ReadLogAggregator(assetId)
-			}
-		case dsfCloudAccountResourceType:
-			{
-				log.Printf("[INFO] checking remote sync state for cloud_account asset %v", assetId)
-				result, err = client.ReadSecretManager(assetId)
-			}
-		case dsfSecretManagerResourceType:
-			{
-				log.Printf("[INFO] checking remote sync state for secret_manager asset %v", assetId)
-				result, err = client.ReadLogAggregator(assetId)
-			}
-
-		default:
-			{
-				return nil, "", fmt.Errorf("invalid resourceType: %v", resourceType)
-			}
-		}
+		result, err = readAsset(client, resourceType, assetId)
 		if err != nil {
 			return 0, "", err
 		}
@@ -547,23 +545,7 @@ func checkAuditState(ctx context.Context, m interface{}, assetId string, resourc
 	var result *ResourceWrapper
 	var err error
 
-	switch resourceType {
-	case dsfDataSourceResourceType:
-		{
-			log.Printf("[INFO] checking audit state for data_source asset %v", assetId)
-			result, err = client.ReadDSFDataSource(assetId)
-		}
-	case dsfLogAggregatorResourceType:
-		{
-			log.Printf("[INFO] checking audit state for log_aggregator asset %v", assetId)
-			result, err = client.ReadLogAggregator(assetId)
-		}
-	default:
-		{
-			return false, fmt.Errorf("invalid resourceType: %v", resourceType)
-		}
-	}
-
+	result, err = readAsset(*client, resourceType, assetId)
 	if err != nil {
 		return false, err
 	}
@@ -758,7 +740,7 @@ func resourceConnectionDataOauthParametersHash(v interface{}) int {
 	return PositiveHash(buf.String())
 }
 
-// AssetData  resource hash functions
+// AssetData resource hash functions
 func resourceAssetDataAuditInfoHash(v interface{}) int {
 	var buf bytes.Buffer
 	m := v.(map[string]interface{})
