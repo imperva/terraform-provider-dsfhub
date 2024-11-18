@@ -713,7 +713,7 @@ func resourceCloudAccountUpdateContext(ctx context.Context, d *schema.ResourceDa
 	// Set the rest of the state from the resource read
 	resourceCloudAccountReadContext(ctx, d, m)
 
-	return nil
+	return diags
 }
 
 func resourceCloudAccountDeleteContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
