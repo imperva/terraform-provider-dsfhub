@@ -1349,12 +1349,25 @@ func resourceDSFDataSourceCreateContext(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
+	// get asset_id
+	assetId := d.Get("asset_id").(string)
+
+	// wait for remoteSyncState
+	err = waitForRemoteSyncState(ctx, dsfDataSourceResourceType, assetId, m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while waiting for remoteSyncState = \"SYNCED\" for asset: %s", assetId),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
+
 	// Connect/disconnect asset to gateway
 	err = connectDisconnectGateway(ctx, d, dsfDataSourceResourceType, m)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Warning,
-			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", d.Get("asset_id")),
+			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", assetId),
 			Detail:   fmt.Sprintf("Error: %s\n", err),
 		})
 	}
@@ -1693,9 +1706,22 @@ func resourceDSFDataSourceUpdateContext(ctx context.Context, d *schema.ResourceD
 	auditPullEnabled, _ := d.GetChange("audit_pull_enabled")
 	dsfDataSource.Data.AssetData.AuditPullEnabled = auditPullEnabled.(bool)
 
+	// get asset_id
+	assetId := d.Get("asset_id").(string)
+
+	// wait for remoteSyncState
+	err := waitForRemoteSyncState(ctx, dsfDataSourceResourceType, assetId, m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while waiting for remoteSyncState = \"SYNCED\" for asset: %s", assetId),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
+
 	// update resource
 	log.Printf("[INFO] Updating DSF data source for serverType: %s and gatewayId: %s assetId: %s\n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, dsfDataSource.Data.AssetData.AssetID)
-	_, err := client.UpdateDSFDataSource(dsfDataSourceId, dsfDataSource)
+	_, err = client.UpdateDSFDataSource(dsfDataSourceId, dsfDataSource)
 	if err != nil {
 		log.Printf("[ERROR] Updating data source for serverType: %s and gatewayId: %s assetId: %s | err:%s\n", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, dsfDataSource.Data.AssetData.AssetID, err)
 		return diag.FromErr(err)
