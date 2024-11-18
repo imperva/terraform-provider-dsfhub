@@ -633,10 +633,7 @@ func connectGateway(ctx context.Context, m interface{}, assetId string, resource
 
 	// confirm asset is connected to gateway
 	isAuditPullEnabled, err := checkAuditState(ctx, m, assetId, resourceType)
-	if err != nil {
-		return err
-	}
-	if !isAuditPullEnabled {
+	if err != nil || !isAuditPullEnabled {
 		return err
 	}
 
@@ -661,10 +658,7 @@ func disconnectGateway(ctx context.Context, m interface{}, assetId string, resou
 
 	// confirm asset is disconnected from gateway
 	isAuditPullEnabled, err := checkAuditState(ctx, m, assetId, resourceType)
-	if err != nil {
-		return err
-	}
-	if isAuditPullEnabled {
+	if err != nil || isAuditPullEnabled {
 		return err
 	}
 
