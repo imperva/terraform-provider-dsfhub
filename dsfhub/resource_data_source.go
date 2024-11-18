@@ -990,6 +990,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Computed:    true,
 			},
 			"db_engine": {
 				Type:        schema.TypeString,
