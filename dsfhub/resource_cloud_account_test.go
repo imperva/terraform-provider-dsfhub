@@ -73,6 +73,36 @@ func TestAccDSFCloudAccount_Azure(t *testing.T) {
 	})
 }
 
+func TestAccDSFCloudAccount_Gcp(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		assetId      = "my_service_account@project-name.iam.gserviceaccount.com:project-name"
+		resourceName = "gcp-cloud-account"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfCloudAccountResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCloudAccountDestroy,
+		Steps: []resource.TestStep{
+			{Config: testAccDSFCloudAccountConfig_Gcp(resourceName, gatewayId, assetId, "default")},
+			{Config: testAccDSFCloudAccountConfig_Gcp(resourceName, gatewayId, assetId, "service_account")},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCloudAccountId(state *terraform.State) (string, error) {
 	log.Printf("[INFO] Running test testAccCloudAccountId \n")
 	for _, rs := range state.RootModule().Resources {

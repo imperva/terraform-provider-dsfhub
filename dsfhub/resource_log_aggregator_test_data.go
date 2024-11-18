@@ -33,7 +33,7 @@ resource "`+dsfLogAggregatorResourceType+`" "%[1]s" {
 }`, resourceName, gatewayId, assetId, parentAssetId, auditPullEnabled, auditType)
 }
 
-const gcpConnectionServiceAccount = `
+const gcpPubsubConnectionServiceAccount = `
   asset_connection {
     auth_mechanism = "service_account"
     reason         = "default"
@@ -41,7 +41,7 @@ const gcpConnectionServiceAccount = `
   }
 `
 
-const gcpConnectDefault = `
+const gcpPubsubConnectionDefault = `
   asset_connection {
     auth_mechanism = "default"
     reason         = "default"
@@ -62,9 +62,9 @@ func testAccDSFLogAggregatorConfig_GcpPubsub(resourceName string, gatewayId stri
 	var assetConnectionBlock string
 	switch authMechanism {
 	case "service_account":
-		assetConnectionBlock = gcpConnectionServiceAccount
+		assetConnectionBlock = gcpPubsubConnectionServiceAccount
 	default:
-		assetConnectionBlock = gcpConnectDefault
+		assetConnectionBlock = gcpPubsubConnectionDefault
 	}
 
 	return fmt.Sprintf(`

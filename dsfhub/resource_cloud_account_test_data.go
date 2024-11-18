@@ -111,6 +111,47 @@ resource "`+dsfCloudAccountResourceType+`" "%[1]s" {
   asset_id           = "%[3]s"
   gateway_id         = "%[2]s"
 
-   `+assetConnectionBlock+`
-}`, resourceName, gatewayId, assetId, authMechanism)
+  `+assetConnectionBlock+`
+}`, resourceName, gatewayId, assetId)
+}
+
+const gcpConnectionDefault = `
+  asset_connection {
+    auth_mechanism = "default"
+    reason         = "default"
+  }
+`
+
+const gcpConnectionServiceAccount = `
+  asset_connection {
+    auth_mechanism = "service_account"
+    key_file       = "/path/to/gcp/credentials/service_account.json" 
+    reason         = "default"
+  }
+`
+
+// Output a terraform config for a GCP cloud account resource.
+//
+// Supports all authentication mechanisms: "default", "service_account"
+func testAccDSFCloudAccountConfig_Gcp(resourceName string, gatewayId string, assetId string, authMechanism string) string {
+	var assetConnectionBlock string
+
+	switch authMechanism {
+	case "default":
+		assetConnectionBlock = gcpConnectionDefault
+	case "service_account":
+		assetConnectionBlock = gcpConnectionServiceAccount
+	}
+
+	return fmt.Sprintf(`
+resource "`+dsfCloudAccountResourceType+`" "%[1]s" {
+  server_type = "GCP"
+
+  admin_email        = "`+testAdminEmail+`"
+  asset_display_name = "%[3]s"
+  asset_id           = "%[3]s"
+  gateway_id         = "%[2]s"
+
+  `+assetConnectionBlock+`  
+}`, resourceName, gatewayId, assetId)
 }
