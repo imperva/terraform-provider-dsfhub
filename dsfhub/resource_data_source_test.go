@@ -236,6 +236,75 @@ func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterCloudWatchSlowQuery(t *testing
 	})
 }
 
+func TestAccDSFDataSource_GcpBigQuery(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "gcp_bigquery_connect_disconnect_gateway"
+		assetId      = "projects/my-project-name/bigquery"
+
+		pubsubResourceName = "bigquery-subscription"
+		pubsubAssetId      = testPubsubSubscriptionPrefix + pubsubResourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	pubsubResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, pubsubResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB asset is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpBigQuery(resourceName, gatewayId, assetId, "true", pubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(pubsubResourceName, gatewayId, pubsubAssetId, "default", "", "", "BIGQUERY", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify pubsub aset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "gateway_service", "gateway-gcp@bigquery.service"),
+				),
+			},
+			// disconnect asset, check that the DB asset is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpBigQuery(resourceName, gatewayId, assetId, "false", pubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(pubsubResourceName, gatewayId, pubsubAssetId, "default", "", "", "BIGQUERY", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify pubsub aset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "gateway_service", ""),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccDSFDataSource_GcpMysql(t *testing.T) {
 	gatewayId := os.Getenv("GATEWAY_ID")
 	if gatewayId == "" {
