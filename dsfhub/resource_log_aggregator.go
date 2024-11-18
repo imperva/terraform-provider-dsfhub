@@ -659,12 +659,25 @@ func resourceLogAggregatorCreateContext(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
+	// get asset_id
+	assetId := d.Get("asset_id").(string)
+
+	// wait for remoteSyncState
+	err = waitForRemoteSyncState(ctx, dsfLogAggregatorResourceType, assetId, m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while waiting for remoteSyncState = \"SYNCED\" for asset: %s", assetId),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
+
 	// Connect/disconnect asset to gateway
 	err = connectDisconnectGateway(ctx, d, dsfLogAggregatorResourceType, m)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Warning,
-			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", d.Get("asset_id")),
+			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", assetId),
 			Detail:   fmt.Sprintf("Error: %s\n", err),
 		})
 	}
@@ -862,12 +875,25 @@ func resourceLogAggregatorUpdateContext(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
+	// get asset_id
+	assetId := d.Get("asset_id").(string)
+
+	// wait for remoteSyncState
+	err = waitForRemoteSyncState(ctx, dsfLogAggregatorResourceType, assetId, m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while waiting for remoteSyncState = \"SYNCED\" for asset: %s", assetId),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
+
 	// Connect/disconnect asset to gateway
 	err = connectDisconnectGateway(ctx, d, dsfLogAggregatorResourceType, m)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Warning,
-			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", d.Get("asset_id")),
+			Summary:  fmt.Sprintf("Error while updating audit state for asset: %s", assetId),
 			Detail:   fmt.Sprintf("Error: %s\n", err),
 		})
 	}
@@ -886,7 +912,7 @@ func resourceLogAggregatorDeleteContext(ctx context.Context, d *schema.ResourceD
 	client := m.(*Client)
 	logAggregatorId := d.Id()
 
-	log.Printf("[INFO] Deleting secret manager with logAggregatorId: %s", logAggregatorId)
+	log.Printf("[INFO] Deleting log aggregator with logAggregatorId: %s", logAggregatorId)
 
 	logAggregatorDeleteResponse, err := client.DeleteLogAggregator(logAggregatorId)
 	if logAggregatorDeleteResponse != nil {

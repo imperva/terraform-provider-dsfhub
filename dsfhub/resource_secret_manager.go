@@ -500,6 +500,7 @@ func resourceSecretManager() *schema.Resource {
 }
 
 func resourceSecretManagerCreateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	client := m.(*Client)
 
 	// check provided fields against schema
@@ -520,6 +521,19 @@ func resourceSecretManagerCreateContext(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
+	// get asset_id
+	assetId := d.Get("asset_id").(string)
+
+	// wait for remoteSyncState
+	err = waitForRemoteSyncState(ctx, dsfSecretManagerResourceType, assetId, m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while waiting for remoteSyncState = \"SYNCED\" for asset: %s", assetId),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
+
 	// set ID
 	secretManagerId := createSecretManagerResponse.Data.ID
 	d.SetId(secretManagerId)
@@ -527,7 +541,7 @@ func resourceSecretManagerCreateContext(ctx context.Context, d *schema.ResourceD
 	// Set the rest of the state from the resource read
 	resourceSecretManagerReadContext(ctx, d, m)
 
-	return nil
+	return diags
 }
 
 func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -669,6 +683,7 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 }
 
 func resourceSecretManagerUpdateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	client := m.(*Client)
 
 	// check provided fields against schema
@@ -690,13 +705,26 @@ func resourceSecretManagerUpdateContext(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
+	// get asset_id
+	assetId := d.Get("asset_id").(string)
+
+	// wait for remoteSyncState
+	err = waitForRemoteSyncState(ctx, dsfSecretManagerResourceType, assetId, m)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Error while waiting for remoteSyncState = \"SYNCED\" for asset: %s", assetId),
+			Detail:   fmt.Sprintf("Error: %s\n", err),
+		})
+	}
+
 	// set ID
 	d.SetId(secretManagerId)
 
 	// Set the rest of the state from the resource read
 	resourceSecretManagerReadContext(ctx, d, m)
 
-	return nil
+	return diags
 }
 
 func resourceSecretManagerDeleteContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
