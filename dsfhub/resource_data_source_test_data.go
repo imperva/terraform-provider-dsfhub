@@ -15,14 +15,16 @@ resource "`+dsfDataSourceResourceType+`" "%[1]s" {
 }`, resourceName, adminEmail, assetId, gatewayId, serverHostName, serverType)
 }
 
-const commonBasicConnectionPassword = `
+var commonBasicConnectionPassword = fmt.Sprintf(`
   asset_connection {
     auth_mechanism = "password"
     password       = "password"
     reason         = "default"
     username       = "username"
   }
-`
+  
+  %[1]s
+`, ignoreAssetConnectionChangesBlock())
 
 // Output a terraform config for an AWS RDS ORACLE data source resource.
 func testAccDSFDataSourceConfig_AwsRdsOracle(resourceName string, gatewayId string, assetId string, auditType string, auditPullEnabled string) string {
