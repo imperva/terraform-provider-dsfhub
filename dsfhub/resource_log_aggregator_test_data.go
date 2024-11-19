@@ -33,6 +33,85 @@ resource "`+dsfLogAggregatorResourceType+`" "%[1]s" {
 }`, resourceName, gatewayId, assetId, parentAssetId, auditPullEnabled, auditType)
 }
 
+// Output an asset_connection block for an AZURE EVENTHUB log aggregator resource.
+func azureEventhubConnectionBlock(authMechanism string, format string) string {
+  var output string 
+  
+  switch authMechanism {
+    case "azure_ad":
+      output = fmt.Sprintf(`
+  asset_connection {
+    auth_mechanism          = "azure_ad"
+    azure_storage_account   = "mystorageaccount"
+    azure_storage_container = "mystoragecontainer"
+    eventhub_name           = "myeventhub"
+    eventhub_namespace      = "myeventhubnamespace"
+    format                  = "%[1]s"
+    reason                  = "default"
+  }`, format)
+    case "client_secret":
+      output = fmt.Sprintf(`
+  asset_connection {
+    application_id          = "a1b2c3de-123c-1234-ab12-ab12c2de3fg4"
+    auth_mechanism          = "client_secret"
+    azure_storage_account   = "mystorageaccount"
+    azure_storage_container = "mystoragecontainer"
+    client_secret           = "secret"
+    directory_id            = "a1b2c3de-123c-1234-ab12-ab12c2de3fg4"
+    eventhub_name           = "myeventhub"
+    eventhub_namespace      = "myeventhubnamespace"
+    format                  = "%[1]s"
+    subscription_id         = "a1b2c3de-123c-1234-ab12-ab12c2de3fg4"
+    reason                  = "default"
+  }`, format)
+    case "default":
+      output = fmt.Sprintf(`
+  asset_connection {
+    auth_mechanism           = "default"
+    azure_storage_account    = "mystorageaccount"
+    azure_storage_container  = "mystoragecontainer"
+    azure_storage_secret_key = "storage-secret"
+    eventhub_access_key      = "eventhub-secret"
+    eventhub_access_policy   = "RootManageSharedAccessKey"
+    eventhub_name            = "myeventhub"
+    eventhub_namespace       = "myeventhubnamespace"
+    format                   = "%[1]s"
+    reason                   = "default"
+  }`, format)
+  }
+
+  return output
+}
+
+// Output a terraform config for an AZURE EVENTHUB log aggregator resource.
+func testAccDSFLogAggregatorConfig_AzureEventhub(resourceName string, gatewayId string, assetId string, authMechanism string, parentAssetId string, auditPullEnabled string, contentType string, format string) string {
+	// handle reference to other assets
+	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
+
+  // convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+  return fmt.Sprintf(`
+resource "`+dsfLogAggregatorResourceType+`" "%[1]s" {
+  server_type = "AZURE EVENTHUB"
+
+  admin_email        = "`+testAdminEmail+`"
+  asset_id           = "%[3]s"
+  asset_display_name = "%[3]s"
+  audit_pull_enabled = %[4]s
+  content_type       = "%[5]s"
+  gateway_id         = "%[2]s"
+  parent_asset_id    = `+parentAssetIdVal+`
+  server_host_name   = "my-namespace.servicebus.windows.net"
+  server_ip          = "1.2.3.4"
+  server_port        = "443"
+
+  `+azureEventhubConnectionBlock(authMechanism, format)+`
+}`, resourceName, gatewayId, assetId, auditPullEnabled, contentType)
+}
+
 const gcpPubsubConnectionServiceAccount = `
   asset_connection {
     auth_mechanism = "service_account"

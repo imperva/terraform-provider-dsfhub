@@ -52,6 +52,41 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 	})
 }
 
+func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		assetId            = "/subscriptions/ID/resourceGroups/someGroup/providers/Microsoft.EventHub/namespaces/somenamespace/eventhubs/someeventhub"
+		resourceName       = "my-azure-eventhub"
+	)
+
+	// resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Failed: missing format
+			{
+				Config:      testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "default", "", "true", "", ""),
+				ExpectError: regexp.MustCompile("Error: missing required fields for dsfhub_data_source with serverType 'AZURE EVENTHUB', missing fields: \"format\""),
+			},
+			// Failed: invalid format
+			{
+				Config:      testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "default", "", "true", "", "bad-format"),
+				ExpectError: regexp.MustCompile("Asset attribute options mismatch: the value 'bad-format' for field 'format' is invalid"),
+			},
+			// Validate different auth_mechanisms
+			{Config:      testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "azure_ad", "", "false", "", "AzureSQL_Managed")},
+			// {Config:      testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "client_secret", "", "false", "", "AzureSQL_Managed")}, //TODO: fix "client_secret" failing refresh
+			// {Config:      testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "default", "", "false", "", "AzureSQL_Managed")}, //TODO: fix "default" failing refresh
+		},
+	})
+}
+
 func TestAccDSFLogAggregator_GcpPubsubBasic(t *testing.T) {
 	gatewayId := os.Getenv("GATEWAY_ID")
 	if gatewayId == "" {

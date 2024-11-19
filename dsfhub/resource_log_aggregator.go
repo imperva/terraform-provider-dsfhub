@@ -185,7 +185,7 @@ func resourceLogAggregator() *schema.Resource {
 							Type:         schema.TypeString,
 							Description:  "Specifies the auth mechanism used by the connection",
 							Required:     true,
-							ValidateFunc: validation.StringInSlice([]string{"default", "service_account", "azure_ad", "kerberos"}, false),
+							ValidateFunc: validation.StringInSlice([]string{"default", "service_account", "azure_ad", "kerberos", "client_secret"}, false),
 						},
 						"azure_storage_account": {
 							Type:        schema.TypeString,
