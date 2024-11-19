@@ -59,8 +59,8 @@ func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
 	}
 
 	const (
-		assetId            = "/subscriptions/ID/resourceGroups/someGroup/providers/Microsoft.EventHub/namespaces/somenamespace/eventhubs/someeventhub"
-		resourceName       = "my-azure-eventhub"
+		assetId      = "/subscriptions/ID/resourceGroups/someGroup/providers/Microsoft.EventHub/namespaces/somenamespace/eventhubs/someeventhub"
+		resourceName = "my-azure-eventhub"
 	)
 
 	// resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
@@ -80,9 +80,9 @@ func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
 				ExpectError: regexp.MustCompile("Asset attribute options mismatch: the value 'bad-format' for field 'format' is invalid"),
 			},
 			// Validate different auth_mechanisms
-			{Config:      testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "azure_ad", "", "false", "", "AzureSQL_Managed")},
-			// {Config:      testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "client_secret", "", "false", "", "AzureSQL_Managed")}, //TODO: fix "client_secret" failing refresh
-			// {Config:      testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "default", "", "false", "", "AzureSQL_Managed")}, //TODO: fix "default" failing refresh
+			{Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "azure_ad", "", "false", "", "AzureSQL_Managed")},
+			{Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "client_secret", "", "false", "", "AzureSQL_Managed")},
+			{Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "default", "", "false", "", "AzureSQL_Managed")},
 		},
 	})
 }

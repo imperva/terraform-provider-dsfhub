@@ -10,7 +10,7 @@ const awsConnectionDefault = `
   }
 `
 
-const awsConnectionKey = `
+var awsConnectionKey = fmt.Sprintf(`
   asset_connection {
     access_id       = "my-access-id"
     auth_mechanism  = "key"
@@ -18,7 +18,9 @@ const awsConnectionKey = `
     region          = "us-east-1"
     secret_key      = "my-secret-key"
   }
-`
+
+  %[1]s
+`, ignoreAssetConnectionChangesBlock())
 
 const awsConnectionProfile = `
   asset_connection {
@@ -36,6 +38,7 @@ const awsConnectionProfile = `
 func testAccDSFCloudAccountConfig_Aws(resourceName string, gatewayId string, assetId string, authMechanism string) string {
 	var assetConnectionBlock string
 
+	// build the asset_connection block
 	switch authMechanism {
 	case "key":
 		assetConnectionBlock = awsConnectionKey
@@ -55,11 +58,11 @@ resource "`+dsfCloudAccountResourceType+`" "%[1]s" {
   asset_id           = "%[3]s"
   gateway_id         = "%[2]s"
 
-  `+assetConnectionBlock+`
-}`, resourceName, gatewayId, assetId)
+  %[4]s
+}`, resourceName, gatewayId, assetId, assetConnectionBlock)
 }
 
-const azureConnectionClientSecret = `
+var azureConnectionClientSecret = fmt.Sprintf(`
   asset_connection {
     auth_mechanism  = "client_secret"
     application_id  = "12345678-1234-1234-1234-123456789012" 
@@ -68,7 +71,9 @@ const azureConnectionClientSecret = `
     reason          = "default"
     subscription_id = "87654321-4321-4321-4321-210987654321"
   }
-`
+
+  %[1]s
+`, ignoreAssetConnectionChangesBlock())
 
 const azureConnectionAuthFile = `
   asset_connection {
@@ -91,8 +96,8 @@ const azureConnectionManagedIdentity = `
 // Supports all authentication mechanisms: "client_secret", "auth_file"," and
 // "managed_identity".
 func testAccDSFCloudAccountConfig_Azure(resourceName string, gatewayId string, assetId string, authMechanism string) string {
+	// build the asset_connection block
 	var assetConnectionBlock string
-
 	switch authMechanism {
 	case "client_secret":
 		assetConnectionBlock = azureConnectionClientSecret
@@ -103,16 +108,16 @@ func testAccDSFCloudAccountConfig_Azure(resourceName string, gatewayId string, a
 	}
 
 	return fmt.Sprintf(`
-resource "`+dsfCloudAccountResourceType+`" "%[1]s" {
+resource "%[1]s" "%[2]s" {
   server_type = "AZURE"
   
-  admin_email        = "`+testAdminEmail+`"
-  asset_display_name = "%[3]s"
-  asset_id           = "%[3]s"
-  gateway_id         = "%[2]s"
+  admin_email        = "%[3]s"
+  asset_display_name = "%[5]s"
+  asset_id           = "%[5]s"
+  gateway_id         = "%[4]s"
 
-  `+assetConnectionBlock+`
-}`, resourceName, gatewayId, assetId)
+  %[6]s
+}`, dsfCloudAccountResourceType, resourceName, testAdminEmail, gatewayId, assetId, assetConnectionBlock)
 }
 
 const gcpConnectionDefault = `

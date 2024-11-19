@@ -799,3 +799,35 @@ func ConfigCompose(config ...string) string {
 
 	return str.String()
 }
+
+// ignoreChangesBlock creates a lifecycle block to be added to a resource config
+// containing the ignore_changes feature - an array specifying a list of attribute
+// names that may change in the future, but should not affect said resource after
+// its creation.
+//
+// See the following for more details
+// https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle#ignore_changes
+func createIgnoreChangesBlock(ignoredAttributes []string) string {
+	var ignoreChangesBlock, ignoredFields string
+
+	// build list like
+	// ignore_changes = [ attribute1, attribute2 ]
+	ignoredFields = `[ ` + strings.Join(ignoredAttributes, `, `) + ` ]`
+	log.Printf("[INFO] creating ignore_changes list with ignored_fields: %s", ignoredFields)
+	ignoreChangesBlock = fmt.Sprintf(`
+  lifecycle {
+    ignore_changes = %[1]s
+  }`, ignoredFields)
+
+	return ignoreChangesBlock
+}
+
+// ignoreAssetConnectionBlock builds the lifecycle meta argument block to ignore
+// fields masked in the connection.
+// e.g. client_secret   = "*****", password = "*****"
+func ignoreAssetConnectionChangesBlock() string {
+	var lifecycleBlock string
+	ignoredAttributes := []string{`asset_connection`}
+	lifecycleBlock = createIgnoreChangesBlock(ignoredAttributes)
+	return lifecycleBlock
+}

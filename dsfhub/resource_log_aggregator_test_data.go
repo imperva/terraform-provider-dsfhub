@@ -35,11 +35,11 @@ resource "`+dsfLogAggregatorResourceType+`" "%[1]s" {
 
 // Output an asset_connection block for an AZURE EVENTHUB log aggregator resource.
 func azureEventhubConnectionBlock(authMechanism string, format string) string {
-  var output string 
-  
-  switch authMechanism {
-    case "azure_ad":
-      output = fmt.Sprintf(`
+	var output string
+
+	switch authMechanism {
+	case "azure_ad":
+		output = fmt.Sprintf(`
   asset_connection {
     auth_mechanism          = "azure_ad"
     azure_storage_account   = "mystorageaccount"
@@ -49,8 +49,8 @@ func azureEventhubConnectionBlock(authMechanism string, format string) string {
     format                  = "%[1]s"
     reason                  = "default"
   }`, format)
-    case "client_secret":
-      output = fmt.Sprintf(`
+	case "client_secret":
+		output = fmt.Sprintf(`
   asset_connection {
     application_id          = "a1b2c3de-123c-1234-ab12-ab12c2de3fg4"
     auth_mechanism          = "client_secret"
@@ -63,9 +63,12 @@ func azureEventhubConnectionBlock(authMechanism string, format string) string {
     format                  = "%[1]s"
     subscription_id         = "a1b2c3de-123c-1234-ab12-ab12c2de3fg4"
     reason                  = "default"
-  }`, format)
-    case "default":
-      output = fmt.Sprintf(`
+  }
+  
+  %[2]s
+  `, format, ignoreAssetConnectionChangesBlock())
+	case "default":
+		output = fmt.Sprintf(`
   asset_connection {
     auth_mechanism           = "default"
     azure_storage_account    = "mystorageaccount"
@@ -77,10 +80,13 @@ func azureEventhubConnectionBlock(authMechanism string, format string) string {
     eventhub_namespace       = "myeventhubnamespace"
     format                   = "%[1]s"
     reason                   = "default"
-  }`, format)
   }
+  
+  %[2]s
+  `, format, ignoreAssetConnectionChangesBlock())
+	}
 
-  return output
+	return output
 }
 
 // Output a terraform config for an AZURE EVENTHUB log aggregator resource.
@@ -88,12 +94,12 @@ func testAccDSFLogAggregatorConfig_AzureEventhub(resourceName string, gatewayId 
 	// handle reference to other assets
 	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
 
-  // convert audit_pull_enabled to "null" if empty
+	// convert audit_pull_enabled to "null" if empty
 	if auditPullEnabled == "" {
 		auditPullEnabled = "null"
 	}
 
-  return fmt.Sprintf(`
+	return fmt.Sprintf(`
 resource "`+dsfLogAggregatorResourceType+`" "%[1]s" {
   server_type = "AZURE EVENTHUB"
 

@@ -30,7 +30,7 @@ func TestAccDSFCloudAccount_Aws(t *testing.T) {
 		Steps: []resource.TestStep{
 			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "default")},
 			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "iam_role")},
-			// {Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "key")}, //TODO: fix "key" failing refresh
+			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "key")},
 			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "profile")},
 			// validate import
 			{
@@ -60,7 +60,7 @@ func TestAccDSFCloudAccount_Azure(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCloudAccountDestroy,
 		Steps: []resource.TestStep{
-			// {Config: testAccDSFCloudAccountConfig_Azure(resourceName, gatewayId, assetId, "client_secret")}, //TODO: fix "client_secret" failing refresh
+			{Config: testAccDSFCloudAccountConfig_Azure(resourceName, gatewayId, assetId, "client_secret")},
 			{Config: testAccDSFCloudAccountConfig_Azure(resourceName, gatewayId, assetId, "auth_file")},
 			{Config: testAccDSFCloudAccountConfig_Azure(resourceName, gatewayId, assetId, "managed_identity")},
 			// validate import
