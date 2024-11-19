@@ -79,6 +79,18 @@ var requiredLogAggregatorJson = `{
 					"eventhub_namespace",
 					"format"
 				],
+				"client_secret": [
+          "reason",
+          "application_id",
+          "azure_storage_account",
+          "azure_storage_container",
+          "client_secret",
+          "directory_id",
+          "eventhub_name",
+          "eventhub_namespace",
+          "format",
+          "subscription_id"
+        ],
 				"default": [
 					"reason",
 					"azure_storage_account",
