@@ -48,6 +48,12 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-aws@oracle-rds.service"),
 				),
 			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -63,7 +69,7 @@ func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
 		resourceName = "my-azure-eventhub"
 	)
 
-	// resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
@@ -83,6 +89,12 @@ func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
 			{Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "azure_ad", "", "false", "", "AzureSQL_Managed")},
 			{Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "client_secret", "", "false", "", "AzureSQL_Managed")},
 			{Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "default", "", "false", "", "AzureSQL_Managed")},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -166,6 +178,12 @@ func TestAccDSFLogAggregator_GcpPubsubBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -216,6 +234,12 @@ func TestAccDSFLogAggregator_GcpPubsubAlloydbPostgresql(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -251,6 +275,12 @@ func TestAccDSFLogAggregator_GcpPubsubBigQuery(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -288,6 +318,12 @@ func TestAccDSFLogAggregator_GcpPubsubBigTable(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -323,6 +359,12 @@ func TestAccDSFLogAggregator_GcpPubsubMssqlserver(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -374,6 +416,12 @@ func TestAccDSFLogAggregator_GcpPubsubMysql(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -409,6 +457,12 @@ func TestAccDSFLogAggregator_GcpPubsubPostgresql(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -451,6 +505,12 @@ func TestAccDSFLogAggregator_GcpPubsubSpanner(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

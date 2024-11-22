@@ -111,7 +111,6 @@ resource "`+dsfLogAggregatorResourceType+`" "%[1]s" {
   gateway_id         = "%[2]s"
   parent_asset_id    = `+parentAssetIdVal+`
   server_host_name   = "my-namespace.servicebus.windows.net"
-  server_ip          = "1.2.3.4"
   server_port        = "443"
 
   `+azureEventhubConnectionBlock(authMechanism, format)+`
