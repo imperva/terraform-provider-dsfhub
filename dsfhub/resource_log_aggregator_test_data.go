@@ -126,12 +126,43 @@ const gcpPubsubConnectionServiceAccount = `
   }
 `
 
-const gcpPubsubConnectionDefault = `
+const commonGcpConnectionDefault = `
   asset_connection {
     auth_mechanism = "default"
     reason         = "default"
   }
 `
+
+// Output a terraform config for an GCP CLOUD STORAGE BUCKET log aggregator resource.
+func testAccDSFLogAggregatorConfig_GcpCloudStorageBucket(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled string, contentType string) string {
+	// handle reference to other assets
+	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
+
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type        = "GCP CLOUD STORAGE BUCKET"
+
+  admin_email        = "%[3]s"
+  asset_display_name = "%[4]s"
+  asset_id           = "%[4]s"
+  audit_pull_enabled = %[5]s
+  audit_type         = "BUCKET"
+  content_type       = "%[6]s"
+  gateway_id         = "%[7]s"
+  parent_asset_id    = %[8]s
+  server_host_name   = "storage.googleapis.com"
+  server_ip          = "storage.googleapis.com"
+  server_port        = "443" 
+
+  %[9]s
+}`, dsfLogAggregatorResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, contentType, gatewayId, parentAssetIdVal, commonGcpConnectionDefault)
+
+}
 
 // Output a terraform config for an GCP PUBSUB log aggregator resource.
 func testAccDSFLogAggregatorConfig_GcpPubsub(resourceName string, gatewayId string, assetId string, authMechanism string, parentAssetId string, auditPullEnabled string, auditType string, contentType string) string {
@@ -149,7 +180,7 @@ func testAccDSFLogAggregatorConfig_GcpPubsub(resourceName string, gatewayId stri
 	case "service_account":
 		assetConnectionBlock = gcpPubsubConnectionServiceAccount
 	default:
-		assetConnectionBlock = gcpPubsubConnectionDefault
+		assetConnectionBlock = commonGcpConnectionDefault
 	}
 
 	return fmt.Sprintf(`

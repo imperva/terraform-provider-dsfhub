@@ -87,6 +87,41 @@ func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
 	})
 }
 
+func TestAccDSFLogAggregator_GcpCloudStorageBucket(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "my-bucket-1"
+		assetId      = "my-project:" + resourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Failed: missing asset_display_name, asset_id, pubsub_subscription
+			{
+				Config:      testAccDSFLogAggregatorConfig_GcpCloudStorageBucket(resourceName, gatewayId, "", "", "false", ""),
+				ExpectError: regexp.MustCompile("Error: missing required fields for dsfhub_data_source"),
+			},
+			// Onboard and connect/disconnect to gateway as standalone log aggregator
+			{Config: testAccDSFLogAggregatorConfig_GcpCloudStorageBucket(resourceName, gatewayId, assetId, "", "true", "GCP MS SQL SERVER")},
+			{Config: testAccDSFLogAggregatorConfig_GcpCloudStorageBucket(resourceName, gatewayId, assetId, "", "false", "GCP MS SQL SERVER")},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccDSFLogAggregator_GcpPubsubBasic(t *testing.T) {
 	gatewayId := os.Getenv("GATEWAY_ID")
 	if gatewayId == "" {
