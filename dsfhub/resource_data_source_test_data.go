@@ -169,6 +169,34 @@ resource "%[1]s" "%[2]s" {
   `, dsfDataSourceResourceType, resourceName, testAdminEmail, gatewayId, assetId, auditPullEnabled, logsDestinationAssetIdVal)
 }
 
+// Output a terraform config for a GCP MS SQL SERVER data source resource.
+func testAccDSFDataSourceConfig_GcpMsSqlServer(resourceName string, gatewayId string, assetId string, auditPullEnabled string, logsDestinationAssetId string, auditType string) string {
+  	// handle reference to other assets
+	logsDestinationAssetIdVal := testAccParseResourceAttributeReference(logsDestinationAssetId)
+
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type               = "GCP MS SQL SERVER"
+
+  admin_email               = "%[3]s"
+  asset_display_name        = "%[5]s"
+  asset_id                  = "%[5]s"
+  audit_pull_enabled        = %[6]s
+  audit_type                = "%[8]s"
+  gateway_id                = "%[4]s"
+  logs_destination_asset_id = %[7]s
+  server_host_name          = "4.3.2.1"
+  server_ip                 = "1.2.3.4"
+  server_port               = "1433"
+}
+  `, dsfDataSourceResourceType, resourceName, testAdminEmail, gatewayId, assetId, auditPullEnabled, logsDestinationAssetIdVal, auditType)
+}
+
 // Output a terraform config for a GCP MYSQL data source resource.
 func testAccDSFDataSourceConfig_GcpMysql(resourceName string, gatewayId string, assetId string, auditPullEnabled string, logsDestinationAssetId string) string {
 	// handle reference to other assets
