@@ -171,7 +171,7 @@ resource "%[1]s" "%[2]s" {
 
 // Output a terraform config for a GCP MS SQL SERVER data source resource.
 func testAccDSFDataSourceConfig_GcpMsSqlServer(resourceName string, gatewayId string, assetId string, auditPullEnabled string, logsDestinationAssetId string, auditType string) string {
-  	// handle reference to other assets
+	// handle reference to other assets
 	logsDestinationAssetIdVal := testAccParseResourceAttributeReference(logsDestinationAssetId)
 
 	// convert audit_pull_enabled to "null" if empty

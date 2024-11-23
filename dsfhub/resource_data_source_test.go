@@ -319,7 +319,7 @@ func TestAccDSFDataSource_GcpMsSqlServer(t *testing.T) {
 		bucketAssetId      = "my-project:" + bucketResourceName
 
 		cloudAccountResourceName = "sql-server-cloud-account-1"
-		cloudAccountAssetId = "my_service_account_1@my-project.iam.gserviceaccount.com:my-project"
+		cloudAccountAssetId      = "my_service_account_1@my-project.iam.gserviceaccount.com:my-project"
 	)
 
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
@@ -387,16 +387,14 @@ func TestAccDSFDataSource_GcpMsSqlServerManyToOne(t *testing.T) {
 	const (
 		resourceNameProd = "gcp_ms_sql_server_many_to_one_prod"
 		assetIdProd      = "my-project:us-west-1:sql-server-instance-2-prod"
-		resourceNameDev = "gcp_ms_sql_server_many_to_one_dev"
-		assetIdDev      = "my-project:us-west-1:sql-server-instance-2-dev"
-
-		
+		resourceNameDev  = "gcp_ms_sql_server_many_to_one_dev"
+		assetIdDev       = "my-project:us-west-1:sql-server-instance-2-dev"
 
 		bucketResourceName = "sql-server-instance-2-bucket"
 		bucketAssetId      = "my-project:" + bucketResourceName
 
 		cloudAccountResourceName = "sql-server-cloud-account-2"
-		cloudAccountAssetId = "my_service_account_2@my-project.iam.gserviceaccount.com:my-project"
+		cloudAccountAssetId      = "my_service_account_2@my-project.iam.gserviceaccount.com:my-project"
 	)
 
 	resourceTypeAndNameProd := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceNameProd)
