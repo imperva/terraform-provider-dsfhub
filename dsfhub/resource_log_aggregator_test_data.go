@@ -16,21 +16,21 @@ func testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName string, gatewayId st
 	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
 
 	return fmt.Sprintf(`
-resource "`+dsfLogAggregatorResourceType+`" "%[1]s" {
-  depends_on = [`+dependsOn+`]
+resource "%[1]s" "%[2]s" {
+  depends_on         = [%[3]s]
   server_type        = "AWS LOG GROUP"
 
-  admin_email        = "`+testAdminEmail+`"
-  arn                = "%[3]s"
-  asset_display_name = "%[3]s"
-  asset_id           = "%[3]s"
-  audit_pull_enabled = %[5]t
-  audit_type         = "%[6]s"
-  gateway_id         = "%[2]s"
-  parent_asset_id    = `+parentAssetIdVal+`
+  admin_email        = "%[4]s"
+  arn                = "%[6]s"
+  asset_display_name = "%[6]s"
+  asset_id           = "%[6]s"
+  audit_pull_enabled = %[8]t
+  audit_type         = "%[9]s"
+  gateway_id         = "%[5]s"
+  parent_asset_id    = %[10]s
 
-  `+awsLogGroupConnectionDefault+`
-}`, resourceName, gatewayId, assetId, parentAssetId, auditPullEnabled, auditType)
+  %[11]s
+}`, dsfLogAggregatorResourceType, resourceName, dependsOn, testAdminEmail, gatewayId, assetId, parentAssetId, auditPullEnabled, auditType, parentAssetIdVal, awsLogGroupConnectionDefault)
 }
 
 // Output an asset_connection block for an AZURE EVENTHUB log aggregator resource.
@@ -100,21 +100,21 @@ func testAccDSFLogAggregatorConfig_AzureEventhub(resourceName string, gatewayId 
 	}
 
 	return fmt.Sprintf(`
-resource "`+dsfLogAggregatorResourceType+`" "%[1]s" {
+resource "%[1]s" "%[2]s" {
   server_type = "AZURE EVENTHUB"
 
-  admin_email        = "`+testAdminEmail+`"
-  asset_id           = "%[3]s"
-  asset_display_name = "%[3]s"
-  audit_pull_enabled = %[4]s
-  content_type       = "%[5]s"
-  gateway_id         = "%[2]s"
-  parent_asset_id    = `+parentAssetIdVal+`
+  admin_email        = "%[3]s"
+  asset_id           = "%[5]s"
+  asset_display_name = "%[5]s"
+  audit_pull_enabled = %[6]s
+  content_type       = "%[7]s"
+  gateway_id         = "%[4]s"
+  parent_asset_id    = %[8]s
   server_host_name   = "my-namespace.servicebus.windows.net"
   server_port        = "443"
 
-  `+azureEventhubConnectionBlock(authMechanism, format)+`
-}`, resourceName, gatewayId, assetId, auditPullEnabled, contentType)
+  %[9]s
+}`, dsfLogAggregatorResourceType, resourceName, testAdminEmail, gatewayId, assetId, auditPullEnabled, contentType, parentAssetIdVal, azureEventhubConnectionBlock(authMechanism, format))
 }
 
 const gcpPubsubConnectionServiceAccount = `
@@ -183,22 +183,22 @@ func testAccDSFLogAggregatorConfig_GcpPubsub(resourceName string, gatewayId stri
 	}
 
 	return fmt.Sprintf(`
-resource "`+dsfLogAggregatorResourceType+`" "%[1]s" {
+resource "%[1]s" "%[2]s" {
   server_type         = "GCP PUBSUB"
 
-  admin_email         = "`+testAdminEmail+`"
-  asset_display_name  = "%[3]s"
-  asset_id            = "%[3]s"
-  audit_pull_enabled  = %[4]s
-  audit_type          = "%[5]s"
-  content_type        = "%[6]s"
-  gateway_id          = "%[2]s"
-  parent_asset_id     = `+parentAssetIdVal+`
-  pubsub_subscription = "%[3]s"
+  admin_email         = "%[3]s"
+  asset_display_name  = "%[5]s"
+  asset_id            = "%[5]s"
+  audit_pull_enabled  = %[6]s
+  audit_type          = "%[7]s"
+  content_type        = "%[8]s"
+  gateway_id          = "%[4]s"
+  parent_asset_id     = %[9]s
+  pubsub_subscription = "%[5]s"
   server_host_name    = "pubsub.googleapis.com"
   server_ip           = "pubsub.googleapis.com"
   server_port         = "443"
 
-  `+assetConnectionBlock+`
-}`, resourceName, gatewayId, assetId, auditPullEnabled, auditType, contentType)
+  %[10]s
+}`, dsfLogAggregatorResourceType, resourceName, testAdminEmail, gatewayId, assetId, auditPullEnabled, auditType, contentType, parentAssetIdVal, assetConnectionBlock)
 }

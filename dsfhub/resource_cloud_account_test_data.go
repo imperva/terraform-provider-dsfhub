@@ -49,17 +49,17 @@ func testAccDSFCloudAccountConfig_Aws(resourceName string, gatewayId string, ass
 	}
 
 	return fmt.Sprintf(`
-resource "`+dsfCloudAccountResourceType+`" "%[1]s" {
+resource "%[1]s" "%[2]s" {
   server_type = "AWS"
   
-  admin_email        = "`+testAdminEmail+`"
-  arn                = "%[3]s"
-  asset_display_name = "%[3]s"
-  asset_id           = "%[3]s"
-  gateway_id         = "%[2]s"
+  admin_email        = "%[3]s"
+  arn                = "%[4]s"
+  asset_display_name = "%[4]s"
+  asset_id           = "%[4]s"
+  gateway_id         = "%[5]s"
 
-  %[4]s
-}`, resourceName, gatewayId, assetId, assetConnectionBlock)
+  %[6]s
+}`, dsfCloudAccountResourceType, resourceName, testAdminEmail, assetId, gatewayId, assetConnectionBlock)
 }
 
 var azureConnectionClientSecret = fmt.Sprintf(`
@@ -149,14 +149,14 @@ func testAccDSFCloudAccountConfig_Gcp(resourceName string, gatewayId string, ass
 	}
 
 	return fmt.Sprintf(`
-resource "`+dsfCloudAccountResourceType+`" "%[1]s" {
+resource "%[1]s" "%[2]s" {
   server_type = "GCP"
 
-  admin_email        = "`+testAdminEmail+`"
-  asset_display_name = "%[3]s"
-  asset_id           = "%[3]s"
-  gateway_id         = "%[2]s"
+  admin_email        = "%[3]s"
+  asset_display_name = "%[4]s"
+  asset_id           = "%[4]s"
+  gateway_id         = "%[5]s"
 
-  `+assetConnectionBlock+`  
-}`, resourceName, gatewayId, assetId)
+  %[6]s  
+}`, dsfCloudAccountResourceType, resourceName, testAdminEmail, assetId, gatewayId, assetConnectionBlock)
 }
