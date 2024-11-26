@@ -748,7 +748,7 @@ func resourceCloudAccountConnectionHash(v interface{}) int {
 	}
 
 	if v, ok := m["auth_mechanism"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
 	}
 
 	if v, ok := m["ca_certs_path"]; ok {
