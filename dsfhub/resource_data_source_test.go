@@ -42,6 +42,70 @@ func TestAccDSFDataSource_Basic(t *testing.T) {
 	})
 }
 
+func TestAccDSFDataSource_AwsDocumentdbCluster(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		assetId      = "arn:aws:rds:us-east-1:123456789012:cluster:my-docdb-cluster"
+		resourceName = "aws_documentdb_onboarding"
+
+		logGroupAssetId      = testAwsLogGroupPrefix + "/aws/docdb/my-docdb-cluster/audit:*"
+		logGroupResourceName = resourceName + "_log_group"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	logGroupResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, logGroupResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the log group is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsDocumentdbCluster(resourceName, gatewayId, assetId, ""),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", true, "", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", "gateway-aws@docdb.service"),
+				),
+			},
+			// refresh and verify DB asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect asset, check that the log group is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsDocumentdbCluster(resourceName, gatewayId, assetId, ""),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", false, "", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", ""),
+				),
+			},
+			// refresh and verify DB asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 

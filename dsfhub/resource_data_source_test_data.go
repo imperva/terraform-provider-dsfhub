@@ -26,6 +26,32 @@ var commonBasicConnectionPassword = fmt.Sprintf(`
   %[1]s
 `, ignoreAssetConnectionChangesBlock())
 
+// Output a terraform config for an AWS DOCUMENTDB CLUSTER data source resource.
+func testAccDSFDataSourceConfig_AwsDocumentdbCluster(resourceName string, gatewayId string, assetId string, auditPullEnabled string) string {
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+  return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type        = "AWS DOCUMENTDB CLUSTER"
+
+  admin_email        = "%[3]s"
+  asset_display_name = "%[4]s"
+  asset_id           = "%[4]s"
+  audit_pull_enabled = %[5]s
+  audit_type         = "LOG_GROUP"
+  gateway_id         = "%[6]s"
+  server_host_name   = "my-docdb-cluster.cp9pk8rsfzja.us-east-1.docdb.amazonaws.com"
+  server_ip          = "%[4]s"
+  server_port        = "27017"
+
+  %[7]s
+}
+`, dsfDataSourceResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, gatewayId, commonBasicConnectionPassword)
+}
+
 // Output a terraform config for an AWS RDS ORACLE data source resource.
 func testAccDSFDataSourceConfig_AwsRdsOracle(resourceName string, gatewayId string, assetId string, auditType string, auditPullEnabled string) string {
 	// convert audit_pull_enabled to "null" if empty
