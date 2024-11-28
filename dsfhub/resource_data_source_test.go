@@ -479,6 +479,70 @@ func TestAccDSFDataSource_AzureMsSqlServer(t *testing.T) {
 	})
 }
 
+func TestAccDSFDataSource_AzurePostgresqlFlexible(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		resourceName = "azure_postgresql_flexible_connect_disconnect_gateway"
+		assetId      = testAzurePrefix + "Microsoft.DBforPostgreSQL/flexibleservers/someflexdatabase"
+
+		eventhubResourceName = "azure-postgresql-flexible-eventhub"
+		eventhubAssetId      = testEventhubPrefix + eventhubResourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	eventhubResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, eventhubResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB asset is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AzurePostgresqlFlexible(resourceName, gatewayId, assetId, "true", eventhubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_AzureEventhub(eventhubResourceName, gatewayId, eventhubAssetId, "default", "", "", "", "Postgresql_Flexible"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify eventhub asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(eventhubResourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect asset, check that the DB asset is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AzurePostgresqlFlexible(resourceName, gatewayId, assetId, "false", eventhubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_AzureEventhub(eventhubResourceName, gatewayId, eventhubAssetId, "default", "", "", "", "Postgresql_Flexible"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify eventhub asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(eventhubResourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccDSFDataSource_AzureSqlManagedInstance(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 
