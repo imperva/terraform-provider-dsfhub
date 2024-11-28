@@ -247,6 +247,36 @@ resource "%[1]s" "%[2]s" {
 }`, dsfDataSourceResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, gatewayId, logsDestinationAssetIdVal, commonBasicConnectionPassword)
 }
 
+// Output a terraform config for an AZURE SQL MANAGED INSTANCE data source resource.
+func testAccDSFDataSourceConfig_AzureSqlManagedInstance(resourceName string, gatewayId string, assetId string, auditPullEnabled string, logsDestinationAssetId string) string {
+	// handle reference to other assets
+	logsDestinationAssetIdVal := testAccParseResourceAttributeReference(logsDestinationAssetId)
+
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+  return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type               = "AZURE SQL MANAGED INSTANCE"
+
+  admin_email               = "%[3]s"
+  asset_display_name        = "%[4]s"
+  asset_id                  = "%[4]s"
+  audit_pull_enabled        = %[5]s
+  database_name             = "master"
+  gateway_id                = "%[6]s"
+  location                  = "us-west2"
+  logs_destination_asset_id = %[7]s
+  server_host_name          = "my-managed-instance.servicebus.windows.net"
+  server_ip                 = "1.2.3.4"
+  server_port               = "3342"
+
+  %[8]s
+}`, dsfDataSourceResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, gatewayId, logsDestinationAssetIdVal, commonBasicConnectionPassword)
+}
+
 // Output a terraform config for a GCP BIGQUERY data source resource.
 func testAccDSFDataSourceConfig_GcpBigQuery(resourceName string, gatewayId string, assetId string, auditPullEnabled string, logsDestinationAssetId string) string {
 	// handle reference to other assets
