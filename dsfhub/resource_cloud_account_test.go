@@ -30,8 +30,69 @@ func TestAccDSFCloudAccount_Aws(t *testing.T) {
 		Steps: []resource.TestStep{
 			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "default")},
 			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "iam_role")},
-			// {Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "key")}, //TODO: fix "key" failing refresh
+			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "key")},
 			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "profile")},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFCloudAccount_Azure(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		assetId      = "/subscriptions/11111111-2222-3333-4444-123456789012/asset"
+		resourceName = "azure-cloud-account"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfCloudAccountResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCloudAccountDestroy,
+		Steps: []resource.TestStep{
+			{Config: testAccDSFCloudAccountConfig_Azure(resourceName, gatewayId, assetId, "client_secret")},
+			{Config: testAccDSFCloudAccountConfig_Azure(resourceName, gatewayId, assetId, "auth_file")},
+			{Config: testAccDSFCloudAccountConfig_Azure(resourceName, gatewayId, assetId, "managed_identity")},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFCloudAccount_Gcp(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		assetId      = "my_service_account@project-name.iam.gserviceaccount.com:project-name"
+		resourceName = "gcp-cloud-account"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfCloudAccountResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCloudAccountDestroy,
+		Steps: []resource.TestStep{
+			{Config: testAccDSFCloudAccountConfig_Gcp(resourceName, gatewayId, assetId, "default")},
+			{Config: testAccDSFCloudAccountConfig_Gcp(resourceName, gatewayId, assetId, "service_account")},
 			// validate import
 			{
 				ResourceName:      resourceTypeAndName,

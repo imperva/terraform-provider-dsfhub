@@ -118,11 +118,13 @@ func TestAccDSFDataSource_AwsRdsAuroraPostgresqlClusterCloudWatch(t *testing.T) 
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			// onboard and connect to gateway
+			// onboard and connect to gateway, check that the log group is connected
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsAuroraPostgresqlCluster(resourceName, gatewayId, assetId, "LOG_GROUP", resourceName) +
-					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresql(instanceResourceName, gatewayId, instanceAssetId, resourceName) +
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresqlCluster(resourceName, gatewayId, assetId, "LOG_GROUP", resourceName),
+					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresql(instanceResourceName, gatewayId, instanceAssetId, resourceName),
 					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", true, "LOG_GROUP", ""),
+				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "true"),
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", "gateway-aws@aurora-postgresql.service"),
@@ -178,10 +180,12 @@ func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterCloudWatchSlowQuery(t *testing
 		Steps: []resource.TestStep{
 			// onboard and connect to gateway
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsAuroraMysqlCluster(resourceName, gatewayId, assetId, "", resourceName) +
-					testAccDSFDataSourceConfig_AwsRdsAuroraMysql(instanceResourceName, gatewayId, instanceAssetId, resourceName) +
-					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", true, "LOG_GROUP", "") +
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsAuroraMysqlCluster(resourceName, gatewayId, assetId, "", resourceName),
+					testAccDSFDataSourceConfig_AwsRdsAuroraMysql(instanceResourceName, gatewayId, instanceAssetId, resourceName),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", true, "LOG_GROUP", ""),
 					testAccDSFLogAggregatorConfig_AwsLogGroup(slowLogGroupResourceName, gatewayId, slowLogGroupAssetId, resourceTypeAndName+".asset_id", true, "AWS_RDS_AURORA_MYSQL_SLOW", logGroupResourceTypeAndName),
+				),
 				// verify log group assets are connected
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "true"),
@@ -200,10 +204,12 @@ func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterCloudWatchSlowQuery(t *testing
 			},
 			// disconnect assets
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsAuroraMysqlCluster(resourceName, gatewayId, assetId, "", resourceName) +
-					testAccDSFDataSourceConfig_AwsRdsAuroraMysql(instanceResourceName, gatewayId, instanceAssetId, resourceName) +
-					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", false, "LOG_GROUP", "") +
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsAuroraMysqlCluster(resourceName, gatewayId, assetId, "", resourceName),
+					testAccDSFDataSourceConfig_AwsRdsAuroraMysql(instanceResourceName, gatewayId, instanceAssetId, resourceName),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", false, "LOG_GROUP", ""),
 					testAccDSFLogAggregatorConfig_AwsLogGroup(slowLogGroupResourceName, gatewayId, slowLogGroupAssetId, resourceTypeAndName+".asset_id", false, "AWS_RDS_AURORA_MYSQL_SLOW", logGroupResourceTypeAndName),
+				),
 				// verify log group assets are disconnected
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "false"),
@@ -218,6 +224,441 @@ func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterCloudWatchSlowQuery(t *testing
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 					// resource.TestCheckResourceAttr(instanceResourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFDataSource_GcpBigQuery(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "gcp_bigquery_connect_disconnect_gateway"
+		assetId      = "projects/my-project-name/bigquery"
+
+		pubsubResourceName = "bigquery-subscription"
+		pubsubAssetId      = testPubsubSubscriptionPrefix + pubsubResourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	pubsubResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, pubsubResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB asset is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpBigQuery(resourceName, gatewayId, assetId, "true", pubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(pubsubResourceName, gatewayId, pubsubAssetId, "default", "", "", "BIGQUERY", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify pubsub aset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "gateway_service", "gateway-gcp@bigquery.service"),
+				),
+			},
+			// disconnect asset, check that the DB asset is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpBigQuery(resourceName, gatewayId, assetId, "false", pubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(pubsubResourceName, gatewayId, pubsubAssetId, "default", "", "", "BIGQUERY", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify pubsub aset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "gateway_service", ""),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFDataSource_GcpMsSqlServer(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "gcp_ms_sql_server_connect_disconnect_gateway"
+		assetId      = "my-project:us-west-1:sql-server-instance-1"
+
+		bucketResourceName = "sql-server-instance-1-bucket"
+		bucketAssetId      = "my-project:" + bucketResourceName
+
+		cloudAccountResourceName = "sql-server-cloud-account-1"
+		cloudAccountAssetId      = "my_service_account_1@my-project.iam.gserviceaccount.com:my-project"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	bucketResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, bucketResourceName)
+	cloudAccountResourceTypeAndName := fmt.Sprintf("%s.%s", dsfCloudAccountResourceType, cloudAccountResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB asset is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFCloudAccountConfig_Gcp(cloudAccountResourceName, gatewayId, cloudAccountAssetId, "default"),
+					testAccDSFDataSourceConfig_GcpMsSqlServer(resourceName, gatewayId, assetId, "true", bucketResourceTypeAndName+".asset_id", ""),
+					testAccDSFLogAggregatorConfig_GcpCloudStorageBucket(bucketResourceName, gatewayId, bucketAssetId, cloudAccountResourceTypeAndName+".asset_id", "", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify bucket asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(bucketResourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect asset, check that the DB asset is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFCloudAccountConfig_Gcp(cloudAccountResourceName, gatewayId, cloudAccountAssetId, "default"),
+					testAccDSFDataSourceConfig_GcpMsSqlServer(resourceName, gatewayId, assetId, "false", bucketResourceTypeAndName+".asset_id", ""),
+					testAccDSFLogAggregatorConfig_GcpCloudStorageBucket(bucketResourceName, gatewayId, bucketAssetId, cloudAccountResourceTypeAndName+".asset_id", "", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify bucket asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(bucketResourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFDataSource_GcpMsSqlServerManyToOne(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceNameProd = "gcp_ms_sql_server_many_to_one_prod"
+		assetIdProd      = "my-project:us-west-1:sql-server-instance-2-prod"
+		resourceNameDev  = "gcp_ms_sql_server_many_to_one_dev"
+		assetIdDev       = "my-project:us-west-1:sql-server-instance-2-dev"
+
+		bucketResourceName = "sql-server-instance-2-bucket"
+		bucketAssetId      = "my-project:" + bucketResourceName
+
+		cloudAccountResourceName = "sql-server-cloud-account-2"
+		cloudAccountAssetId      = "my_service_account_2@my-project.iam.gserviceaccount.com:my-project"
+	)
+
+	resourceTypeAndNameProd := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceNameProd)
+	resourceTypeAndNameDev := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceNameDev)
+	bucketResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, bucketResourceName)
+	cloudAccountResourceTypeAndName := fmt.Sprintf("%s.%s", dsfCloudAccountResourceType, cloudAccountResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB assets are connected
+			{
+				Config: ConfigCompose(
+					testAccDSFCloudAccountConfig_Gcp(cloudAccountResourceName, gatewayId, cloudAccountAssetId, "default"),
+					testAccDSFDataSourceConfig_GcpMsSqlServer(resourceNameProd, gatewayId, assetIdProd, "true", bucketResourceTypeAndName+".asset_id", ""),
+					testAccDSFDataSourceConfig_GcpMsSqlServer(resourceNameDev, gatewayId, assetIdDev, "true", bucketResourceTypeAndName+".asset_id", ""),
+					testAccDSFLogAggregatorConfig_GcpCloudStorageBucket(bucketResourceName, gatewayId, bucketAssetId, cloudAccountResourceTypeAndName+".asset_id", "", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndNameProd, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndNameDev, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify bucket asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndNameProd, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(resourceTypeAndNameDev, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(bucketResourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect asset, check that the DB assets are disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFCloudAccountConfig_Gcp(cloudAccountResourceName, gatewayId, cloudAccountAssetId, "default"),
+					testAccDSFDataSourceConfig_GcpMsSqlServer(resourceNameProd, gatewayId, assetIdProd, "false", bucketResourceTypeAndName+".asset_id", ""),
+					testAccDSFDataSourceConfig_GcpMsSqlServer(resourceNameDev, gatewayId, assetIdDev, "false", bucketResourceTypeAndName+".asset_id", ""),
+					testAccDSFLogAggregatorConfig_GcpCloudStorageBucket(bucketResourceName, gatewayId, bucketAssetId, cloudAccountResourceTypeAndName+".asset_id", "", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndNameProd, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndNameDev, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify bucket asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndNameProd, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceTypeAndNameDev, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(bucketResourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDSFDataSource_GcpMysql(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "gcp_mysql_connect_disconnect_gateway"
+		assetId      = "my-project:us-west-1:mysql-instance-1"
+
+		pubsubResourceName = "mysql-instance-1-subscription"
+		pubsubAssetId      = testPubsubSubscriptionPrefix + pubsubResourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	pubsubResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, pubsubResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB asset is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "true", pubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(pubsubResourceName, gatewayId, pubsubAssetId, "default", "", "", "MYSQL", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify pubsub asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "gateway_service", "gateway-gcp@mysql.service"),
+				),
+			},
+			// disconnect asset, check that the DB asset is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "false", pubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(pubsubResourceName, gatewayId, pubsubAssetId, "default", "", "", "MYSQL", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify pubsub asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "gateway_service", ""),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFDataSource_GcpMysqlSlowQuery(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "gcp_mysql_slow_query"
+		assetId      = "my-project:us-west-1:mysql-instance-2"
+
+		auditPubsubResourceName = "mysql-instance-2-audit-subscription"
+		auditPubsubAssetId      = testPubsubSubscriptionPrefix + auditPubsubResourceName
+
+		slowQueryPubsubResourceName = "mysql-instance-2-slow-query-subscription"
+		slowQueryPubsubAssetId      = testPubsubSubscriptionPrefix + slowQueryPubsubResourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	auditPubsubResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, auditPubsubResourceName)
+	slowQueryPubsubResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, slowQueryPubsubResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB asset is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "true", auditPubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(auditPubsubResourceName, gatewayId, auditPubsubAssetId, "default", "", "", "MYSQL", ""),
+					testAccDSFLogAggregatorConfig_GcpPubsub(slowQueryPubsubResourceName, gatewayId, slowQueryPubsubAssetId, "default", "", "true", "GCP_MYSQL_SLOW", "GCP MYSQL"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify pubsub asets are connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(auditPubsubResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(auditPubsubResourceTypeAndName, "gateway_service", "gateway-gcp@mysql.service"),
+					resource.TestCheckResourceAttr(slowQueryPubsubResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(slowQueryPubsubResourceTypeAndName, "gateway_service", "gateway-gcp@mysql-slow-query.service"),
+				),
+			},
+			// disconnect asset, check that the DB asset is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpMysql(resourceName, gatewayId, assetId, "false", auditPubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(auditPubsubResourceName, gatewayId, auditPubsubAssetId, "default", "", "", "MYSQL", ""),
+					testAccDSFLogAggregatorConfig_GcpPubsub(slowQueryPubsubResourceName, gatewayId, slowQueryPubsubAssetId, "default", "", "false", "GCP_MYSQL_SLOW", "GCP MYSQL"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify pubsub asets are disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(auditPubsubResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(auditPubsubResourceTypeAndName, "gateway_service", ""),
+					resource.TestCheckResourceAttr(slowQueryPubsubResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(slowQueryPubsubResourceTypeAndName, "gateway_service", ""),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFDataSource_GcpPostgresql(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "gcp_postgresql_connect_disconnect_gateway"
+		assetId      = "my-project:us-west-1:postgresql-instance-1"
+
+		pubsubResourceName = "postgresql-instance-1-subscription"
+		pubsubAssetId      = testPubsubSubscriptionPrefix + pubsubResourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	pubsubResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, pubsubResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB asset is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpPostgresql(resourceName, gatewayId, assetId, "true", pubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(pubsubResourceName, gatewayId, pubsubAssetId, "default", "", "", "POSTGRESQL", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify pubsub aset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "gateway_service", "gateway-gcp@postgresql.service"),
+				),
+			},
+			// disconnect asset, check that the DB asset is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_GcpPostgresql(resourceName, gatewayId, assetId, "false", pubsubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_GcpPubsub(pubsubResourceName, gatewayId, pubsubAssetId, "default", "", "", "POSTGRESQL", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify pubsub aset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(pubsubResourceTypeAndName, "gateway_service", ""),
 				),
 			},
 			// validate import

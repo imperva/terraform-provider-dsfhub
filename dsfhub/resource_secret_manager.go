@@ -572,6 +572,7 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("available_regions", secretManagerReadResponse.Data.AssetData.AvailableRegions)
 	d.Set("credentials_endpoint", secretManagerReadResponse.Data.AssetData.CredentialsEndpoint)
 	d.Set("criticality", secretManagerReadResponse.Data.AssetData.Criticality)
+	d.Set("gateway_id", secretManagerReadResponse.Data.GatewayID)
 	d.Set("jsonar_uid", secretManagerReadResponse.Data.AssetData.JsonarUID)
 	d.Set("location", secretManagerReadResponse.Data.AssetData.Location)
 	d.Set("managed_by", secretManagerReadResponse.Data.AssetData.ManagedBy)
@@ -589,6 +590,7 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 		}
 		d.Set("server_port", serverPort)
 	}
+	d.Set("server_type", secretManagerReadResponse.Data.ServerType)
 	d.Set("used_for", secretManagerReadResponse.Data.AssetData.UsedFor)
 	d.Set("version", secretManagerReadResponse.Data.AssetData.Version)
 

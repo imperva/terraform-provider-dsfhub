@@ -185,7 +185,7 @@ func resourceLogAggregator() *schema.Resource {
 							Type:         schema.TypeString,
 							Description:  "Specifies the auth mechanism used by the connection",
 							Required:     true,
-							ValidateFunc: validation.StringInSlice([]string{"default", "service_account", "azure_ad", "kerberos"}, false),
+							ValidateFunc: validation.StringInSlice([]string{"default", "service_account", "azure_ad", "kerberos", "client_secret"}, false),
 						},
 						"azure_storage_account": {
 							Type:        schema.TypeString,
@@ -733,11 +733,13 @@ func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("location", logAggregatorReadResponse.Data.AssetData.Location)
 	d.Set("managed_by", logAggregatorReadResponse.Data.AssetData.ManagedBy)
 	d.Set("owned_by", logAggregatorReadResponse.Data.AssetData.OwnedBy)
+	d.Set("parent_asset_id", logAggregatorReadResponse.Data.AssetData.ParentAssetID)
 	d.Set("proxy", logAggregatorReadResponse.Data.AssetData.Proxy)
 	d.Set("pubsub_subscription", logAggregatorReadResponse.Data.AssetData.PubsubSubscription)
 	d.Set("region", logAggregatorReadResponse.Data.AssetData.Region)
 	d.Set("s3_provider", logAggregatorReadResponse.Data.AssetData.S3Provider)
 	d.Set("server_host_name", logAggregatorReadResponse.Data.AssetData.ServerHostName)
+	d.Set("server_ip", logAggregatorReadResponse.Data.AssetData.ServerIP)
 	d.Set("server_type", logAggregatorReadResponse.Data.ServerType)
 	if logAggregatorReadResponse.Data.AssetData.ServerPort != nil {
 		var serverPort string
