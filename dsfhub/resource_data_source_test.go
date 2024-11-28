@@ -236,6 +236,207 @@ func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterCloudWatchSlowQuery(t *testing
 	})
 }
 
+func TestAccDSFDataSource_AzureCosmosDB(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "azure_cosmosdb_sql_connect_disconnect_gateway"
+		assetId      = testAzurePrefix + "Microsoft.DocumentDB/databaseAccounts/my-cosmos-sql"
+
+		eventhubResourceName = "azure-cosmosdb-sql-eventhub"
+		eventhubAssetId      = testEventhubPrefix + eventhubResourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	eventhubResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, eventhubResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB asset is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AzureCosmosDB(resourceName, gatewayId, assetId, "true", eventhubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_AzureEventhub(eventhubResourceName, gatewayId, eventhubAssetId, "default", "", "", "", "Cosmos_SQL"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify eventhub asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(eventhubResourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect asset, check that the DB asset is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AzureCosmosDB(resourceName, gatewayId, assetId, "false", eventhubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_AzureEventhub(eventhubResourceName, gatewayId, eventhubAssetId, "default", "", "", "", "Cosmos_SQL"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify eventhub asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(eventhubResourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFDataSource_AzureCosmosDBMongo(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "azure_cosmosdb_mongo_connect_disconnect_gateway"
+		assetId      = testAzurePrefix + "Microsoft.DocumentDB/databaseAccounts/my-cosmos-mongodb"
+
+		eventhubResourceName = "azure-cosmosdb-mongo-eventhub"
+		eventhubAssetId      = testEventhubPrefix + eventhubResourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	eventhubResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, eventhubResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB asset is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AzureCosmosDBMongo(resourceName, gatewayId, assetId, "true", eventhubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_AzureEventhub(eventhubResourceName, gatewayId, eventhubAssetId, "default", "", "", "", "Cosmos_Mongo"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify eventhub asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(eventhubResourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect asset, check that the DB asset is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AzureCosmosDBMongo(resourceName, gatewayId, assetId, "false", eventhubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_AzureEventhub(eventhubResourceName, gatewayId, eventhubAssetId, "default", "", "", "", "Cosmos_Mongo"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify eventhub asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(eventhubResourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFDataSource_AzureCosmosDBTable(t *testing.T) {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Skip("GATEWAY_ID environment variable must be set")
+	}
+
+	const (
+		resourceName = "azure_cosmosdb_table_connect_disconnect_gateway"
+		assetId      = testAzurePrefix + "Microsoft.DocumentDB/databaseAccounts/my-cosmos-table"
+
+		eventhubResourceName = "azure-cosmosdb-table-eventhub"
+		eventhubAssetId      = testEventhubPrefix + eventhubResourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	eventhubResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, eventhubResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB asset is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AzureCosmosDBTable(resourceName, gatewayId, assetId, "true", eventhubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_AzureEventhub(eventhubResourceName, gatewayId, eventhubAssetId, "default", "", "", "", "Cosmos_Table"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify eventhub asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(eventhubResourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect asset, check that the DB asset is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AzureCosmosDBTable(resourceName, gatewayId, assetId, "false", eventhubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_AzureEventhub(eventhubResourceName, gatewayId, eventhubAssetId, "default", "", "", "", "Cosmos_Table"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify eventhub asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(eventhubResourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccDSFDataSource_GcpBigQuery(t *testing.T) {
 	gatewayId := os.Getenv("GATEWAY_ID")
 	if gatewayId == "" {
@@ -267,7 +468,7 @@ func TestAccDSFDataSource_GcpBigQuery(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
 				),
 			},
-			// refresh and verify pubsub aset is connected
+			// refresh and verify pubsub asset is connected
 			{
 				RefreshState: true,
 				Check: resource.ComposeTestCheckFunc(
@@ -286,7 +487,7 @@ func TestAccDSFDataSource_GcpBigQuery(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 				),
 			},
-			// refresh and verify pubsub aset is disconnected
+			// refresh and verify pubsub asset is disconnected
 			{
 				RefreshState: true,
 				Check: resource.ComposeTestCheckFunc(
@@ -559,7 +760,7 @@ func TestAccDSFDataSource_GcpMysqlSlowQuery(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
 				),
 			},
-			// refresh and verify pubsub asets are connected
+			// refresh and verify pubsub assets are connected
 			{
 				RefreshState: true,
 				Check: resource.ComposeTestCheckFunc(
@@ -581,7 +782,7 @@ func TestAccDSFDataSource_GcpMysqlSlowQuery(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 				),
 			},
-			// refresh and verify pubsub asets are disconnected
+			// refresh and verify pubsub assets are disconnected
 			{
 				RefreshState: true,
 				Check: resource.ComposeTestCheckFunc(
@@ -633,7 +834,7 @@ func TestAccDSFDataSource_GcpPostgresql(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
 				),
 			},
-			// refresh and verify pubsub aset is connected
+			// refresh and verify pubsub asset is connected
 			{
 				RefreshState: true,
 				Check: resource.ComposeTestCheckFunc(
@@ -652,7 +853,7 @@ func TestAccDSFDataSource_GcpPostgresql(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 				),
 			},
-			// refresh and verify pubsub aset is disconnected
+			// refresh and verify pubsub asset is disconnected
 			{
 				RefreshState: true,
 				Check: resource.ComposeTestCheckFunc(

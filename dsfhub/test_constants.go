@@ -21,5 +21,7 @@ const (
 
 	testSMServerType = "HASHICORP"
 
+	testAzurePrefix              = "/subscriptions/my-subscription-id/resourceGroups/my-resource-group/providers/"
+	testEventhubPrefix           = testAzurePrefix + "Microsoft.EventHub/namespaces/my-namespace/eventhubs/"
 	testPubsubSubscriptionPrefix = "projects/my-project/subscriptions/"
 )

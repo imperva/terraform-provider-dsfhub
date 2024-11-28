@@ -142,6 +142,81 @@ resource "%[1]s" "%[2]s" {
 `, dsfDataSourceResourceType, resourceName, testAdminEmail, gatewayId, assetId, clusterId, commonBasicConnectionPassword)
 }
 
+// Output a terraform config for an AZURE COSMOSDB data source resource.
+func testAccDSFDataSourceConfig_AzureCosmosDB(resourceName string, gatewayId string, assetId string, auditPullEnabled string, logsDestinationAssetId string) string {
+	// handle reference to other assets
+	logsDestinationAssetIdVal := testAccParseResourceAttributeReference(logsDestinationAssetId)
+
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type = "AZURE COSMOSDB"
+
+  admin_email               = "%[3]s"
+  asset_display_name        = "%[4]s"
+  asset_id                  = "%[4]s"
+  audit_pull_enabled        = %[5]s
+  gateway_id                = "%[6]s"
+  logs_destination_asset_id = %[7]s
+  server_host_name          = "my-cosmosdbsql.documents.azure.com"
+  server_port               = "443"
+}`, dsfDataSourceResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, gatewayId, logsDestinationAssetIdVal)
+}
+
+// Output a terraform config for an AZURE COSMOSDB MONGO data source resource.
+func testAccDSFDataSourceConfig_AzureCosmosDBMongo(resourceName string, gatewayId string, assetId string, auditPullEnabled string, logsDestinationAssetId string) string {
+	// handle reference to other assets
+	logsDestinationAssetIdVal := testAccParseResourceAttributeReference(logsDestinationAssetId)
+
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type = "AZURE COSMOSDB MONGO"
+
+  admin_email               = "%[3]s"
+  asset_display_name        = "%[4]s"
+  asset_id                  = "%[4]s"
+  audit_pull_enabled        = %[5]s
+  gateway_id                = "%[6]s"
+  logs_destination_asset_id = %[7]s
+  server_host_name          = "my-cosmos-mongodb.mongo.cosmos.azure.com"
+  server_port               = "443"
+}`, dsfDataSourceResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, gatewayId, logsDestinationAssetIdVal)
+}
+
+// Output a terraform config for an AZURE COSMOSDB TABLE data source resource.
+func testAccDSFDataSourceConfig_AzureCosmosDBTable(resourceName string, gatewayId string, assetId string, auditPullEnabled string, logsDestinationAssetId string) string {
+	// handle reference to other assets
+	logsDestinationAssetIdVal := testAccParseResourceAttributeReference(logsDestinationAssetId)
+
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type = "AZURE COSMOSDB TABLE"
+
+  admin_email               = "%[3]s"
+  asset_display_name        = "%[4]s"
+  asset_id                  = "%[4]s"
+  audit_pull_enabled        = %[5]s
+  gateway_id                = "%[6]s"
+  logs_destination_asset_id = %[7]s
+  server_host_name          = "my-cosmosdbtable.table.cosmos.azure.com"
+  server_port               = "443"
+}`, dsfDataSourceResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, gatewayId, logsDestinationAssetIdVal)
+}
+
 // Output a terraform config for a GCP BIGQUERY data source resource.
 func testAccDSFDataSourceConfig_GcpBigQuery(resourceName string, gatewayId string, assetId string, auditPullEnabled string, logsDestinationAssetId string) string {
 	// handle reference to other assets
