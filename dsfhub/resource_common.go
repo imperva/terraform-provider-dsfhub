@@ -6,10 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
@@ -830,4 +832,14 @@ func ignoreAssetConnectionChangesBlock() string {
 	ignoredAttributes := []string{`asset_connection`}
 	lifecycleBlock = createIgnoreChangesBlock(ignoredAttributes)
 	return lifecycleBlock
+}
+
+// checkGatewayId checks that the GATEWAY_ID environment variable is set correctly
+// for acceptance tests
+func checkGatewayId(t *testing.T) string {
+	gatewayId := os.Getenv("GATEWAY_ID")
+	if gatewayId == "" {
+		t.Fatal("GATEWAY_ID environment variable must be set")
+	}
+	return gatewayId
 }

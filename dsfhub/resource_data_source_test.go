@@ -3,7 +3,6 @@ package dsfhub
 import (
 	"fmt"
 	"log"
-	"os"
 	"testing"
 	"time"
 
@@ -12,10 +11,7 @@ import (
 )
 
 func TestAccDSFDataSource_Basic(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const resourceName = "basic_test_data_source"
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
@@ -47,10 +43,7 @@ func TestAccDSFDataSource_Basic(t *testing.T) {
 }
 
 func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const resourceName = "rds_oracle_connect_disconnect_gateway"
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
@@ -94,10 +87,7 @@ func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
 }
 
 func TestAccDSFDataSource_AwsRdsAuroraPostgresqlClusterCloudWatch(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		assetId      = "arn:aws:rds:us-east-2:123456789012:cluster:my-aurorapostgresql-cluster"
@@ -149,10 +139,7 @@ func TestAccDSFDataSource_AwsRdsAuroraPostgresqlClusterCloudWatch(t *testing.T) 
 }
 
 func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterCloudWatchSlowQuery(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		assetId      = "arn:aws:rds:us-east-2:123456789012:cluster:my-auroramysql-cluster"
@@ -237,10 +224,7 @@ func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterCloudWatchSlowQuery(t *testing
 }
 
 func TestAccDSFDataSource_AzureCosmosDB(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "azure_cosmosdb_sql_connect_disconnect_gateway"
@@ -304,10 +288,7 @@ func TestAccDSFDataSource_AzureCosmosDB(t *testing.T) {
 }
 
 func TestAccDSFDataSource_AzureCosmosDBMongo(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "azure_cosmosdb_mongo_connect_disconnect_gateway"
@@ -371,10 +352,7 @@ func TestAccDSFDataSource_AzureCosmosDBMongo(t *testing.T) {
 }
 
 func TestAccDSFDataSource_AzureCosmosDBTable(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "azure_cosmosdb_table_connect_disconnect_gateway"
@@ -438,10 +416,7 @@ func TestAccDSFDataSource_AzureCosmosDBTable(t *testing.T) {
 }
 
 func TestAccDSFDataSource_GcpBigQuery(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "gcp_bigquery_connect_disconnect_gateway"
@@ -507,10 +482,7 @@ func TestAccDSFDataSource_GcpBigQuery(t *testing.T) {
 }
 
 func TestAccDSFDataSource_GcpMsSqlServer(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "gcp_ms_sql_server_connect_disconnect_gateway"
@@ -580,10 +552,7 @@ func TestAccDSFDataSource_GcpMsSqlServer(t *testing.T) {
 }
 
 func TestAccDSFDataSource_GcpMsSqlServerManyToOne(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceNameProd = "gcp_ms_sql_server_many_to_one_prod"
@@ -656,10 +625,7 @@ func TestAccDSFDataSource_GcpMsSqlServerManyToOne(t *testing.T) {
 }
 
 func TestAccDSFDataSource_GcpMysql(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "gcp_mysql_connect_disconnect_gateway"
@@ -725,10 +691,7 @@ func TestAccDSFDataSource_GcpMysql(t *testing.T) {
 }
 
 func TestAccDSFDataSource_GcpMysqlSlowQuery(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "gcp_mysql_slow_query"
@@ -804,10 +767,7 @@ func TestAccDSFDataSource_GcpMysqlSlowQuery(t *testing.T) {
 }
 
 func TestAccDSFDataSource_GcpPostgresql(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "gcp_postgresql_connect_disconnect_gateway"

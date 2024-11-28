@@ -12,10 +12,7 @@ import (
 )
 
 func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		assetId            = "arn:aws:logs:us-east-2:123456789012:log-group:/aws/rds/instance/my-database/audit:*"
@@ -59,10 +56,7 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		assetId      = "/subscriptions/ID/resourceGroups/someGroup/providers/Microsoft.EventHub/namespaces/somenamespace/eventhubs/someeventhub"
@@ -100,10 +94,7 @@ func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpCloudStorageBucket(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-bucket-1"
@@ -135,10 +126,7 @@ func TestAccDSFLogAggregator_GcpCloudStorageBucket(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubBasic(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-basic-pubsub-subscription"
@@ -189,10 +177,7 @@ func TestAccDSFLogAggregator_GcpPubsubBasic(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubAlloydbPostgresql(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-alloydb-pubsub-subscription"
@@ -245,10 +230,7 @@ func TestAccDSFLogAggregator_GcpPubsubAlloydbPostgresql(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubBigQuery(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-bigquery-pubsub-subscription"
@@ -287,10 +269,7 @@ func TestAccDSFLogAggregator_GcpPubsubBigQuery(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubBigTable(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-bigtable-pubsub-subscription"
@@ -329,10 +308,7 @@ func TestAccDSFLogAggregator_GcpPubsubBigTable(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubMssqlserver(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-mssql-server-pubsub-subscription"
@@ -371,10 +347,7 @@ func TestAccDSFLogAggregator_GcpPubsubMssqlserver(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubMysql(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-mysql-pubsub-subscription"
@@ -427,10 +400,7 @@ func TestAccDSFLogAggregator_GcpPubsubMysql(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubPostgresql(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-postgresql-pubsub-subscription"
@@ -469,10 +439,7 @@ func TestAccDSFLogAggregator_GcpPubsubPostgresql(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubSpanner(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	skipVersions := []string{"4.17"}
 	dsfhubVersion := os.Getenv("DSFHUB_VERSION")
