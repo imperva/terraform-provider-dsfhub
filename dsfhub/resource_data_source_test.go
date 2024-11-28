@@ -415,6 +415,70 @@ func TestAccDSFDataSource_AzureCosmosDBTable(t *testing.T) {
 	})
 }
 
+func TestAccDSFDataSource_AzureMsSqlServer(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		resourceName = "azure_sql_server_connect_disconnect_gateway"
+		assetId      = testAzurePrefix + "Microsoft.Sql/servers/my-sql-server"
+
+		eventhubResourceName = "azure-sql-server-eventhub"
+		eventhubAssetId      = testEventhubPrefix + eventhubResourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	eventhubResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, eventhubResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the DB asset is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AzureMsSqlServer(resourceName, gatewayId, assetId, "true", eventhubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_AzureEventhub(eventhubResourceName, gatewayId, eventhubAssetId, "default", "", "", "", "Sql"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify eventhub asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(eventhubResourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect asset, check that the DB asset is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AzureMsSqlServer(resourceName, gatewayId, assetId, "false", eventhubResourceTypeAndName+".asset_id"),
+					testAccDSFLogAggregatorConfig_AzureEventhub(eventhubResourceName, gatewayId, eventhubAssetId, "default", "", "", "", "Sql"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify eventhub asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(eventhubResourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccDSFDataSource_GcpBigQuery(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 
