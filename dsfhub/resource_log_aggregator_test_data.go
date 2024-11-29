@@ -33,6 +33,34 @@ resource "%[1]s" "%[2]s" {
 }`, dsfLogAggregatorResourceType, resourceName, dependsOn, testAdminEmail, gatewayId, assetId, parentAssetId, auditPullEnabled, auditType, parentAssetIdVal, awsLogGroupConnectionDefault)
 }
 
+// Output a terraform config for an AWS S3 log aggregator resource.
+func testAccDSFLogAggregatorConfig_AwsS3(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool, auditType string) string {
+	// handle reference to other assets
+	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
+  
+  return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type        = "AWS S3"
+
+  admin_email        = "%[3]s"
+  asset_display_name = "%[4]s"
+  asset_id           = "%[4]s"
+  audit_pull_enabled = %[5]t
+  audit_type         = "%[6]s"
+  bucket_account_id  = "%[7]s"
+  gateway_id         = "%[8]s"
+  parent_asset_id    = %[9]s
+  region             = "us-east-1"
+  server_host_name   = "%[4]s"
+
+  asset_connection {
+    auth_mechanism = "default"
+    reason         = "default"
+  }
+}
+  `, dsfLogAggregatorResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, auditType, testAwsAccountId, gatewayId, parentAssetIdVal)
+}
+
 // Output an asset_connection block for an AZURE EVENTHUB log aggregator resource.
 func azureEventhubConnectionBlock(authMechanism string, format string) string {
 	var output string

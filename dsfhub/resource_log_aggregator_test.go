@@ -15,7 +15,7 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 
 	const (
-		assetId            = "arn:aws:logs:us-east-2:123456789012:log-group:/aws/rds/instance/my-database/audit:*"
+		assetId            = testAwsLogGroupPrefix + "/aws/rds/instance/my-database/audit:*"
 		resourceName       = "my-database-log-group"
 		serverHostName     = "oracle-rds-db.xxxxx8rsfzja.us-east-2.rds.amazonaws.com"
 		parentAssetId      = "arn:aws:rds:us-east-2:123456789012:db:oracle-rds-db"
@@ -45,6 +45,36 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-aws@oracle-rds.service"),
 				),
 			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFLogAggregator_AwsS3(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		assetId            = "arn:aws:s3:::my-s3-bucket"
+		resourceName       = "my-s3-bucket"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Test various audit types
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", false, "")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", false, "LOG_GROUP")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", false, "REDSHIFT")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", false, "CLOUDWATCH")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", false, "DYNAMODB")},
 			// validate import
 			{
 				ResourceName:      resourceTypeAndName,
