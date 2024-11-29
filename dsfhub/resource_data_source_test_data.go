@@ -33,7 +33,7 @@ func testAccDSFDataSourceConfig_AwsDocumentdbCluster(resourceName string, gatewa
 		auditPullEnabled = "null"
 	}
 
-  return fmt.Sprintf(`
+	return fmt.Sprintf(`
 resource "%[1]s" "%[2]s" {
   server_type        = "AWS DOCUMENTDB CLUSTER"
 
@@ -50,6 +50,87 @@ resource "%[1]s" "%[2]s" {
   %[7]s
 }
 `, dsfDataSourceResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, gatewayId, commonBasicConnectionPassword)
+}
+
+const awsDynamodbConnectionDefault = `
+  asset_connection {
+    auth_mechanism  = "default"
+    reason          = "default"
+  }
+`
+
+const awsDynamodbConnectionIamRole = `
+  asset_connection {
+    auth_mechanism  = "iam_role"
+    reason          = "default"
+  }
+`
+
+var awsDynamodbConnectionKey = fmt.Sprintf(`
+  asset_connection {
+    access_id       = "my-access-id"
+    auth_mechanism  = "key"
+    reason          = "default"
+    secret_key      = "my-secret-key"
+  }
+
+  %[1]s
+`, ignoreAssetConnectionChangesBlock())
+
+const awsDynamodbConnectionProfile = `
+  asset_connection {
+    auth_mechanism  = "profile"
+    reason          = "default"
+    username        = "dsfhubuser"
+  }
+`
+
+func awsDynamodbConnectionBlock(authMechanism string) string {
+	var assetConnectionBlock string
+
+	// build the asset_connection block
+	switch authMechanism {
+	case "key":
+		assetConnectionBlock = awsDynamodbConnectionKey
+	case "profile":
+		assetConnectionBlock = awsDynamodbConnectionProfile
+	case "iam_role":
+		assetConnectionBlock = awsDynamodbConnectionIamRole
+	case "default":
+		assetConnectionBlock = awsDynamodbConnectionDefault
+	default:
+		assetConnectionBlock = awsDynamodbConnectionDefault
+	}
+
+	return assetConnectionBlock
+}
+
+// Output a terraform config for an AWS DYNAMODB data source resource.
+func testAccDSFDataSourceConfig_AwsDynamodb(resourceName string, gatewayId string, assetId string, auditPullEnabled string, authMechanism string) string {
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+	assetConnectionBlock := awsDynamodbConnectionBlock(authMechanism)
+
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type        = "AWS DYNAMODB"
+
+  admin_email        = "%[3]s"
+  asset_display_name = "%[4]s"
+  asset_id           = "%[4]s"
+  arn                = "%[4]s"
+  audit_pull_enabled = %[5]s
+  available_regions  = ["us-west-1", "us-east-1"]
+  gateway_id         = "%[6]s"
+  region             = "us-east-1"
+  server_port        = "27017"
+
+  %[7]s
+}
+`, dsfDataSourceResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, gatewayId, assetConnectionBlock)
 }
 
 // Output a terraform config for an AWS RDS ORACLE data source resource.
@@ -253,7 +334,7 @@ func testAccDSFDataSourceConfig_AzureMsSqlServer(resourceName string, gatewayId 
 		auditPullEnabled = "null"
 	}
 
-  return fmt.Sprintf(`
+	return fmt.Sprintf(`
 resource "%[1]s" "%[2]s" {
   server_type               = "AZURE MS SQL SERVER"
 
@@ -283,7 +364,7 @@ func testAccDSFDataSourceConfig_AzurePostgresqlFlexible(resourceName string, gat
 		auditPullEnabled = "null"
 	}
 
-  return fmt.Sprintf(`
+	return fmt.Sprintf(`
 resource "%[1]s" "%[2]s" {
   server_type               = "AZURE POSTGRESQL FLEXIBLE"
 
@@ -312,7 +393,7 @@ func testAccDSFDataSourceConfig_AzureSqlManagedInstance(resourceName string, gat
 		auditPullEnabled = "null"
 	}
 
-  return fmt.Sprintf(`
+	return fmt.Sprintf(`
 resource "%[1]s" "%[2]s" {
   server_type               = "AZURE SQL MANAGED INSTANCE"
 

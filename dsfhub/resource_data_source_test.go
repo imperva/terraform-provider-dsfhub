@@ -106,6 +106,161 @@ func TestAccDSFDataSource_AwsDocumentdbCluster(t *testing.T) {
 	})
 }
 
+func TestAccDSFDataSource_AwsDynamodbBasic(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		assetId      = "aws_dynamodb_basic"
+		resourceName = "aws_dynamodb_basic"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// check various auth mechanisms
+			{Config: testAccDSFDataSourceConfig_AwsDynamodb(resourceName, gatewayId, assetId, "", "iam_role")},
+			{Config: testAccDSFDataSourceConfig_AwsDynamodb(resourceName, gatewayId, assetId, "", "key")},
+			{Config: testAccDSFDataSourceConfig_AwsDynamodb(resourceName, gatewayId, assetId, "", "profile")},
+			{Config: testAccDSFDataSourceConfig_AwsDynamodb(resourceName, gatewayId, assetId, "", "default")},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFDataSource_AwsDynamodbCloudwatch(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		assetId      = "aws_dynamodb_cloudwatch_onboarding"
+		resourceName = "aws_dynamodb_cloudwatch_onboarding"
+
+		logGroupAssetId      = testAwsLogGroupPrefix + "/aws/events/Dynamodb:*"
+		logGroupResourceName = resourceName + "_log_group"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	logGroupResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, logGroupResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the log group is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsDynamodb(resourceName, gatewayId, assetId, "", "default"),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", true, "", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", "gateway-aws@dynamodb.service"),
+				),
+			},
+			// refresh and verify DB asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect asset, check that the log group is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsDynamodb(resourceName, gatewayId, assetId, "", "default"),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", false, "", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", ""),
+				),
+			},
+			// refresh and verify DB asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFDataSource_AwsDynamodbS3(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		assetId      = "aws_dynamodb_s3_onboarding"
+		resourceName = "aws_dynamodb_s3_onboarding"
+
+		s3BucketAssetId      = testAwsS3BucketPrefix + "dynamodb-s3-bucket"
+		s3BucketResourceName = resourceName + "_bucket"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	s3BucketResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, s3BucketResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the s3 bucket is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsDynamodb(resourceName, gatewayId, assetId, "", "default"),
+					testAccDSFLogAggregatorConfig_AwsS3(s3BucketResourceName, gatewayId, s3BucketAssetId, resourceTypeAndName+".asset_id", true, "DYNAMODB"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(s3BucketResourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// refresh and verify DB asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect asset, check that the s3 bucket is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsDynamodb(resourceName, gatewayId, assetId, "", "default"),
+					testAccDSFLogAggregatorConfig_AwsS3(s3BucketResourceName, gatewayId, s3BucketAssetId, resourceTypeAndName+".asset_id", false, "DYNAMODB"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(s3BucketResourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// refresh and verify DB asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 

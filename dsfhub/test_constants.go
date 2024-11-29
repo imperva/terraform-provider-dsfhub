@@ -23,6 +23,7 @@ const (
 
 	testAwsAccountId             = "123456789012"
 	testAwsLogGroupPrefix        = "arn:aws:logs:us-east-1:" + testAwsAccountId + ":log-group:"
+	testAwsS3BucketPrefix        = "arn:aws:s3:::"
 	testAzurePrefix              = "/subscriptions/my-subscription-id/resourceGroups/my-resource-group/providers/"
 	testEventhubPrefix           = testAzurePrefix + "Microsoft.EventHub/namespaces/my-namespace/eventhubs/"
 	testPubsubSubscriptionPrefix = "projects/my-project/subscriptions/"
