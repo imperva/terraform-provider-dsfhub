@@ -59,8 +59,8 @@ func TestAccDSFLogAggregator_AwsS3(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 
 	const (
-		assetId            = "arn:aws:s3:::my-s3-bucket"
-		resourceName       = "my-s3-bucket"
+		assetId      = testAwsS3BucketPrefix + "my-s3-bucket"
+		resourceName = "my-s3-bucket"
 	)
 
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)

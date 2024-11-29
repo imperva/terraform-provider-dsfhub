@@ -37,8 +37,8 @@ resource "%[1]s" "%[2]s" {
 func testAccDSFLogAggregatorConfig_AwsS3(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool, auditType string) string {
 	// handle reference to other assets
 	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
-  
-  return fmt.Sprintf(`
+
+	return fmt.Sprintf(`
 resource "%[1]s" "%[2]s" {
   server_type        = "AWS S3"
 
