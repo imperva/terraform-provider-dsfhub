@@ -499,6 +499,98 @@ func TestAccDSFDataSource_AwsRdsAuroraPostgresqlClusterCloudWatch(t *testing.T) 
 	})
 }
 
+func TestAccDSFDataSource_AwsRdsAuroraPostgresqlClusterKinesis(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		assetId      = testAwsRdsClusterPrefix + "my-aurorapostgresql-kinesis-cluster"
+		resourceName = "aurora_postgresql_kinesis_cluster_onboarding"
+
+		instanceAssetId      = assetId + "-writer"
+		instanceResourceName = resourceName + "_instance"
+
+		kinesisAssetId      = testAwsKinesisPrefix + resourceName
+		kinesisResourceName = resourceName + "_kinesis_stream"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	instanceResourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, instanceResourceName)
+	kinesisResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, kinesisResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, check that the kinesis stream is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresqlCluster(resourceName, gatewayId, assetId, "", resourceName),
+					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresql(instanceResourceName, gatewayId, instanceAssetId, resourceName),
+					testAccDSFLogAggregatorConfig_AwsKinesis(kinesisResourceName, gatewayId, kinesisAssetId, resourceTypeAndName+".asset_id", true, "KINESIS"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(kinesisResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(kinesisResourceTypeAndName, "gateway_service", "gateway-kinesis@aurora-postgresql.service"),
+				),
+			},
+			// refresh and verify DB assets are connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(instanceResourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// update audit_type -> reconnect asset to gateway
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresqlCluster(resourceName, gatewayId, assetId, "", resourceName),
+					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresql(instanceResourceName, gatewayId, instanceAssetId, resourceName),
+					testAccDSFLogAggregatorConfig_AwsKinesis(kinesisResourceName, gatewayId, kinesisAssetId, resourceTypeAndName+".asset_id", true, "KINESIS_AGGREGATED"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(kinesisResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(kinesisResourceTypeAndName, "gateway_service", "gateway-kinesis@aurora-postgresql-aggregated.service"),
+				),
+			},
+			// refresh and verify DB assets are still connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(instanceResourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect gateway, check that the kinesis stream is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresqlCluster(resourceName, gatewayId, assetId, "", resourceName),
+					testAccDSFDataSourceConfig_AwsRdsAuroraPostgresql(instanceResourceName, gatewayId, instanceAssetId, resourceName),
+					testAccDSFLogAggregatorConfig_AwsKinesis(kinesisResourceName, gatewayId, kinesisAssetId, resourceTypeAndName+".asset_id", false, "KINESIS_AGGREGATED"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(kinesisResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(kinesisResourceTypeAndName, "gateway_service", ""),
+				),
+			},
+			// refresh and verify DB assets are disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(instanceResourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterCloudWatchSlowQuery(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 
