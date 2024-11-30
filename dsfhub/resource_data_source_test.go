@@ -46,7 +46,7 @@ func TestAccDSFDataSource_AwsDocumentdbCluster(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 
 	const (
-		assetId      = "arn:aws:rds:us-east-1:123456789012:cluster:my-docdb-cluster"
+		assetId      = testAwsRdsClusterPrefix + "my-docdb-cluster"
 		resourceName = "aws_documentdb_onboarding"
 
 		logGroupAssetId      = testAwsLogGroupPrefix + "/aws/docdb/my-docdb-cluster/audit:*"
@@ -261,10 +261,76 @@ func TestAccDSFDataSource_AwsDynamodbS3(t *testing.T) {
 	})
 }
 
-func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
+func TestAccDSFDataSource_AwsRdsOracleCloudwatch(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 
-	const resourceName = "rds_oracle_connect_disconnect_gateway"
+	const (
+		resourceName = "rds_oracle_cloudwatch"
+		assetId = testAwsRdsDbPrefix + resourceName
+
+		logGroupResourceName = resourceName + "_log_group"
+		logGroupAssetId = testAwsLogGroupPrefix + "/aws/rds/instance/rds_oracle_cloudwatch/audit:*"
+	)
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	logGroupResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, logGroupResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway, verify log group is connected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, assetId, "LOG_GROUP", ""),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", true, "", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", "gateway-aws@oracle-rds.service"),
+				),
+			},
+			// refresh and verify DB asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect asset, verify log group is disconnected
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, assetId, "LOG_GROUP", ""),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", false, "", ""),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", ""),
+				),
+			},
+			// refresh and verify DB asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFDataSource_AwsRdsOracleUnified(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		resourceName = "rds_oracle_unified"
+		assetId = testAwsRdsDbPrefix + resourceName
+	)
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -273,7 +339,7 @@ func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
 		Steps: []resource.TestStep{
 			// onboard and connect to gateway
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, resourceName, "UNIFIED", "true"),
+				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, assetId, "UNIFIED", "true"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-odbc@oracle_unified.service"),
@@ -281,7 +347,7 @@ func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
 			},
 			// update audit_type -> reconnect asset to gateway
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, resourceName, "UNIFIED_AGGREGATED", "true"),
+				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, assetId, "UNIFIED_AGGREGATED", "true"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-odbc@oracle_unified_aggregated.service"),
@@ -289,7 +355,7 @@ func TestAccDSFDataSource_AwsRdsOracleConnectDisconnectGateway(t *testing.T) {
 			},
 			// disconnect asset
 			{
-				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, resourceName, "UNIFIED_AGGREGATED", "false"),
+				Config: testAccDSFDataSourceConfig_AwsRdsOracle(resourceName, gatewayId, assetId, "UNIFIED_AGGREGATED", "false"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
@@ -309,13 +375,13 @@ func TestAccDSFDataSource_AwsRdsAuroraPostgresqlClusterCloudWatch(t *testing.T) 
 	gatewayId := checkGatewayId(t)
 
 	const (
-		assetId      = "arn:aws:rds:us-east-2:123456789012:cluster:my-aurorapostgresql-cluster"
+		assetId      = testAwsRdsClusterPrefix + "my-aurorapostgresql-cluster"
 		resourceName = "aurora_postgresql_cluster_onboarding"
 
 		instanceAssetId      = assetId + "-writer"
 		instanceResourceName = resourceName + "_instance"
 
-		logGroupAssetId      = "arn:aws:logs:us-east-2:123456789012:log-group:/aws/rds/cluster/my-cluster/postgresql:*"
+		logGroupAssetId      = testAwsLogGroupPrefix + "/aws/rds/cluster/my-cluster/postgresql:*"
 		logGroupResourceName = resourceName + "_log_group"
 	)
 
@@ -361,16 +427,16 @@ func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterCloudWatchSlowQuery(t *testing
 	gatewayId := checkGatewayId(t)
 
 	const (
-		assetId      = "arn:aws:rds:us-east-2:123456789012:cluster:my-auroramysql-cluster"
+		assetId      = testAwsRdsClusterPrefix + "my-auroramysql-cluster"
 		resourceName = "aurora_mysql_cluster_onboarding"
 
 		instanceAssetId      = assetId + "-writer"
 		instanceResourceName = resourceName + "_instance"
 
-		logGroupAssetId      = "arn:aws:logs:us-east-2:123456789012:log-group:/aws/rds/cluster/my-aurora-cluster/audit:*"
+		logGroupAssetId      = testAwsLogGroupPrefix + "/aws/rds/cluster/my-aurora-cluster/audit:*"
 		logGroupResourceName = resourceName + "_log_group"
 
-		slowLogGroupAssetId      = "arn:aws:logs:us-east-2:123456789012:log-group:/aws/rds/cluster/my-aurora-cluster/slowquery:*"
+		slowLogGroupAssetId      = testAwsLogGroupPrefix + "/aws/rds/cluster/my-aurora-cluster/slowquery:*"
 		slowLogGroupResourceName = resourceName + "_slow_log_group"
 	)
 
