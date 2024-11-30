@@ -199,6 +199,82 @@ func TestAccDSFDataSource_AwsDynamodbCloudwatch(t *testing.T) {
 	})
 }
 
+func TestAccDSFDataSource_AwsNeptuneClusterSlowQuery(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		assetId      = testAwsRdsClusterPrefix + "my-neptune-cluster"
+		resourceName = "aurora_neptune_cluster_onboarding"
+
+		logGroupAssetId      = testAwsLogGroupPrefix + "/aws/rds/cluster/my-neptune-cluster/audit:*"
+		logGroupResourceName = resourceName + "_log_group"
+
+		slowLogGroupAssetId      = testAwsLogGroupPrefix + "/aws/rds/cluster/my-neptune-cluster/slowquery:*"
+		slowLogGroupResourceName = resourceName + "_slow_log_group"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
+	logGroupResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, logGroupResourceName)
+	slowLogGroupResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, slowLogGroupResourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// onboard and connect to gateway
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsNeptuneCluster(resourceName, gatewayId, assetId, ""),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", true, "LOG_GROUP", ""),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(slowLogGroupResourceName, gatewayId, slowLogGroupAssetId, resourceTypeAndName+".asset_id", true, "AWS_NEPTUNE_SLOW", logGroupResourceTypeAndName),
+				),
+				// verify log group assets are connected
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", "gateway-aws@neptune.service"),
+					resource.TestCheckResourceAttr(slowLogGroupResourceTypeAndName, "audit_pull_enabled", "true"),
+					resource.TestCheckResourceAttr(slowLogGroupResourceTypeAndName, "gateway_service", "gateway-aws@neptune-slow-query.service"),
+				),
+			},
+			// refresh and verify DB asset is connected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "true"),
+				),
+			},
+			// disconnect assets
+			{
+				Config: ConfigCompose(
+					testAccDSFDataSourceConfig_AwsNeptuneCluster(resourceName, gatewayId, assetId, ""),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(logGroupResourceName, gatewayId, logGroupAssetId, resourceTypeAndName+".asset_id", false, "LOG_GROUP", ""),
+					testAccDSFLogAggregatorConfig_AwsLogGroup(slowLogGroupResourceName, gatewayId, slowLogGroupAssetId, resourceTypeAndName+".asset_id", false, "AWS_NEPTUNE_SLOW", logGroupResourceTypeAndName),
+				),
+				// verify log group assets are connected
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(logGroupResourceTypeAndName, "gateway_service", ""),
+					resource.TestCheckResourceAttr(slowLogGroupResourceTypeAndName, "audit_pull_enabled", "false"),
+					resource.TestCheckResourceAttr(slowLogGroupResourceTypeAndName, "gateway_service", ""),
+				),
+			},
+			// refresh and verify DB asset is disconnected
+			{
+				RefreshState: true,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "audit_pull_enabled", "false"),
+				),
+			},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccDSFDataSource_AwsDynamodbS3(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 

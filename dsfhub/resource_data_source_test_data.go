@@ -133,6 +133,33 @@ resource "%[1]s" "%[2]s" {
 `, dsfDataSourceResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, gatewayId, assetConnectionBlock)
 }
 
+const awsNeptuneClusterConnectionEc2 = `
+  asset_connection {
+    auth_mechanism = "ec2"
+    reason         = "default"
+  }
+`
+
+// Output a terraform config for an AWS NEPTUNE CLUSTER data source resource.
+func testAccDSFDataSourceConfig_AwsNeptuneCluster(resourceName string, gatewayId string, assetId string, auditType string) string {
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type        = "AWS NEPTUNE CLUSTER"
+
+  admin_email	       = "%[3]s"
+  asset_display_name = "%[5]s"
+  asset_id           = "%[5]s"
+  audit_type         = "%[6]s"
+  gateway_id         = "%[4]s"
+  region             = "us-east-2"
+  server_host_name   = "my-cluster.cluster-xxxxk8rsfzja.us-east-2.rds.amazonaws.com"
+  server_port        = "5432"
+
+  %[7]s
+}	
+`, dsfDataSourceResourceType, resourceName, testAdminEmail, gatewayId, assetId, auditType, awsNeptuneClusterConnectionEc2)
+}
+
 // Output a terraform config for an AWS RDS ORACLE data source resource.
 func testAccDSFDataSourceConfig_AwsRdsOracle(resourceName string, gatewayId string, assetId string, auditType string, auditPullEnabled string) string {
 	// convert audit_pull_enabled to "null" if empty
