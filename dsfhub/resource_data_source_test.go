@@ -342,10 +342,10 @@ func TestAccDSFDataSource_AwsRdsOracleCloudwatch(t *testing.T) {
 
 	const (
 		resourceName = "rds_oracle_cloudwatch"
-		assetId = testAwsRdsDbPrefix + resourceName
+		assetId      = testAwsRdsDbPrefix + resourceName
 
 		logGroupResourceName = resourceName + "_log_group"
-		logGroupAssetId = testAwsLogGroupPrefix + "/aws/rds/instance/rds_oracle_cloudwatch/audit:*"
+		logGroupAssetId      = testAwsLogGroupPrefix + "/aws/rds/instance/rds_oracle_cloudwatch/audit:*"
 	)
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
 	logGroupResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, logGroupResourceName)
@@ -405,7 +405,7 @@ func TestAccDSFDataSource_AwsRdsOracleUnified(t *testing.T) {
 
 	const (
 		resourceName = "rds_oracle_unified"
-		assetId = testAwsRdsDbPrefix + resourceName
+		assetId      = testAwsRdsDbPrefix + resourceName
 	)
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
 
