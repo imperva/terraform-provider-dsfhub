@@ -22,6 +22,7 @@ const (
 	testSMServerType = "HASHICORP"
 
 	testAwsAccountId             = "123456789012"
+	testAwsKinesisPrefix         = "arn:aws:kinesis:us-east-1:" + testAwsAccountId + ":stream/"
 	testAwsLogGroupPrefix        = "arn:aws:logs:us-east-1:" + testAwsAccountId + ":log-group:"
 	testAwsRdsPrefix             = "arn:aws:rds:us-east-2:123456789012"
 	testAwsRdsClusterPrefix      = testAwsRdsPrefix + ":cluster:"

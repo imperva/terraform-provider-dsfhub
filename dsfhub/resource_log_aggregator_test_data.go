@@ -2,13 +2,35 @@ package dsfhub
 
 import "fmt"
 
-const awsLogGroupConnectionDefault = `
+const awsCommonConnectionDefault = `
   asset_connection {
     auth_mechanism = "default"
     reason         = "default"
     region         = "us-east-2"
   }
 `
+
+// Output a terraform config for an AWS KINESIS log aggregator resource.
+func testAccDSFLogAggregatorConfig_AwsKinesis(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool, auditType string) string {
+	// handle reference to other assets
+	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
+
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type        = "AWS KINESIS"
+
+  admin_email        = "%[3]s"
+  asset_display_name = "%[4]s"
+  asset_id           = "%[4]s"
+  audit_pull_enabled = %[5]t
+  audit_type         = "%[6]s"
+  gateway_id         = "%[7]s"
+  parent_asset_id    = %[8]s
+
+  %[9]s
+}
+  `, dsfLogAggregatorResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, auditType, gatewayId, parentAssetIdVal, awsCommonConnectionDefault)
+}
 
 // Output a terraform config for an AWS LOG GROUP log aggregator resource.
 func testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool, auditType string, dependsOn string) string {
@@ -30,7 +52,7 @@ resource "%[1]s" "%[2]s" {
   parent_asset_id    = %[10]s
 
   %[11]s
-}`, dsfLogAggregatorResourceType, resourceName, dependsOn, testAdminEmail, gatewayId, assetId, parentAssetId, auditPullEnabled, auditType, parentAssetIdVal, awsLogGroupConnectionDefault)
+}`, dsfLogAggregatorResourceType, resourceName, dependsOn, testAdminEmail, gatewayId, assetId, parentAssetId, auditPullEnabled, auditType, parentAssetIdVal, awsCommonConnectionDefault)
 }
 
 // Output a terraform config for an AWS S3 log aggregator resource.

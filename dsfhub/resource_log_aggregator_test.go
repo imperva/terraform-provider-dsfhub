@@ -11,6 +11,38 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
+func TestAccDSFLogAggregator_AwsKinesis(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		resourceName = "aws_kinesis_basic"
+		assetId      = testAwsKinesisPrefix + resourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Failed: bad audit_type
+			{
+				Config:      testAccDSFLogAggregatorConfig_AwsKinesis(resourceName, gatewayId, assetId, "", false, "BAD_AUDIT_TYPE"),
+				ExpectError: regexp.MustCompile("Asset attribute options mismatch: the value 'BAD_AUDIT_TYPE' for field 'audit_type' is invalid"),
+			},
+			// Test various audit types
+			{Config: testAccDSFLogAggregatorConfig_AwsKinesis(resourceName, gatewayId, assetId, "", false, "KINESIS")},
+			{Config: testAccDSFLogAggregatorConfig_AwsKinesis(resourceName, gatewayId, assetId, "", false, "KINESIS_AGGREGATED")},
+			// Validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 
