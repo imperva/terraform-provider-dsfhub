@@ -13,7 +13,7 @@ func TestAccDSFCloudAccount_Aws(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 
 	const (
-		assetId      = "arn:aws:iam::123456789012"
+		assetId      = testAwsAccountArnPrefix + "basic-role"
 		resourceName = "aws-cloud-account"
 	)
 

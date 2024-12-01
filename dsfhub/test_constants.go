@@ -22,11 +22,13 @@ const (
 	testSMServerType = "HASHICORP"
 
 	testAwsAccountId             = "123456789012"
+	testAwsAccountArnPrefix      = "arn:aws:iam::" + testAwsAccountId + ":role/"
 	testAwsKinesisPrefix         = "arn:aws:kinesis:us-east-1:" + testAwsAccountId + ":stream/"
 	testAwsLogGroupPrefix        = "arn:aws:logs:us-east-1:" + testAwsAccountId + ":log-group:"
 	testAwsRdsPrefix             = "arn:aws:rds:us-east-2:123456789012"
 	testAwsRdsClusterPrefix      = testAwsRdsPrefix + ":cluster:"
 	testAwsRdsDbPrefix           = testAwsRdsPrefix + ":db:"
+	testAwsRedshiftPrefix        = "arn:aws:redshift:us-east-1:" + testAwsAccountId + ":cluster:"
 	testAwsS3BucketPrefix        = "arn:aws:s3:::"
 	testAzurePrefix              = "/subscriptions/my-subscription-id/resourceGroups/my-resource-group/providers/"
 	testEventhubPrefix           = testAzurePrefix + "Microsoft.EventHub/namespaces/my-namespace/eventhubs/"

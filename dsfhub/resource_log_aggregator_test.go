@@ -102,11 +102,11 @@ func TestAccDSFLogAggregator_AwsS3(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			// Test various audit types
-			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", false, "")},
-			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", false, "LOG_GROUP")},
-			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", false, "REDSHIFT")},
-			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", false, "CLOUDWATCH")},
-			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", false, "DYNAMODB")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "LOG_GROUP")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "REDSHIFT")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "CLOUDWATCH")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "DYNAMODB")},
 			// validate import
 			{
 				ResourceName:      resourceTypeAndName,

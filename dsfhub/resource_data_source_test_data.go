@@ -49,7 +49,14 @@ resource "%[1]s" "%[2]s" {
 
   %[7]s
 }
-`, dsfDataSourceResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, gatewayId, commonBasicConnectionPassword)
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		assetId,
+		auditPullEnabled,
+		gatewayId,
+		commonBasicConnectionPassword)
 }
 
 const awsDynamodbConnectionDefault = `
@@ -130,7 +137,14 @@ resource "%[1]s" "%[2]s" {
 
   %[7]s
 }
-`, dsfDataSourceResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, gatewayId, assetConnectionBlock)
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		assetId,
+		auditPullEnabled,
+		gatewayId,
+		assetConnectionBlock)
 }
 
 const awsNeptuneClusterConnectionEc2 = `
@@ -157,7 +171,14 @@ resource "%[1]s" "%[2]s" {
 
   %[7]s
 }	
-`, dsfDataSourceResourceType, resourceName, testAdminEmail, gatewayId, assetId, auditType, awsNeptuneClusterConnectionEc2)
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		gatewayId,
+		assetId,
+		auditType,
+		awsNeptuneClusterConnectionEc2)
 }
 
 // Output a terraform config for an AWS RDS ORACLE data source resource.
@@ -183,7 +204,15 @@ resource "%[1]s" "%[2]s" {
 
   %[8]s
 }
-`, dsfDataSourceResourceType, resourceName, testAdminEmail, gatewayId, assetId, auditType, auditPullEnabled, commonBasicConnectionPassword)
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		gatewayId,
+		assetId,
+		auditType,
+		auditPullEnabled,
+		commonBasicConnectionPassword)
 }
 
 // Output a terraform config for an AWS RDS AURORA POSTGRESQL CLUSTER data
@@ -206,7 +235,15 @@ resource "%[1]s" "%[2]s" {
 
   %[8]s
 }	
-`, dsfDataSourceResourceType, resourceName, testAdminEmail, gatewayId, assetId, auditType, clusterId, commonBasicConnectionPassword)
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		gatewayId,
+		assetId,
+		auditType,
+		clusterId,
+		commonBasicConnectionPassword)
 }
 
 // Output a terraform config for an AWS RDS AURORA POSTGRESQL data source
@@ -228,7 +265,14 @@ resource "%[1]s" "%[2]s" {
 
   %[7]s
 }	
-`, dsfDataSourceResourceType, resourceName, testAdminEmail, gatewayId, assetId, clusterId, commonBasicConnectionPassword)
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		gatewayId,
+		assetId,
+		clusterId,
+		commonBasicConnectionPassword)
 }
 
 // Output a terraform config for an AWS RDS AURORA MYSQL CLUSTER data source
@@ -251,7 +295,15 @@ resource "%[1]s" "%[2]s" {
 
   %[8]s
 }	
-`, dsfDataSourceResourceType, resourceName, testAdminEmail, gatewayId, assetId, auditType, clusterId, commonBasicConnectionPassword)
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		gatewayId,
+		assetId,
+		auditType,
+		clusterId,
+		commonBasicConnectionPassword)
 }
 
 // Output a terraform config for an AWS RDS AURORA MYSQL data source resource.
@@ -273,7 +325,180 @@ resource "%[1]s" "%[2]s" {
 
   %[7]s
 }
-`, dsfDataSourceResourceType, resourceName, testAdminEmail, gatewayId, assetId, clusterId, commonBasicConnectionPassword)
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		gatewayId,
+		assetId,
+		clusterId,
+		commonBasicConnectionPassword)
+}
+
+// Output a terraform config for an AWS RDS MARIADB data source resource.
+func testAccDSFDataSourceConfig_AwsRdsMariadb(resourceName string, gatewayId string, assetId string) string {
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type        = "AWS RDS MARIADB"
+
+  admin_email        = "%[3]s"
+  asset_display_name = "%[4]s"
+  asset_id           = "%[4]s"
+  database_name      = "my-database"
+  gateway_id         = "%[5]s"
+  #parent_asset_id    = "todo"
+  region             = "us-east-2"
+  server_host_name   = "my-database.xxxxk8rsfzja.us-east-2.rds.amazonaws.com"
+  server_port        = "3306"
+}  
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		assetId,
+		gatewayId)
+}
+
+// Output a terraform config for an AWS RDS MS SQL SERVER data source resource.
+func testAccDSFDataSourceConfig_AwsRdsMsSqlServer(resourceName string, gatewayId string, assetId string, auditPullEnabled string, logsDestinationAssetId string) string {
+	// handle reference to other assets
+	logsDestinationAssetIdVal := testAccParseResourceAttributeReference(logsDestinationAssetId)
+
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type               = "AWS RDS MS SQL SERVER"
+
+  admin_email               = "%[3]s"
+  asset_display_name        = "%[4]s"
+  asset_id                  = "%[4]s"
+  audit_pull_enabled        = %[5]s
+  database_name             = "master"
+  gateway_id                = "%[6]s"
+  logs_destination_asset_id = %[7]s
+  #parent_asset_id           = "todo"
+  region                    = "us-east-2"
+  server_host_name          = "my-database.xxxxk8rsfzja.us-east-2.rds.amazonaws.com"
+  server_port               = "3306"
+}  
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		assetId,
+		auditPullEnabled,
+		gatewayId,
+		logsDestinationAssetIdVal)
+}
+
+// Output a terraform config for an AWS RDS MYSQL data source resource.
+func testAccDSFDataSourceConfig_AwsRdsMysql(resourceName string, gatewayId string, assetId string, auditType string) string {
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type        = "AWS RDS MYSQL"
+
+  admin_email        = "%[3]s"
+  asset_display_name = "%[4]s"
+  asset_id           = "%[4]s"
+  audit_type         = "%[5]s"
+  database_name      = "master"
+  gateway_id         = "%[6]s"
+  #parent_asset_id    = "todo"
+  region             = "us-east-2"
+  server_host_name   = "my-rds-name.cp9pk8xxxxxx.<region>.rds.amazonaws.com"
+  server_port        = "3306"
+}  
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		assetId,
+		auditType,
+		gatewayId)
+}
+
+// Output a terraform config for an AWS RDS POSTGRESQL data source resource.
+func testAccDSFDataSourceConfig_AwsRdsPostgresql(resourceName string, gatewayId string, assetId string, auditType string) string {
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type        = "AWS RDS POSTGRESQL"
+
+  admin_email        = "%[3]s"
+  asset_display_name = "%[4]s"
+  asset_id           = "%[4]s"
+  audit_type         = "%[5]s
+  database_name      = "postgresql"
+  gateway_id         = "%[6]s"
+  #parent_asset_id    = "todo"
+  region             = "us-east-2"
+  server_host_name   = "my-database.xxxxr5ierus0.us-east-1.rds.amazonaws.com"
+  server_port        = "3306"
+}  
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		assetId,
+		auditType,
+		gatewayId)
+}
+
+var AwsRedshiftConnectionPassword = fmt.Sprintf(`
+  asset_connection {
+    auth_mechanism = "password"
+    database_name  = "dev"
+    password       = "password"
+    reason         = "default"
+    username       = "username"
+  }
+
+  %[1]s
+`, ignoreAssetConnectionChangesBlock())
+
+// Output a terraform config for an AWS REDSHIFT data source resource.
+func testAccDSFDataSourceConfig_AwsRedshift(resourceName string, gatewayId string, assetId string, auditType string, auditPullEnabled string, logsDestinationAssetId string) string {
+	// handle reference to other assets
+	logsDestinationAssetIdVal := testAccParseResourceAttributeReference(logsDestinationAssetId)
+
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
+
+	return fmt.Sprintf(`
+resource "%[1]s" "%[2]s" {
+  server_type               = "AWS REDSHIFT"
+
+  admin_email               = "%[3]s"
+  asset_display_name        = "%[4]s"
+  asset_id                  = "%[4]s"
+  audit_type                = "%[5]s"
+  audit_pull_enabled        = %[6]s
+  gateway_id                = "%[7]s"
+  logs_destination_asset_id = %[8]s
+  #parent_asset_id           = "todo"
+  region                    = "us-east-2"
+  server_host_name          = "my-database.xxxxr5ierus0.us-east-1.rds.amazonaws.com"
+  server_ip                 = "1.2.3.4"
+  server_port               = "5439"
+
+  %[9]s
+}  
+`,
+		dsfDataSourceResourceType,
+		resourceName,
+		testAdminEmail,
+		assetId,
+		auditType,
+		auditPullEnabled,
+		gatewayId,
+		logsDestinationAssetIdVal,
+		AwsRedshiftConnectionPassword, //TODO: support aws_credentials
+	)
 }
 
 // Output a terraform config for an AZURE COSMOSDB data source resource.

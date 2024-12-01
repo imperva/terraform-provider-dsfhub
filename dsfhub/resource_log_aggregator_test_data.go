@@ -56,9 +56,14 @@ resource "%[1]s" "%[2]s" {
 }
 
 // Output a terraform config for an AWS S3 log aggregator resource.
-func testAccDSFLogAggregatorConfig_AwsS3(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool, auditType string) string {
+func testAccDSFLogAggregatorConfig_AwsS3(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled string, auditType string) string {
 	// handle reference to other assets
 	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
+
+	// convert audit_pull_enabled to "null" if empty
+	if auditPullEnabled == "" {
+		auditPullEnabled = "null"
+	}
 
 	return fmt.Sprintf(`
 resource "%[1]s" "%[2]s" {
@@ -67,7 +72,7 @@ resource "%[1]s" "%[2]s" {
   admin_email        = "%[3]s"
   asset_display_name = "%[4]s"
   asset_id           = "%[4]s"
-  audit_pull_enabled = %[5]t
+  audit_pull_enabled = %[5]s
   audit_type         = "%[6]s"
   bucket_account_id  = "%[7]s"
   gateway_id         = "%[8]s"
