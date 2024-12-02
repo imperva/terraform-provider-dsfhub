@@ -9,6 +9,12 @@ const awsCommonConnectionDefault = `
     region         = "us-east-2"
   }
 `
+const awsS3ConnectionDefault = `
+  asset_connection {
+    auth_mechanism = "default"
+    reason         = "default"
+  }
+`
 
 // Output a terraform config for an AWS KINESIS log aggregator resource.
 func testAccDSFLogAggregatorConfig_AwsKinesis(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool, auditType string) string {
@@ -81,7 +87,17 @@ resource "%[1]s" "%[2]s" {
   server_host_name   = "%[4]s"
 
   %[10]s
-}`, dsfLogAggregatorResourceType, resourceName, testAdminEmail, gatewayId, assetId, parentAssetId, auditPullEnabled, auditType, parentAssetIdVal, awsCommonConnectionDefault)
+}`,
+		dsfLogAggregatorResourceType,
+		resourceName,
+		testAdminEmail,
+		assetId,
+		auditPullEnabled,
+		auditType,
+		testAwsAccountId,
+		gatewayId,
+		parentAssetIdVal,
+		awsS3ConnectionDefault)
 }
 
 // Output an asset_connection block for an AZURE EVENTHUB log aggregator resource.
