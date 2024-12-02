@@ -80,12 +80,8 @@ resource "%[1]s" "%[2]s" {
   region             = "us-east-1"
   server_host_name   = "%[4]s"
 
-  asset_connection {
-    auth_mechanism = "default"
-    reason         = "default"
-  }
-}
-  `, dsfLogAggregatorResourceType, resourceName, testAdminEmail, assetId, auditPullEnabled, auditType, testAwsAccountId, gatewayId, parentAssetIdVal)
+  %[11]s
+}`, dsfLogAggregatorResourceType, resourceName, testAdminEmail, gatewayId, assetId, parentAssetId, auditPullEnabled, auditType, parentAssetIdVal, awsCommonConnectionDefault)
 }
 
 // Output an asset_connection block for an AZURE EVENTHUB log aggregator resource.
