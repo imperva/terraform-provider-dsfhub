@@ -750,9 +750,11 @@ func TestAccDSFDataSource_AwsRdsPostgresql(t *testing.T) {
 	})
 }
 
-// TODO: determine why logs_destination_asset_id does not appear in USC and skip
-// this test until fixed
 func TestAccDSFDataSource_AwsRedshiftS3(t *testing.T) {
+	skipTestForKnownIssue(t, "4.17", "https://onejira.imperva.com/browse/USC-2396")
+	skipTestForKnownIssue(t, "4.18", "https://onejira.imperva.com/browse/USC-2396")
+	skipTestForKnownIssue(t, "master", "https://onejira.imperva.com/browse/USC-2396")
+
 	gatewayId := checkGatewayId(t)
 
 	const (
