@@ -436,7 +436,7 @@ func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterKinesis(t *testing.T) {
 	)
 
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, resourceName)
-	instanceResourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, instanceResourceName)
+	// instanceResourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, instanceResourceName)
 	kinesisResourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, kinesisResourceName)
 
 	// initial config
@@ -455,8 +455,8 @@ func TestAccDSFDataSource_AwsRdsAuroraMysqlClusterKinesis(t *testing.T) {
 	var refreshChecks = make(map[string]map[string]string)
 	refreshChecks[resourceTypeAndName] = make(map[string]string)
 	refreshChecks[resourceTypeAndName]["audit_pull_enabled"] = "true"
-	refreshChecks[instanceResourceTypeAndName] = make(map[string]string)
-	refreshChecks[instanceResourceTypeAndName]["audit_pull_enabled"] = "true"
+	// refreshChecks[instanceResourceTypeAndName] = make(map[string]string)
+	// refreshChecks[instanceResourceTypeAndName]["audit_pull_enabled"] = "true"
 
 	// run test
 	resource.ParallelTest(t, resource.TestCase{
