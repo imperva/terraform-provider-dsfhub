@@ -80,7 +80,7 @@ resource "%[1]s" "%[2]s" {
   region             = "us-east-1"
   server_host_name   = "%[4]s"
 
-  %[11]s
+  %[10]s
 }`, dsfLogAggregatorResourceType, resourceName, testAdminEmail, gatewayId, assetId, parentAssetId, auditPullEnabled, auditType, parentAssetIdVal, awsCommonConnectionDefault)
 }
 
