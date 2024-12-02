@@ -196,6 +196,8 @@ func connectDisconnectGatewaySteps(config string, initialAttrChecks map[string]m
 	return steps
 }
 
+// skipTestForKnownIssue takes in a DSF Hub version and skips the test if that 
+// version matches the one being used to run the test
 func skipTestForKnownIssue(t *testing.T, version string, details string) {
 	dsfhubVersion := os.Getenv("DSFHUB_VERSION")
 	if dsfhubVersion == version {
