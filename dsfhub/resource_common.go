@@ -816,7 +816,6 @@ func createIgnoreChangesBlock(ignoredAttributes []string) string {
 	// build list like
 	// ignore_changes = [ attribute1, attribute2 ]
 	ignoredFields = `[ ` + strings.Join(ignoredAttributes, `, `) + ` ]`
-	log.Printf("[INFO] creating ignore_changes list with ignored_fields: %s", ignoredFields)
 	ignoreChangesBlock = fmt.Sprintf(`
   lifecycle {
     ignore_changes = %[1]s
@@ -959,4 +958,11 @@ func connectDisconnectGatewaySteps(config string, initialAttrChecks map[string]m
 		steps = append(steps, validateImportStep(resourceTypeAndName))
 	}
 	return steps
+}
+
+func skipTestForKnownIssue(t *testing.T, version string, details string) {
+	dsfhubVersion := os.Getenv("DSFHUB_VERSION")
+	if dsfhubVersion == version {
+		t.Skipf("Skipping test %s for DSFHUB_VERSION '%s', details: '%s'", t.Name(), dsfhubVersion, details)
+	}
 }

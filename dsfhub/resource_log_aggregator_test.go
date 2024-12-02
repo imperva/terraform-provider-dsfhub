@@ -3,7 +3,6 @@ package dsfhub
 import (
 	"fmt"
 	"log"
-	"os"
 	"regexp"
 	"testing"
 
@@ -503,11 +502,7 @@ func TestAccDSFLogAggregator_GcpPubsubPostgresql(t *testing.T) {
 func TestAccDSFLogAggregator_GcpPubsubSpanner(t *testing.T) {
 	gatewayId := checkGatewayId(t)
 
-	skipVersions := []string{"4.17"}
-	dsfhubVersion := os.Getenv("DSFHUB_VERSION")
-	if contains(skipVersions, dsfhubVersion) {
-		t.Skipf("Skipping test for DSFHUB_VERSION %s. See SR-2063 for more details.", dsfhubVersion)
-	}
+	skipTestForKnownIssue(t, "4.17", "SR-2063")
 
 	const (
 		resourceName = "my-spanner-pubsub-subscription"
