@@ -430,7 +430,7 @@ resource "%[1]s" "%[2]s" {
   admin_email        = "%[3]s"
   asset_display_name = "%[4]s"
   asset_id           = "%[4]s"
-  audit_type         = "%[5]s
+  audit_type         = "%[5]s"
   database_name      = "postgresql"
   gateway_id         = "%[6]s"
   #parent_asset_id    = "todo"
