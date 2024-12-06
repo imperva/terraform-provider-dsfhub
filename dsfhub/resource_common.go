@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"reflect"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -769,65 +768,4 @@ func resourceAssetDataServiceEndpointsHash(v interface{}) int {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 	return PositiveHash(buf.String())
-}
-
-// testAccParseResourceAttributeReference parses a terraform field and
-// determines whether it is a reference to another resource. If the field is
-// a reference, return the input string and if not, return it wrapped in
-// double-quotes.
-func testAccParseResourceAttributeReference(field string) string {
-	var regExpr string = `dsfhub_[A-Za-z0-9_-].+\.[A-Za-z0-9_-].+` //e.g. dsfhub_cloud_account.my-cloud-account, dsfhub_cloud_account.my-cloud-account.asset_id
-	var parsedField string
-
-	isReference, _ := regexp.Match(regExpr, []byte(field))
-	if isReference {
-		parsedField = field
-	} else {
-		parsedField = fmt.Sprintf("\"%s\"", field)
-	}
-	return parsedField
-}
-
-// ConfigCompose can be called to concatenate multiple strings to build test
-// configurations
-func ConfigCompose(config ...string) string {
-	var str strings.Builder
-
-	for _, conf := range config {
-		str.WriteString(conf)
-	}
-
-	return str.String()
-}
-
-// ignoreChangesBlock creates a lifecycle block to be added to a resource config
-// containing the ignore_changes feature - an array specifying a list of attribute
-// names that may change in the future, but should not affect said resource after
-// its creation.
-//
-// See the following for more details
-// https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle#ignore_changes
-func createIgnoreChangesBlock(ignoredAttributes []string) string {
-	var ignoreChangesBlock, ignoredFields string
-
-	// build list like
-	// ignore_changes = [ attribute1, attribute2 ]
-	ignoredFields = `[ ` + strings.Join(ignoredAttributes, `, `) + ` ]`
-	log.Printf("[INFO] creating ignore_changes list with ignored_fields: %s", ignoredFields)
-	ignoreChangesBlock = fmt.Sprintf(`
-  lifecycle {
-    ignore_changes = %[1]s
-  }`, ignoredFields)
-
-	return ignoreChangesBlock
-}
-
-// ignoreAssetConnectionBlock builds the lifecycle meta argument block to ignore
-// fields masked in the connection.
-// e.g. client_secret   = "*****", password = "*****"
-func ignoreAssetConnectionChangesBlock() string {
-	var lifecycleBlock string
-	ignoredAttributes := []string{`asset_connection`}
-	lifecycleBlock = createIgnoreChangesBlock(ignoredAttributes)
-	return lifecycleBlock
 }

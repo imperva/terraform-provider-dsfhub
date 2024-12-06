@@ -3,7 +3,6 @@ package dsfhub
 import (
 	"fmt"
 	"log"
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -11,10 +10,7 @@ import (
 )
 
 func TestAccDSFSecretManager_Hashicorp(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		assetId      = testOnPremServerHostName + ":HASHICORP::8200"

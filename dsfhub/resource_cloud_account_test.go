@@ -3,7 +3,6 @@ package dsfhub
 import (
 	"fmt"
 	"log"
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -11,13 +10,10 @@ import (
 )
 
 func TestAccDSFCloudAccount_Aws(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
-		assetId      = "arn:aws:iam::123456789012"
+		assetId      = testAwsAccountArnPrefix + "basic-role"
 		resourceName = "aws-cloud-account"
 	)
 
@@ -43,10 +39,7 @@ func TestAccDSFCloudAccount_Aws(t *testing.T) {
 }
 
 func TestAccDSFCloudAccount_Azure(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		assetId      = "/subscriptions/11111111-2222-3333-4444-123456789012/asset"
@@ -74,10 +67,7 @@ func TestAccDSFCloudAccount_Azure(t *testing.T) {
 }
 
 func TestAccDSFCloudAccount_Gcp(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		assetId      = "my_service_account@project-name.iam.gserviceaccount.com:project-name"

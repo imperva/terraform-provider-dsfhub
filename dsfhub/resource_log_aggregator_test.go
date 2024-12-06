@@ -3,7 +3,6 @@ package dsfhub
 import (
 	"fmt"
 	"log"
-	"os"
 	"regexp"
 	"testing"
 
@@ -11,14 +10,43 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+func TestAccDSFLogAggregator_AwsKinesis(t *testing.T) {
+	gatewayId := checkGatewayId(t)
 
 	const (
-		assetId            = "arn:aws:logs:us-east-2:123456789012:log-group:/aws/rds/instance/my-database/audit:*"
+		resourceName = "aws_kinesis_basic"
+		assetId      = testAwsKinesisPrefix + resourceName
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Failed: bad audit_type
+			{
+				Config:      testAccDSFLogAggregatorConfig_AwsKinesis(resourceName, gatewayId, assetId, "", false, "BAD_AUDIT_TYPE"),
+				ExpectError: regexp.MustCompile("Asset attribute options mismatch: the value 'BAD_AUDIT_TYPE' for field 'audit_type' is invalid"),
+			},
+			// Test various audit types
+			{Config: testAccDSFLogAggregatorConfig_AwsKinesis(resourceName, gatewayId, assetId, "", false, "KINESIS")},
+			{Config: testAccDSFLogAggregatorConfig_AwsKinesis(resourceName, gatewayId, assetId, "", false, "KINESIS_AGGREGATED")},
+			// Validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		assetId            = testAwsLogGroupPrefix + "/aws/rds/instance/my-database/audit:*"
 		resourceName       = "my-database-log-group"
 		serverHostName     = "oracle-rds-db.xxxxx8rsfzja.us-east-2.rds.amazonaws.com"
 		parentAssetId      = "arn:aws:rds:us-east-2:123456789012:db:oracle-rds-db"
@@ -58,11 +86,38 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 	})
 }
 
+func TestAccDSFLogAggregator_AwsS3(t *testing.T) {
+	gatewayId := checkGatewayId(t)
+
+	const (
+		assetId      = testAwsS3BucketPrefix + "my-s3-bucket"
+		resourceName = "my-s3-bucket"
+	)
+
+	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			// Test various audit types
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "LOG_GROUP")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "REDSHIFT")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "CLOUDWATCH")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "DYNAMODB")},
+			// validate import
+			{
+				ResourceName:      resourceTypeAndName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		assetId      = "/subscriptions/ID/resourceGroups/someGroup/providers/Microsoft.EventHub/namespaces/somenamespace/eventhubs/someeventhub"
@@ -100,10 +155,7 @@ func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpCloudStorageBucket(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-bucket-1"
@@ -135,10 +187,7 @@ func TestAccDSFLogAggregator_GcpCloudStorageBucket(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubBasic(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-basic-pubsub-subscription"
@@ -189,10 +238,7 @@ func TestAccDSFLogAggregator_GcpPubsubBasic(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubAlloydbPostgresql(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-alloydb-pubsub-subscription"
@@ -245,10 +291,7 @@ func TestAccDSFLogAggregator_GcpPubsubAlloydbPostgresql(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubBigQuery(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-bigquery-pubsub-subscription"
@@ -287,10 +330,7 @@ func TestAccDSFLogAggregator_GcpPubsubBigQuery(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubBigTable(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-bigtable-pubsub-subscription"
@@ -329,10 +369,7 @@ func TestAccDSFLogAggregator_GcpPubsubBigTable(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubMssqlserver(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-mssql-server-pubsub-subscription"
@@ -371,10 +408,7 @@ func TestAccDSFLogAggregator_GcpPubsubMssqlserver(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubMysql(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-mysql-pubsub-subscription"
@@ -427,10 +461,7 @@ func TestAccDSFLogAggregator_GcpPubsubMysql(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubPostgresql(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
 	const (
 		resourceName = "my-postgresql-pubsub-subscription"
@@ -469,16 +500,9 @@ func TestAccDSFLogAggregator_GcpPubsubPostgresql(t *testing.T) {
 }
 
 func TestAccDSFLogAggregator_GcpPubsubSpanner(t *testing.T) {
-	gatewayId := os.Getenv("GATEWAY_ID")
-	if gatewayId == "" {
-		t.Skip("GATEWAY_ID environment variable must be set")
-	}
+	gatewayId := checkGatewayId(t)
 
-	skipVersions := []string{"4.17"}
-	dsfhubVersion := os.Getenv("DSFHUB_VERSION")
-	if contains(skipVersions, dsfhubVersion) {
-		t.Skipf("Skipping test for DSFHUB_VERSION %s. See SR-2063 for more details.", dsfhubVersion)
-	}
+	skipTestForKnownIssue(t, "4.17", "SR-2063")
 
 	const (
 		resourceName = "my-spanner-pubsub-subscription"
