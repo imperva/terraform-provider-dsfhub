@@ -1242,6 +1242,15 @@ var assetSchemaJson = `{
                 "SSH"
             ]
         },
+        "AvailableBucketAccountIds": {
+            "defaultValue": null,
+            "description": "A list of AWS account IDs that have access to the bucket",
+            "displayName": "Available Bucket Account IDs",
+            "example": "123456789101, 123456789102",
+            "id": "available_bucket_account_ids",
+            "required": false,
+            "type": "string"
+        },
         "AvailabilityZones": {
             "defaultValue": null,
             "description": "",

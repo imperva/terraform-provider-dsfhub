@@ -1,5 +1,10 @@
 ## 1.3.7 (Unreleased)
 
+ENHANCEMENTS:
+
+* resource/data_source: added support of the available_bucket_account_ids attribute
+* resource/data_source: added support for GCP ALLOYDB POSTGRESQL CLUSTER and GCP ALLOYDB POSTGRESQL server types
+
 ## 1.3.6 (November 20, 2024)
 
 ENHANCEMENTS:

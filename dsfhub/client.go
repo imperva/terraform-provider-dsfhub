@@ -79,40 +79,41 @@ type ResourceData struct {
 }
 
 type AssetData struct {
-	AdminEmail             string            `json:"admin_email"`
-	Application            string            `json:"application,omitempty"`
-	Archive                bool              `json:"archive,omitempty"`
-	Arn                    string            `json:"arn,omitempty"`
-	AssetDisplayName       string            `json:"asset_display_name"`
-	AssetID                string            `json:"asset_id,omitempty"`
-	AssetSource            string            `json:"Asset Source,omitempty"`
-	AuditDataType          string            `json:"audit_data_type,omitempty"`
-	AuditInfo              *AuditInfo        `json:"audit_info,omitempty"`
-	AuditPullEnabled       bool              `json:"audit_pull_enabled,omitempty"`
-	AuditType              string            `json:"audit_type,omitempty"`
-	AvailabilityZones      []interface{}     `json:"availability_zones,omitempty"`
-	AvailableRegions       []interface{}     `json:"available_regions,omitempty"`
-	AwsProxyConfig         *AwsProxyConfig   `json:"aws_proxy_config,omitempty"`
-	BucketAccountId        string            `json:"bucket_account_id,omitempty"`
-	CaCertsPath            string            `json:"ca_certs_path,omitempty"`
-	CaFile                 string            `json:"ca_file,omitempty"`
-	ClusterEngine          string            `json:"cluster_engine,omitempty"`
-	ClusterID              string            `json:"cluster_id,omitempty"`
-	ClusterMemberID        string            `json:"cluster_member_id,omitempty"`
-	ClusterName            string            `json:"cluster_name,omitempty"`
-	Connections            []AssetConnection `json:"connections,omitempty"`
-	ConsumerGroup          string            `json:"consumer_group,omitempty"`
-	ConsumerGroupWorkers   string            `json:"consumer_group_workers,omitempty"`
-	ContentType            string            `json:"content_type,omitempty"`
-	CredentialsEndpoint    string            `json:"credentials_endpoint,omitempty"`
-	Criticality            int               `json:"criticality,omitempty"`
-	DatabaseName           string            `json:"database_name,omitempty"`
-	DbEngine               string            `json:"db_engine,omitempty"`
-	DbInstancesDisplayName []interface{}     `json:"db_instances_display_name,omitempty"`
-	DurationThreshold      int               `json:"duration_threshold,omitempty"`
-	EnableAuditManagement  bool              `json:"enable_audit_management,omitempty"`
-	EnableAuditMonitoring  bool              `json:"enable_audit_monitoring,omitempty"`
-	EnabledLogsExports     []interface{}     `json:"enabled_logs_exports,omitempty"`
+	AdminEmail                string            `json:"admin_email"`
+	Application               string            `json:"application,omitempty"`
+	Archive                   bool              `json:"archive,omitempty"`
+	Arn                       string            `json:"arn,omitempty"`
+	AssetDisplayName          string            `json:"asset_display_name"`
+	AssetID                   string            `json:"asset_id,omitempty"`
+	AssetSource               string            `json:"Asset Source,omitempty"`
+	AuditDataType             string            `json:"audit_data_type,omitempty"`
+	AuditInfo                 *AuditInfo        `json:"audit_info,omitempty"`
+	AuditPullEnabled          bool              `json:"audit_pull_enabled,omitempty"`
+	AuditType                 string            `json:"audit_type,omitempty"`
+	AvailableBucketAccountIds []interface{}     `json:"available_bucket_account_ids,omitempty"`
+	AvailabilityZones         []interface{}     `json:"availability_zones,omitempty"`
+	AvailableRegions          []interface{}     `json:"available_regions,omitempty"`
+	AwsProxyConfig            *AwsProxyConfig   `json:"aws_proxy_config,omitempty"`
+	BucketAccountId           string            `json:"bucket_account_id,omitempty"`
+	CaCertsPath               string            `json:"ca_certs_path,omitempty"`
+	CaFile                    string            `json:"ca_file,omitempty"`
+	ClusterEngine             string            `json:"cluster_engine,omitempty"`
+	ClusterID                 string            `json:"cluster_id,omitempty"`
+	ClusterMemberID           string            `json:"cluster_member_id,omitempty"`
+	ClusterName               string            `json:"cluster_name,omitempty"`
+	Connections               []AssetConnection `json:"connections,omitempty"`
+	ConsumerGroup             string            `json:"consumer_group,omitempty"`
+	ConsumerGroupWorkers      string            `json:"consumer_group_workers,omitempty"`
+	ContentType               string            `json:"content_type,omitempty"`
+	CredentialsEndpoint       string            `json:"credentials_endpoint,omitempty"`
+	Criticality               int               `json:"criticality,omitempty"`
+	DatabaseName              string            `json:"database_name,omitempty"`
+	DbEngine                  string            `json:"db_engine,omitempty"`
+	DbInstancesDisplayName    []interface{}     `json:"db_instances_display_name,omitempty"`
+	DurationThreshold         int               `json:"duration_threshold,omitempty"`
+	EnableAuditManagement     bool              `json:"enable_audit_management,omitempty"`
+	EnableAuditMonitoring     bool              `json:"enable_audit_monitoring,omitempty"`
+	EnabledLogsExports        []interface{}     `json:"enabled_logs_exports,omitempty"`
 	//Endpoint               string            `json:"endpoint,omitempty"`
 	EntitlementEnabled     bool        `json:"entitlement_enabled,omitempty"`
 	GatewayService         string      `json:"gateway_service,omitempty"`
