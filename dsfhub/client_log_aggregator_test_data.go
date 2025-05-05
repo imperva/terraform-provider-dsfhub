@@ -210,10 +210,13 @@ var logAggregatorTestDataJson = `{
                     },
                     "audit_pull_enabled": true,
                     "audit_type": "LOG_GROUP",
+                    "available_bucket_account_ids": ["string"],
+                    "available_regions": ["string"],
                     "aws_proxy_config": {
                         "http": "< proxy >",
                         "https": "< proxy >"
                     },
+                    "bucket_account_id": "string",
                     "ca_certs_path": "string",
                     "ca_file": "string",
                     "connections": [

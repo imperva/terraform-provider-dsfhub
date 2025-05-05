@@ -10,3 +10,4 @@ examples-dev/*
 .vscode/
 terraform-provider-dsfhub
 vendor/
+npm-cache/

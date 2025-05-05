@@ -76,6 +76,17 @@ func resourceLogAggregator() *schema.Resource {
 				Default:     nil,
 				// ValidateFunc: validation.StringInSlice([]string{"BIGQUERY", "BIGTABLE", "BUCKET", "MSSQL", "MYSQL", "POSTGRESQL", "SPANNER"}, false),
 			},
+			"available_bucket_account_ids": {
+				Type:        schema.TypeList,
+				Description: "A list of S3 bucket Account IDs",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+				Computed:    false,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
 			"available_regions": {
 				Type:        schema.TypeList,
 				Description: "A list of regions to use in discovery actions that iterate through region",
@@ -720,6 +731,7 @@ func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("asset_source", logAggregatorReadResponse.Data.AssetData.AssetSource)
 	d.Set("audit_pull_enabled", logAggregatorReadResponse.Data.AssetData.AuditPullEnabled)
 	d.Set("audit_type", logAggregatorReadResponse.Data.AssetData.AuditType)
+	d.Set("available_bucket_account_ids", logAggregatorReadResponse.Data.AssetData.AvailableBucketAccountIds)
 	d.Set("available_regions", logAggregatorReadResponse.Data.AssetData.AvailableRegions)
 	d.Set("bucket_account_id", logAggregatorReadResponse.Data.AssetData.BucketAccountId)
 	d.Set("content_type", logAggregatorReadResponse.Data.AssetData.ContentType)
