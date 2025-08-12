@@ -387,6 +387,14 @@ func resourceCloudAccount() *schema.Resource {
 				Description: "The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'",
 				Required:    true,
 			},
+			"id": {
+				Type:        schema.TypeString,
+				Description: "Unique identifier for the asset",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+				Computed:    true,
+			},
 			"jsonar_uid": {
 				Type:        schema.TypeString,
 				Description: "Unique identifier (UID) attached to the Sonar machine controlling the asset",
@@ -572,6 +580,7 @@ func resourceCloudAccountReadContext(ctx context.Context, d *schema.ResourceData
 	}
 	d.Set("criticality", cloudAccountReadResponse.Data.AssetData.Criticality)
 	d.Set("gateway_id", cloudAccountReadResponse.Data.GatewayID)
+	d.Set("id", cloudAccountReadResponse.Data.ID)
 	d.Set("jsonar_uid", cloudAccountReadResponse.Data.AssetData.JsonarUID)
 	d.Set("location", cloudAccountReadResponse.Data.AssetData.Location)
 	d.Set("managed_by", cloudAccountReadResponse.Data.AssetData.ManagedBy)

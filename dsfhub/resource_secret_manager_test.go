@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccDSFSecretManager_Hashicorp(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		assetId      = testOnPremServerHostName + ":HASHICORP::8200"
@@ -20,18 +20,14 @@ func TestAccDSFSecretManager_Hashicorp(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfSecretManagerResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDSFSecretManagerConfig_Hashicorp(resourceName, gatewayId, assetId, "ec2", "vault-role-for-ec2"),
 			},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
@@ -65,23 +61,4 @@ func testCheckSecretManagerExists(secretManagerId string) resource.TestCheckFunc
 		}
 		return nil
 	}
-}
-
-func testAccSecretManagerDestroy(state *terraform.State) error {
-	log.Printf("[INFO] Running test testAccDSFDataSourceDestroy \n")
-	client := testAccProvider.Meta().(*Client)
-	for _, res := range state.RootModule().Resources {
-		if res.Type != "secret_manager" {
-			continue
-		}
-		secretManagerId := res.Primary.ID
-		readDSFDataSourceResponse, err := client.ReadSecretManager(secretManagerId)
-		if readDSFDataSourceResponse.Errors == nil {
-			return fmt.Errorf("DSF Data Source %s should have received an error in the response", secretManagerId)
-		}
-		if err == nil {
-			return fmt.Errorf("DSF Data Source %s still exists for gatewayId: %s", secretManagerId, testGatewayId)
-		}
-	}
-	return nil
 }

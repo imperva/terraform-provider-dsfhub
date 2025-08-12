@@ -47,10 +47,10 @@ func (c *Client) CreateLogAggregator(logAggregator ResourceWrapper) (*ResourceWr
 
 // ReadLogAggregator gets the LogAggregator by ID
 func (c *Client) ReadLogAggregator(logAggregatorId string) (*ResourceWrapper, error) {
-	log.Printf("[INFO] Getting LogAggregator for logAggregatorId: %s)\n", logAggregatorId)
+	log.Printf("[INFO] Getting LogAggregator for logAggregatorId: %s\n", logAggregatorId)
 
 	reqURL := fmt.Sprintf(endpointLogAggregators+"/%s", url.PathEscape(logAggregatorId))
-	resp, err := c.MakeCall(http.MethodGet, reqURL, nil)
+	resp, err := c.MakeCall(http.MethodGet, reqURL, nil, baseAPIPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error reading LogAggregator for logAggregatorId: %s | err: %s\n", logAggregatorId, err)
 	}
@@ -69,6 +69,9 @@ func (c *Client) ReadLogAggregator(logAggregatorId string) (*ResourceWrapper, er
 		return nil, fmt.Errorf("error parsing LogAggregator JSON response for logAggregatorId: %s | responseBody: %s err: %s\n", logAggregatorId, responseBody, err)
 	}
 	if readLogAggregatorResponse.Errors != nil {
+		if readLogAggregatorResponse.Errors[0].Status == 404 {
+			return nil, fmt.Errorf("LogAggregator not found for logAggregatorId: %s", logAggregatorId)
+		}
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
 	}
 
@@ -79,7 +82,7 @@ func (c *Client) ReadLogAggregator(logAggregatorId string) (*ResourceWrapper, er
 func (c *Client) ReadLogAggregators() (*ResourcesWrapper, error) {
 	log.Printf("[INFO] Getting LogAggregators\n")
 
-	resp, err := c.MakeCall(http.MethodGet, endpointLogAggregators, nil)
+	resp, err := c.MakeCall(http.MethodGet, endpointLogAggregators, nil, baseAPIPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error reading LogAggregators | err: %s\n", err)
 	}
@@ -145,7 +148,7 @@ func (c *Client) DeleteLogAggregator(logAggregatorId string) (*ResourceResponse,
 	log.Printf("[INFO] Deleting LogAggregator with logAggregatorId: %s\n", logAggregatorId)
 
 	reqURL := fmt.Sprintf(endpointLogAggregators+"/%s", url.PathEscape(logAggregatorId))
-	resp, err := c.MakeCall(http.MethodDelete, reqURL, nil)
+	resp, err := c.MakeCall(http.MethodDelete, reqURL, nil, baseAPIPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting LogAggregator for logAggregatorId: %s, %s\n", logAggregatorId, err)
 	}

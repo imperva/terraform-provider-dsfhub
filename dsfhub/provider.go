@@ -4,11 +4,18 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-var baseAPIPrefix string
+// API prefixes
+var (
+	baseAPIPrefix string // Regular USC APIs
+	apiPrefix     string // GET Playbook status API
+)
+
+// Provider schema descriptions
 var descriptions map[string]string
 
 func init() {
 	baseAPIPrefix = "/dsf/api/v2"
+	apiPrefix = "/api" // TODO: look into issue where live config doesn't add first "/" in requests but acceptance tests do
 	descriptions = map[string]string{
 		"dsfhub_token": "The API token for API operations. You can retrieve this\n" +
 			"from the DSF management hub console. Can be set via TF_VAR_dsfhub_token " +

@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
+	"time"
 )
 
 const endpointDsfDataSource = "/data-sources"
@@ -52,7 +54,7 @@ func (c *Client) ReadDSFDataSource(dataSourceId string) (*ResourceWrapper, error
 	log.Printf("[INFO] Getting DSFDataSource for dataSourceId: %s\n", dataSourceId)
 
 	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s", url.PathEscape(dataSourceId))
-	resp, err := c.MakeCall(http.MethodGet, reqURL, nil)
+	resp, err := c.MakeCall(http.MethodGet, reqURL, nil, baseAPIPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error reading DSFDataSource for dataSourceId: %s | err: %s", dataSourceId, err)
 	}
@@ -72,6 +74,9 @@ func (c *Client) ReadDSFDataSource(dataSourceId string) (*ResourceWrapper, error
 	}
 
 	if readDSFDataSourceDataResponse.Errors != nil {
+		if readDSFDataSourceDataResponse.Errors[0].Status == 404 {
+			return nil, fmt.Errorf("DSFDataSource not found for dataSourceId: %s", dataSourceId)
+		}
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
 	}
 
@@ -82,7 +87,7 @@ func (c *Client) ReadDSFDataSource(dataSourceId string) (*ResourceWrapper, error
 func (c *Client) ReadDSFDataSources() (*ResourcesWrapper, error) {
 	log.Printf("[INFO] Getting DSFDataSources\n")
 
-	resp, err := c.MakeCall(http.MethodGet, endpointDsfDataSource, nil)
+	resp, err := c.MakeCall(http.MethodGet, endpointDsfDataSource, nil, baseAPIPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error reading DSFDataSources | err: %s", err)
 	}
@@ -151,7 +156,7 @@ func (c *Client) DeleteDSFDataSource(dataSourceId string) (*ResourceResponse, er
 	log.Printf("[INFO] Deleting DSFDataSource with dataSourceId: %s\n", dataSourceId)
 
 	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s", url.PathEscape(dataSourceId))
-	resp, err := c.MakeCall(http.MethodDelete, reqURL, nil)
+	resp, err := c.MakeCall(http.MethodDelete, reqURL, nil, baseAPIPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting DSFDataSource for dataSourceId: %s, %s", dataSourceId, err)
 	}
@@ -177,12 +182,12 @@ func (c *Client) DeleteDSFDataSource(dataSourceId string) (*ResourceResponse, er
 	return &deleteDSFDataSourceResponse, nil
 }
 
-// EnableAuditDSFDataSource enables logging for a DSF data source
-func (c *Client) EnableAuditDSFDataSource(dataSourceId string) (*UpdateAuditResponse, error) {
+// EnableAuditDSFDataSource enables audit monitoring for a DSF data source
+func (c *Client) EnableAuditDSFDataSource(dataSourceId string) (*APIResponse, error) {
 	log.Printf("[INFO] Enabling audit for dataSourceId: %v\n", dataSourceId)
 
 	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s/operations/enable-audit-collection", url.PathEscape(dataSourceId))
-	resp, err := c.MakeCall(http.MethodPost, reqURL, nil)
+	resp, err := c.MakeCall(http.MethodPost, reqURL, nil, baseAPIPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error enabling audit for dataSourceId: %s | err: %s\n", dataSourceId, err)
 	}
@@ -195,7 +200,7 @@ func (c *Client) EnableAuditDSFDataSource(dataSourceId string) (*UpdateAuditResp
 	log.Printf("[DEBUG] Enable audit for DSFDataSource '%v' JSON response: %s\n", dataSourceId, string(responseBody))
 
 	// Parse the JSON
-	var enableAuditResponse UpdateAuditResponse
+	var enableAuditResponse APIResponse
 	err = json.Unmarshal([]byte(responseBody), &enableAuditResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing enable audit DSFDataSource JSON response dataSourceId: %s | err: %s\n", dataSourceId, err)
@@ -203,15 +208,27 @@ func (c *Client) EnableAuditDSFDataSource(dataSourceId string) (*UpdateAuditResp
 	if enableAuditResponse.Errors != nil {
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
 	}
+
+	// Poll playbook until status is "success"
+	err = c.waitForPlaybookSuccess(enableAuditResponse.Data, 5*time.Minute)
+	if err != nil {
+		// Skips check if JSONAR_VERSION is not set, or version is below 15.2, or there is an error in parsing the env var
+		if strings.Contains(err.Error(), "[Skip waitForPlaybookSuccess]") {
+			log.Printf("[DEBUG] %s", err.Error())
+			return &enableAuditResponse, nil
+		}
+		return nil, fmt.Errorf("error waiting for playbook success: %s", err)
+	}
+
 	return &enableAuditResponse, nil
 }
 
 // DisableAuditDSFDataSource enables logging for a DSF data source
-func (c *Client) DisableAuditDSFDataSource(dataSourceId string) (*UpdateAuditResponse, error) {
+func (c *Client) DisableAuditDSFDataSource(dataSourceId string) (*APIResponse, error) {
 	log.Printf("[INFO] Disabling audit for dataSourceId: %v\n", dataSourceId)
 
 	reqURL := fmt.Sprintf(endpointDsfDataSource+"/%s/operations/disable-audit-collection", url.PathEscape(dataSourceId))
-	resp, err := c.MakeCall(http.MethodPost, reqURL, nil)
+	resp, err := c.MakeCall(http.MethodPost, reqURL, nil, baseAPIPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error disabling audit for dataSourceId: %s | err: %s\n", dataSourceId, err)
 	}
@@ -224,7 +241,7 @@ func (c *Client) DisableAuditDSFDataSource(dataSourceId string) (*UpdateAuditRes
 	log.Printf("[DEBUG] Disable audit for DSFDataSource '%v' JSON response: %s\n", dataSourceId, string(responseBody))
 
 	// Parse the JSON
-	var disableAuditResponse UpdateAuditResponse
+	var disableAuditResponse APIResponse
 	err = json.Unmarshal([]byte(responseBody), &disableAuditResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing disable audit DSFDataSource JSON response dataSourceId: %s | err: %s\n", dataSourceId, err)

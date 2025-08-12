@@ -19,7 +19,7 @@ const awsS3ConnectionDefault = `
 // Output a terraform config for an AWS KINESIS log aggregator resource.
 func testAccDSFLogAggregatorConfig_AwsKinesis(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool, auditType string) string {
 	// handle reference to other assets
-	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
+	parentAssetIdVal := parseResourceAttributeReference(parentAssetId)
 
 	return fmt.Sprintf(`
 resource "%[1]s" "%[2]s" {
@@ -41,7 +41,7 @@ resource "%[1]s" "%[2]s" {
 // Output a terraform config for an AWS LOG GROUP log aggregator resource.
 func testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled bool, auditType string, dependsOn string) string {
 	// handle reference to other assets
-	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
+	parentAssetIdVal := parseResourceAttributeReference(parentAssetId)
 
 	return fmt.Sprintf(`
 resource "%[1]s" "%[2]s" {
@@ -62,31 +62,30 @@ resource "%[1]s" "%[2]s" {
 }
 
 // Output a terraform config for an AWS S3 log aggregator resource.
-func testAccDSFLogAggregatorConfig_AwsS3(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled string, auditType string) string {
+func testAccDSFLogAggregatorConfig_AwsS3(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled string, auditType string, availableBucketAccountIds string) string {
 	// handle reference to other assets
-	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
+	parentAssetIdVal := parseResourceAttributeReference(parentAssetId)
 
-	// convert audit_pull_enabled to "null" if empty
-	if auditPullEnabled == "" {
-		auditPullEnabled = "null"
-	}
+	auditPullEnabled = nullIfEmpty(auditPullEnabled)
+	availableBucketAccountIds = nullIfEmpty(availableBucketAccountIds)
 
 	return fmt.Sprintf(`
 resource "%[1]s" "%[2]s" {
   server_type        = "AWS S3"
 
-  admin_email        = "%[3]s"
-  asset_display_name = "%[4]s"
-  asset_id           = "%[4]s"
-  audit_pull_enabled = %[5]s
-  audit_type         = "%[6]s"
-  bucket_account_id  = "%[7]s"
-  gateway_id         = "%[8]s"
-  parent_asset_id    = %[9]s
-  region             = "us-east-1"
-  server_host_name   = "%[4]s"
+  admin_email                  = "%[3]s"
+  asset_display_name           = "%[4]s"
+  asset_id                     = "%[4]s"
+  audit_pull_enabled           = %[5]s
+  audit_type                   = "%[6]s"
+  available_bucket_account_ids = %[7]s
+  bucket_account_id            = "%[8]s"
+  gateway_id                   = "%[9]s"
+  parent_asset_id              = %[10]s
+  region                       = "us-east-1"
+  server_host_name             = "%[4]s"
 
-  %[10]s
+  %[11]s
 }`,
 		dsfLogAggregatorResourceType,
 		resourceName,
@@ -94,6 +93,7 @@ resource "%[1]s" "%[2]s" {
 		assetId,
 		auditPullEnabled,
 		auditType,
+		availableBucketAccountIds,
 		testAwsAccountId,
 		gatewayId,
 		parentAssetIdVal,
@@ -133,7 +133,7 @@ func azureEventhubConnectionBlock(authMechanism string, format string) string {
   }
   
   %[2]s
-  `, format, ignoreAssetConnectionChangesBlock())
+  `, format, ignoreChangesBlock([]string{"asset_connection"}))
 	case "default":
 		output = fmt.Sprintf(`
   asset_connection {
@@ -150,7 +150,7 @@ func azureEventhubConnectionBlock(authMechanism string, format string) string {
   }
   
   %[2]s
-  `, format, ignoreAssetConnectionChangesBlock())
+  `, format, ignoreChangesBlock([]string{"asset_connection"}))
 	}
 
 	return output
@@ -159,12 +159,10 @@ func azureEventhubConnectionBlock(authMechanism string, format string) string {
 // Output a terraform config for an AZURE EVENTHUB log aggregator resource.
 func testAccDSFLogAggregatorConfig_AzureEventhub(resourceName string, gatewayId string, assetId string, authMechanism string, parentAssetId string, auditPullEnabled string, contentType string, format string) string {
 	// handle reference to other assets
-	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
+	parentAssetIdVal := parseResourceAttributeReference(parentAssetId)
 
 	// convert audit_pull_enabled to "null" if empty
-	if auditPullEnabled == "" {
-		auditPullEnabled = "null"
-	}
+	auditPullEnabled = nullIfEmpty(auditPullEnabled)
 
 	return fmt.Sprintf(`
 resource "%[1]s" "%[2]s" {
@@ -202,12 +200,10 @@ const commonGcpConnectionDefault = `
 // Output a terraform config for an GCP CLOUD STORAGE BUCKET log aggregator resource.
 func testAccDSFLogAggregatorConfig_GcpCloudStorageBucket(resourceName string, gatewayId string, assetId string, parentAssetId string, auditPullEnabled string, contentType string) string {
 	// handle reference to other assets
-	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
+	parentAssetIdVal := parseResourceAttributeReference(parentAssetId)
 
 	// convert audit_pull_enabled to "null" if empty
-	if auditPullEnabled == "" {
-		auditPullEnabled = "null"
-	}
+	auditPullEnabled = nullIfEmpty(auditPullEnabled)
 
 	return fmt.Sprintf(`
 resource "%[1]s" "%[2]s" {
@@ -233,12 +229,10 @@ resource "%[1]s" "%[2]s" {
 // Output a terraform config for an GCP PUBSUB log aggregator resource.
 func testAccDSFLogAggregatorConfig_GcpPubsub(resourceName string, gatewayId string, assetId string, authMechanism string, parentAssetId string, auditPullEnabled string, auditType string, contentType string) string {
 	// handle reference to other assets
-	parentAssetIdVal := testAccParseResourceAttributeReference(parentAssetId)
+	parentAssetIdVal := parseResourceAttributeReference(parentAssetId)
 
 	// convert audit_pull_enabled to "null" if empty
-	if auditPullEnabled == "" {
-		auditPullEnabled = "null"
-	}
+	auditPullEnabled = nullIfEmpty(auditPullEnabled)
 
 	// handle different asset_connection blocks
 	var assetConnectionBlock string

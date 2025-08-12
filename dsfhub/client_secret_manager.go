@@ -51,7 +51,7 @@ func (c *Client) ReadSecretManager(secretManagerId string) (*ResourceWrapper, er
 	log.Printf("[INFO] Getting SecretManager for secretManagerId: %s)\n", secretManagerId)
 
 	reqURL := fmt.Sprintf(endpointSecretManagers+"/%s", url.PathEscape(secretManagerId))
-	resp, err := c.MakeCall(http.MethodGet, reqURL, nil)
+	resp, err := c.MakeCall(http.MethodGet, reqURL, nil, baseAPIPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error reading SecretManager for secretManagerId: %s | err: %s\n", secretManagerId, err)
 	}
@@ -70,6 +70,9 @@ func (c *Client) ReadSecretManager(secretManagerId string) (*ResourceWrapper, er
 		return nil, fmt.Errorf("error parsing SecretManager JSON response for secretManagerId: %s | secretManager: %s err: %s\n", secretManagerId, responseBody, err)
 	}
 	if readSecretManagerResponse.Errors != nil {
+		if readSecretManagerResponse.Errors[0].Status == 404 {
+			return nil, fmt.Errorf("SecretManager not found for secretManagerId: %s", secretManagerId)
+		}
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
 	}
 
@@ -80,7 +83,7 @@ func (c *Client) ReadSecretManager(secretManagerId string) (*ResourceWrapper, er
 func (c *Client) ReadSecretManagers() (*ResourcesWrapper, error) {
 	log.Printf("[INFO] Getting SecretManagers\n")
 
-	resp, err := c.MakeCall(http.MethodGet, endpointSecretManagers, nil)
+	resp, err := c.MakeCall(http.MethodGet, endpointSecretManagers, nil, baseAPIPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error reading SecretManagers | err: %s\n", err)
 	}
@@ -146,7 +149,7 @@ func (c *Client) DeleteSecretManager(secretManagerId string) (*ResourceResponse,
 	log.Printf("[INFO] Deleting SecretManager with secretManagerId: %s\n", secretManagerId)
 
 	reqURL := fmt.Sprintf(endpointSecretManagers+"/%s", url.PathEscape(secretManagerId))
-	resp, err := c.MakeCall(http.MethodDelete, reqURL, nil)
+	resp, err := c.MakeCall(http.MethodDelete, reqURL, nil, baseAPIPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting SecretManager for secretManagerId: %s, %s\n", secretManagerId, err)
 	}

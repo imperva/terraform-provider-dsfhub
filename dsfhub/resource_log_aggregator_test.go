@@ -11,7 +11,7 @@ import (
 )
 
 func TestAccDSFLogAggregator_AwsKinesis(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		resourceName = "aws_kinesis_basic"
@@ -21,8 +21,9 @@ func TestAccDSFLogAggregator_AwsKinesis(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Failed: bad audit_type
 			{
@@ -32,18 +33,13 @@ func TestAccDSFLogAggregator_AwsKinesis(t *testing.T) {
 			// Test various audit types
 			{Config: testAccDSFLogAggregatorConfig_AwsKinesis(resourceName, gatewayId, assetId, "", false, "KINESIS")},
 			{Config: testAccDSFLogAggregatorConfig_AwsKinesis(resourceName, gatewayId, assetId, "", false, "KINESIS_AGGREGATED")},
-			// Validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		assetId            = testAwsLogGroupPrefix + "/aws/rds/instance/my-database/audit:*"
@@ -57,8 +53,9 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 	parentResourceTypeAndName := fmt.Sprintf("%s.%s", dsfDataSourceResourceType, parentResourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Failed: missing parent_asset_id
 			{
@@ -68,7 +65,7 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 			// Onboard with AWS parent asset
 			{
 				Config: ConfigCompose(
-					testAccDSFDataSourceConfig_AwsRdsOracle(parentResourceName, gatewayId, parentAssetId, "LOG_GROUP", ""),
+					testAccDSFDataSourceConfig_AwsRdsOracle(parentResourceName, gatewayId, parentAssetId, "LOG_GROUP", "", ""),
 					testAccDSFLogAggregatorConfig_AwsLogGroup(resourceName, gatewayId, assetId, parentResourceTypeAndName+".asset_id", true, "LOG_GROUP", ""),
 				),
 				Check: resource.ComposeTestCheckFunc(
@@ -76,18 +73,13 @@ func TestAccDSFLogAggregator_AwsLogGroup(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", "gateway-aws@oracle-rds.service"),
 				),
 			},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_AwsS3(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		assetId      = testAwsS3BucketPrefix + "my-s3-bucket"
@@ -97,27 +89,24 @@ func TestAccDSFLogAggregator_AwsS3(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Test various audit types
-			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "")},
-			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "LOG_GROUP")},
-			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "REDSHIFT")},
-			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "CLOUDWATCH")},
-			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "DYNAMODB")},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "", "")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "LOG_GROUP", "")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "REDSHIFT", "")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "CLOUDWATCH", "")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "DYNAMODB", "")},
+			{Config: testAccDSFLogAggregatorConfig_AwsS3(resourceName, gatewayId, assetId, "", "false", "ORACLE", "123456789012")},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		assetId      = "/subscriptions/ID/resourceGroups/someGroup/providers/Microsoft.EventHub/namespaces/somenamespace/eventhubs/someeventhub"
@@ -127,8 +116,9 @@ func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Failed: missing format
 			{
@@ -141,21 +131,28 @@ func TestAccDSFLogAggregator_AzureEventhub(t *testing.T) {
 				ExpectError: regexp.MustCompile("Asset attribute options mismatch: the value 'bad-format' for field 'format' is invalid"),
 			},
 			// Validate different auth_mechanisms
-			{Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "azure_ad", "", "false", "", "AzureSQL_Managed")},
-			{Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "client_secret", "", "false", "", "AzureSQL_Managed")},
-			{Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "default", "", "false", "", "AzureSQL_Managed")},
-			// validate import
 			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+				Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "azure_ad", "", "false", "", "AzureSQL_Managed"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "asset_connection.0.auth_mechanism", "azure_ad"),
+				)},
+			{
+				Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "client_secret", "", "false", "", "AzureSQL_Managed"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "asset_connection.0.auth_mechanism", "client_secret"),
+				)},
+			{
+				Config: testAccDSFLogAggregatorConfig_AzureEventhub(resourceName, gatewayId, assetId, "default", "", "false", "", "AzureSQL_Managed"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "asset_connection.0.auth_mechanism", "default"),
+				)},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_GcpCloudStorageBucket(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		resourceName = "my-bucket-1"
@@ -165,8 +162,9 @@ func TestAccDSFLogAggregator_GcpCloudStorageBucket(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Failed: missing asset_display_name, asset_id, pubsub_subscription
 			{
@@ -176,18 +174,13 @@ func TestAccDSFLogAggregator_GcpCloudStorageBucket(t *testing.T) {
 			// Onboard and connect/disconnect to gateway as standalone log aggregator
 			{Config: testAccDSFLogAggregatorConfig_GcpCloudStorageBucket(resourceName, gatewayId, assetId, "", "true", "GCP MS SQL SERVER")},
 			{Config: testAccDSFLogAggregatorConfig_GcpCloudStorageBucket(resourceName, gatewayId, assetId, "", "false", "GCP MS SQL SERVER")},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_GcpPubsubBasic(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		resourceName = "my-basic-pubsub-subscription"
@@ -197,8 +190,9 @@ func TestAccDSFLogAggregator_GcpPubsubBasic(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Failed: missing asset_display_name, asset_id, pubsub_subscription
 			{
@@ -227,18 +221,13 @@ func TestAccDSFLogAggregator_GcpPubsubBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_GcpPubsubAlloydbPostgresql(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		resourceName = "my-alloydb-pubsub-subscription"
@@ -248,8 +237,9 @@ func TestAccDSFLogAggregator_GcpPubsubAlloydbPostgresql(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Test connect/disconnect
 			{
@@ -280,18 +270,13 @@ func TestAccDSFLogAggregator_GcpPubsubAlloydbPostgresql(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_GcpPubsubBigQuery(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		resourceName = "my-bigquery-pubsub-subscription"
@@ -301,8 +286,9 @@ func TestAccDSFLogAggregator_GcpPubsubBigQuery(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Test connect/disconnect
 			{
@@ -319,18 +305,13 @@ func TestAccDSFLogAggregator_GcpPubsubBigQuery(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_GcpPubsubBigTable(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		resourceName = "my-bigtable-pubsub-subscription"
@@ -340,8 +321,9 @@ func TestAccDSFLogAggregator_GcpPubsubBigTable(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Test connect/disconnect
 			{
@@ -358,18 +340,13 @@ func TestAccDSFLogAggregator_GcpPubsubBigTable(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_GcpPubsubMssqlserver(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		resourceName = "my-mssql-server-pubsub-subscription"
@@ -379,8 +356,9 @@ func TestAccDSFLogAggregator_GcpPubsubMssqlserver(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Test connect/disconnect
 			{
@@ -397,18 +375,13 @@ func TestAccDSFLogAggregator_GcpPubsubMssqlserver(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_GcpPubsubMysql(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		resourceName = "my-mysql-pubsub-subscription"
@@ -418,8 +391,9 @@ func TestAccDSFLogAggregator_GcpPubsubMysql(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Test connect/disconnect
 			{
@@ -450,18 +424,13 @@ func TestAccDSFLogAggregator_GcpPubsubMysql(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_GcpPubsubPostgresql(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		resourceName = "my-postgresql-pubsub-subscription"
@@ -471,8 +440,9 @@ func TestAccDSFLogAggregator_GcpPubsubPostgresql(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Test connect/disconnect
 			{
@@ -489,20 +459,16 @@ func TestAccDSFLogAggregator_GcpPubsubPostgresql(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFLogAggregator_GcpPubsubSpanner(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
-	skipTestForKnownIssue(t, "4.17", "SR-2063")
+	// TODO: check on 4.16
+	skipTestForKnownIssue(t, "4.17", "SR-2063", false)
 
 	const (
 		resourceName = "my-spanner-pubsub-subscription"
@@ -512,8 +478,9 @@ func TestAccDSFLogAggregator_GcpPubsubSpanner(t *testing.T) {
 	resourceTypeAndName := fmt.Sprintf("%s.%s", dsfLogAggregatorResourceType, resourceName)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			// Test connect/disconnect
 			{
@@ -530,12 +497,7 @@ func TestAccDSFLogAggregator_GcpPubsubSpanner(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceTypeAndName, "gateway_service", ""),
 				),
 			},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
@@ -569,23 +531,4 @@ func testCheckLogAggregatorExists(dataSourceId string) resource.TestCheckFunc {
 		}
 		return nil
 	}
-}
-
-func testAccLogAggregatorDestroy(state *terraform.State) error {
-	log.Printf("[INFO] Running test testAccLogAggregatorDestroy \n")
-	client := testAccProvider.Meta().(*Client)
-	for _, res := range state.RootModule().Resources {
-		if res.Type != "dsfhub_log_aggregator" {
-			continue
-		}
-		logAggregatorId := res.Primary.ID
-		readLogAggregatorResponse, err := client.ReadLogAggregator(logAggregatorId)
-		if readLogAggregatorResponse.Errors == nil {
-			return fmt.Errorf("DSF Log Aggregator %s should have received an error in the response", logAggregatorId)
-		}
-		if err == nil {
-			return fmt.Errorf("DSF Log Aggregator %s still exists for gatewayId: %s", logAggregatorId, testGatewayId)
-		}
-	}
-	return nil
 }

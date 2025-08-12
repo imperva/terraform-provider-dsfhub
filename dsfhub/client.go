@@ -39,9 +39,20 @@ type GatewaysResponse struct {
 	Message string `json:"message"`
 }
 
-type UpdateAuditResponse struct {
+type APIResponse struct {
 	Data   string     `json:"data"`
 	Errors []APIError `json:"errors,omitempty"`
+}
+
+type GetPlaybookData struct {
+	PID    string `json:"pid"`
+	Status string `json:"status"`
+	Result string `json:"result"`
+	Nodes  []struct {
+		Shortname string `json:"shortname"`
+		Status    string `json:"status"`
+		Message   string `json:"message"`
+	} `json:"nodes"`
 }
 
 type ResourcesWrapper struct {
@@ -71,7 +82,7 @@ type ResourceData struct {
 	AuditState      string    `json:"auditState,omitempty"`
 	GatewayID       string    `json:"gatewayId"`
 	GatewayName     string    `json:"gatewayName,omitempty"`
-	ID              string    `json:"id,omitempty,omitempty"`
+	ID              string    `json:"id"`
 	IsMonitored     bool      `json:"isMonitored,omitempty"`
 	ParentAssetID   string    `json:"parentAssetId,omitempty"`
 	RemoteSyncState string    `json:"remoteSyncState,omitempty"`
@@ -153,8 +164,8 @@ type AssetData struct {
 	UsedFor          string            `json:"used_for,omitempty"`
 	Version          float64           `json:"version,omitempty"`
 	VirtualHostname  string            `json:"virtual_hostname,omitempty"`
-	VirtualIp        string            `json:"virtual_ip,omitempty,omitempty"`
-	XelDirectory     string            `json:"xel_directory,omitempty,omitempty"`
+	VirtualIp        string            `json:"virtual_ip,omitempty"`
+	XelDirectory     string            `json:"xel_directory,omitempty"`
 }
 
 type AwsProxyConfig struct {
@@ -294,7 +305,7 @@ type ConnectionData struct {
 
 type Secret struct {
 	FieldMapping  map[string]string `json:"field_mapping,omitempty"`
-	Path          string            `json:"path,omitempty,omitempty"`
+	Path          string            `json:"path,omitempty"`
 	SecretAssetID string            `json:"secret_asset_id,omitempty"`
 	SecretName    string            `json:"secret_name,omitempty"`
 }
@@ -327,7 +338,7 @@ func NewClient(config *Config) *Client {
 func (c *Client) Verify() (*GatewaysResponse, error) {
 	log.Println("[INFO] Checking API token against DSF Host /gateways endpoint")
 
-	resp, err := c.MakeCall(http.MethodGet, endpointGateways, nil)
+	resp, err := c.MakeCall(http.MethodGet, endpointGateways, nil, baseAPIPrefix)
 	if err != nil {
 		// tls: failed to verify certificate
 		return nil, fmt.Errorf("error checking token: %s", err)
@@ -354,8 +365,8 @@ func (c *Client) Verify() (*GatewaysResponse, error) {
 	return &gatewaysResponse, nil
 }
 
-func (c *Client) MakeCall(method string, action string, data []byte) (*http.Response, error) {
-	reqURL := c.config.DSFHUBHost + baseAPIPrefix + action
+func (c *Client) MakeCall(method string, action string, data []byte, prefix string) (*http.Response, error) {
+	reqURL := c.config.DSFHUBHost + prefix + action
 	req, err := PrepareJsonRequest(method, reqURL, data)
 	if err != nil {
 		return nil, fmt.Errorf("error preparing request: %s", err)

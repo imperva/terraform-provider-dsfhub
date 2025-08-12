@@ -14,6 +14,7 @@ var ignoreDataSourceParamsByServerType = map[string]map[string]bool{
 	"AWS RDS AURORA MYSQL":              {"arn": true, "asset_display_name": true},
 	"AWS RDS AURORA POSTGRESQL CLUSTER": {"arn": true, "asset_display_name": true},
 	"AWS RDS AURORA POSTGRESQL":         {"arn": true, "asset_display_name": true},
+	"AWS RDS DB2":                       {"arn": true, "asset_display_name": true},
 	"AWS RDS MARIADB":                   {"arn": true, "asset_display_name": true},
 	"AWS RDS MS SQL SERVER":             {"arn": true, "asset_display_name": true},
 	"AWS RDS MYSQL":                     {"arn": true, "asset_display_name": true},
@@ -398,6 +399,24 @@ var requiredDataSourceFieldsJson = `{
                 "arn",
                 "server_host_name",
                 "admin_email"
+            ]
+        },
+        "AWS RDS DB2": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password",
+                    "database_name"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "arn",
+                "server_host_name",
+                "admin_email",
+                "resource_id"
             ]
         },
         "AWS RDS MARIADB": {
@@ -788,6 +807,24 @@ var requiredDataSourceFieldsJson = `{
                 "admin_email"
             ]
         },
+        "CLICKHOUSE": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password"
+                ]
+            },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "database_name",
+                "admin_email"
+            ]
+        },
         "CLOUDANT": {
             "auth_mechanisms": {
                 "iam_role": [
@@ -807,18 +844,6 @@ var requiredDataSourceFieldsJson = `{
                     "service_key"
                 ]
             },
-            "required": [
-                "gateway_id",
-                "asset_display_name",
-                "asset_id",
-                "server_host_name",
-                "server_ip",
-                "server_port",
-                "admin_email"
-            ]
-        },
-        "CLOUDANT LOCAL": {
-            "auth_mechanisms": {},
             "required": [
                 "gateway_id",
                 "asset_display_name",
@@ -914,6 +939,32 @@ var requiredDataSourceFieldsJson = `{
                 "admin_email"
             ]
         },
+        "DRUID CLUSTER": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email",
+                "cluster_id",
+                "cluster_name"
+            ]
+        },
+        "DRUID": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
         "EDB POSTGRESQL": {
             "auth_mechanisms": {
                 "password": [
@@ -964,7 +1015,7 @@ var requiredDataSourceFieldsJson = `{
                 "admin_email"
             ]
         },
-        "EMR": {
+        "GAUSSDB": {
             "auth_mechanisms": {},
             "required": [
                 "gateway_id",
@@ -1056,6 +1107,19 @@ var requiredDataSourceFieldsJson = `{
                 "admin_email"
             ]
         },
+        "GCP FIRESTORE": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email",
+                "parent_asset_id"
+            ]
+        },
         "GCP MS SQL SERVER": {
             "auth_mechanisms": {
                 "password": [
@@ -1113,6 +1177,30 @@ var requiredDataSourceFieldsJson = `{
                     "reason"
                 ]
             },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "GEMFIRE": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
+        "GRIDGAIN IGNITE": {
+            "auth_mechanisms": {},
             "required": [
                 "gateway_id",
                 "asset_display_name",
@@ -1233,6 +1321,28 @@ var requiredDataSourceFieldsJson = `{
                     "password"
                 ]
             },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "MAPR FS": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "MAPR HBASE": {
+            "auth_mechanisms": {},
             "required": [
                 "gateway_id",
                 "asset_display_name",
@@ -1518,6 +1628,18 @@ var requiredDataSourceFieldsJson = `{
                 "admin_email"
             ]
         },
+        "SAP IQ": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "server_port",
+                "admin_email"
+            ]
+        },
         "SCYLLADB": {
             "auth_mechanisms": {
                 "password": [
@@ -1538,6 +1660,12 @@ var requiredDataSourceFieldsJson = `{
         },
         "SNOWFLAKE": {
             "auth_mechanisms": {
+                "key_file": [
+                    "reason",
+                    "username",
+                    "access_id",
+                    "key_file"
+                ],
                 "oauth": [
                     "reason",
                     "username",
@@ -1625,6 +1753,35 @@ var requiredDataSourceFieldsJson = `{
                     "database_name"
                 ]
             },
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "TIGERGRAPH": {
+            "auth_mechanisms": {},
+            "required": [
+                "gateway_id",
+                "asset_display_name",
+                "asset_id",
+                "server_host_name",
+                "server_ip",
+                "admin_email"
+            ]
+        },
+        "VERTICA": {
+            "auth_mechanisms": {
+                "password": [
+                    "reason",
+                    "username",
+                    "password",
+                    "database_name"
+                ]
+            },           
             "required": [
                 "gateway_id",
                 "asset_display_name",

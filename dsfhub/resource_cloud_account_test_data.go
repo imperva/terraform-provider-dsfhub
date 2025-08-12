@@ -6,7 +6,7 @@ const awsConnectionDefault = `
   asset_connection {
     auth_mechanism  = "default"
     reason          = "default"
-    region          = "us-west-1"
+    region          = "us-east-2"
   }
 `
 
@@ -20,7 +20,7 @@ var awsConnectionKey = fmt.Sprintf(`
   }
 
   %[1]s
-`, ignoreAssetConnectionChangesBlock())
+`, ignoreChangesBlock([]string{"asset_connection"}))
 
 const awsConnectionProfile = `
   asset_connection {
@@ -73,7 +73,7 @@ var azureConnectionClientSecret = fmt.Sprintf(`
   }
 
   %[1]s
-`, ignoreAssetConnectionChangesBlock())
+`, ignoreChangesBlock([]string{"asset_connection"}))
 
 const azureConnectionAuthFile = `
   asset_connection {

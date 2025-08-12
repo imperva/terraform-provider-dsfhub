@@ -5,7 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"net/url"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -413,36 +417,25 @@ func contains(l []string, x string) bool {
 
 // readAsset reads an asset of any resource type
 func readAsset(client Client, resourceType string, assetId string) (*ResourceWrapper, error) {
-	var result *ResourceWrapper
-	var err error
+	var (
+		result *ResourceWrapper
+		err    error
+	)
 
-	switch resourceType {
-	case dsfDataSourceResourceType:
-		{
-			log.Printf("[INFO] reading data_source asset %v", assetId)
-			result, err = client.ReadDSFDataSource(assetId)
-		}
-	case dsfLogAggregatorResourceType:
-		{
-			log.Printf("[INFO] reading log_aggregator asset %v", assetId)
-			result, err = client.ReadLogAggregator(assetId)
-		}
-	case dsfCloudAccountResourceType:
-		{
-			log.Printf("[INFO] reading cloud_account asset %v", assetId)
-			result, err = client.ReadSecretManager(assetId)
-		}
-	case dsfSecretManagerResourceType:
-		{
-			log.Printf("[INFO] reading secret_manager asset %v", assetId)
-			result, err = client.ReadLogAggregator(assetId)
-		}
-	default:
-		{
-			return nil, fmt.Errorf("invalid resourceType: %v", resourceType)
-		}
+	readFuncs := map[string]func(string) (*ResourceWrapper, error){
+		dsfDataSourceResourceType:    client.ReadDSFDataSource,
+		dsfLogAggregatorResourceType: client.ReadLogAggregator,
+		dsfCloudAccountResourceType:  client.ReadSecretManager,
+		dsfSecretManagerResourceType: client.ReadLogAggregator,
 	}
 
+	readFn, ok := readFuncs[resourceType]
+	if !ok {
+		return nil, fmt.Errorf("invalid resourceType: %v", resourceType)
+	}
+
+	log.Printf("[INFO] reading %s asset %v", resourceType, assetId)
+	result, err = readFn(assetId)
 	if err != nil {
 		return result, err
 	}
@@ -551,7 +544,70 @@ func checkAuditState(ctx context.Context, m interface{}, assetId string, resourc
 
 	auditPullState = result.Data.AssetData.AuditPullEnabled
 
+	log.Printf("[DEBUG] auditPullState for asset %v is %v", assetId, auditPullState)
+
 	return auditPullState, nil
+}
+
+// parseDSFVersion parses a version string in the format "A.B.C.D.E" and returns the major and minor version as a float64.
+// E.g. "15.0.0.10.0" becomes 15.0
+func parseDSFVersion(version string) (float64, error) {
+	parts := strings.Split(version, ".")
+	if len(parts) >= 2 {
+		v := parts[0] + "." + parts[1]
+		return strconv.ParseFloat(v, 64)
+	}
+	return strconv.ParseFloat(version, 64)
+}
+
+// waitForPlaybookSuccess checks the status of a playbook process by its ID and waits until it succeeds
+// or until the timeout is reached. Polls the playbook status every 2 seconds.
+func (c *Client) waitForPlaybookSuccess(processId string, timeout time.Duration) error {
+	verString := os.Getenv("JSONAR_VERSION")
+	if verString == "" {
+		return fmt.Errorf("[Skip waitForPlaybookSuccess] JSONAR_VERSION environment variable is not set. Skipping GET playbook status")
+	}
+	ver, err := parseDSFVersion(verString)
+	if err != nil {
+		return fmt.Errorf("[Skip waitForPlaybookSuccess] could not parse JSONAR_VERSION: %v", err)
+	}
+	if ver < 15.2 {
+		return fmt.Errorf("[Skip waitForPlaybookSuccess] GET playbook status is not supported in DSF version < 15.2, current version: %s", verString)
+	}
+
+	playbookReqURL := fmt.Sprintf("/playbook-runner/playbook-engine/processes/%s", url.PathEscape(processId))
+
+	log.Printf("[DEBUG] Waiting for playbook process '%s' to succeed, URL: %s", processId, playbookReqURL)
+
+	deadline := time.Now().Add(timeout)
+
+	for {
+		playbookResp, err := c.MakeCall(http.MethodGet, playbookReqURL, nil, apiPrefix)
+		if err != nil {
+			return fmt.Errorf("error getting playbook status: %s | err: %s", processId, err)
+		}
+		defer playbookResp.Body.Close()
+		body, err := ioutil.ReadAll(playbookResp.Body)
+		if err != nil {
+			return fmt.Errorf("error reading playbook response: %s", err)
+		}
+
+		log.Printf("[DEBUG] Get status for playbook pid '%v' JSON response: %s\n", processId, string(body))
+
+		var playbookResponse GetPlaybookData
+		if err := json.Unmarshal([]byte(body), &playbookResponse); err != nil {
+			return fmt.Errorf("error parsing playbook status JSON: %s", err)
+		}
+
+		log.Printf("[DEBUG] Playbook status for playbook pid '%s': %s", processId, playbookResponse.Status)
+		if playbookResponse.Status == "success" {
+			return nil
+		}
+		if time.Now().After(deadline) {
+			return fmt.Errorf("timeout waiting for playbook pid %s to succeed", processId)
+		}
+		time.Sleep(2 * time.Second) // polling interval
+	}
 }
 
 // connectDisconnectGateway determines whether an asset should be connected to or disconnected from gateway
@@ -601,6 +657,7 @@ func connectDisconnectGateway(ctx context.Context, d *schema.ResourceData, resou
 func connectGateway(ctx context.Context, m interface{}, assetId string, resourceType string) error {
 	client := m.(*Client)
 	_, err := client.EnableAuditDSFDataSource(assetId)
+
 	if err != nil {
 		log.Printf("[INFO] Error enabling audit for assetId: %s\n", assetId)
 		return err

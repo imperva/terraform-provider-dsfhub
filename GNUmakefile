@@ -13,6 +13,9 @@ default: install
 build: fmtcheck
 	go build -o ${BINARY}
 
+build-debug: fmtcheck
+	go build -gcflags=all="-N -l" -o ${BINARY}
+
 install: build
 	mkdir -p ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${PKG_NAME}/${VERSION}/${OS_ARCH}
 	mv ${BINARY} ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${PKG_NAME}/${VERSION}/${OS_ARCH}

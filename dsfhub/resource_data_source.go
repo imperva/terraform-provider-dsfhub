@@ -1075,6 +1075,15 @@ func resourceDSFDataSource() *schema.Resource {
 				Optional:    true,
 				Default:     nil,
 			},
+			"id": {
+				Type:        schema.TypeString,
+				Description: "Unique identifier for the asset",
+				// Required: true,
+				Required: false,
+				Optional: true,
+				Default:  nil,
+				Computed: true,
+			},
 			"ignore_latest_of": {
 				Type:        schema.TypeString,
 				Description: "A regex defining a group. From all the files with the same group, the latest one will be ignored, so that it isn't archived until server is done writing",
@@ -1412,7 +1421,6 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("asset_display_name", dsfDataSourceReadResponse.Data.AssetData.AssetDisplayName)
 	d.Set("asset_id", dsfDataSourceReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", dsfDataSourceReadResponse.Data.AssetData.AssetSource)
-	//d.Set("audit_data_type", dsfDataSourceReadResponse.Data.AssetData.AuditDataType)
 	d.Set("audit_pull_enabled", dsfDataSourceReadResponse.Data.AssetData.AuditPullEnabled)
 	d.Set("audit_type", dsfDataSourceReadResponse.Data.AssetData.AuditType)
 	d.Set("availability_zones", dsfDataSourceReadResponse.Data.AssetData.AvailabilityZones)
@@ -1441,6 +1449,7 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("gateway_id", dsfDataSourceReadResponse.Data.GatewayID)
 	d.Set("gateway_service", dsfDataSourceReadResponse.Data.AssetData.GatewayService)
 	d.Set("host_timezone_offset", dsfDataSourceReadResponse.Data.AssetData.HostTimezoneOffset)
+	d.Set("id", dsfDataSourceReadResponse.Data.ID)
 	d.Set("ignore_latest_of", dsfDataSourceReadResponse.Data.AssetData.IgnoreLatestOf)
 	d.Set("is_cluster", dsfDataSourceReadResponse.Data.AssetData.IsCluster)
 	d.Set("is_multi_zones", dsfDataSourceReadResponse.Data.AssetData.IsMultiZones)

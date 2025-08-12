@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccDSFCloudAccount_Aws(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		assetId      = testAwsAccountArnPrefix + "basic-role"
@@ -22,24 +22,35 @@ func TestAccDSFCloudAccount_Aws(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCloudAccountDestroy,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
-			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "default")},
-			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "iam_role")},
-			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "key")},
-			{Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "profile")},
-			// validate import
 			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+				Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "default"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "asset_connection.0.auth_mechanism", "default"),
+				)},
+			{
+				Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "iam_role"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "asset_connection.0.auth_mechanism", "iam_role"),
+				)},
+			{
+				Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "key"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "asset_connection.0.auth_mechanism", "key"),
+				)},
+			{
+				Config: testAccDSFCloudAccountConfig_Aws(resourceName, gatewayId, assetId, "profile"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceTypeAndName, "asset_connection.0.auth_mechanism", "profile"),
+				)},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFCloudAccount_Azure(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		assetId      = "/subscriptions/11111111-2222-3333-4444-123456789012/asset"
@@ -51,23 +62,18 @@ func TestAccDSFCloudAccount_Azure(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCloudAccountDestroy,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			{Config: testAccDSFCloudAccountConfig_Azure(resourceName, gatewayId, assetId, "client_secret")},
 			{Config: testAccDSFCloudAccountConfig_Azure(resourceName, gatewayId, assetId, "auth_file")},
 			{Config: testAccDSFCloudAccountConfig_Azure(resourceName, gatewayId, assetId, "managed_identity")},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
 
 func TestAccDSFCloudAccount_Gcp(t *testing.T) {
-	gatewayId := checkGatewayId(t)
+	gatewayId := getGatewayId(t)
 
 	const (
 		assetId      = "my_service_account@project-name.iam.gserviceaccount.com:project-name"
@@ -79,16 +85,11 @@ func TestAccDSFCloudAccount_Gcp(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCloudAccountDestroy,
+		CheckDestroy: testAccCheckDestroyDSFResources,
 		Steps: []resource.TestStep{
 			{Config: testAccDSFCloudAccountConfig_Gcp(resourceName, gatewayId, assetId, "default")},
 			{Config: testAccDSFCloudAccountConfig_Gcp(resourceName, gatewayId, assetId, "service_account")},
-			// validate import
-			{
-				ResourceName:      resourceTypeAndName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
+			createValidateImportStep(resourceTypeAndName),
 		},
 	})
 }
@@ -122,23 +123,4 @@ func testCheckCloudAccountExists(dataSourceId string) resource.TestCheckFunc {
 		}
 		return nil
 	}
-}
-
-func testAccCloudAccountDestroy(state *terraform.State) error {
-	log.Printf("[INFO] Running test testAccCloudAccountDestroy \n")
-	client := testAccProvider.Meta().(*Client)
-	for _, res := range state.RootModule().Resources {
-		if res.Type != "dsfhub_data_source" {
-			continue
-		}
-		cloudAccountId := res.Primary.ID
-		readCloudAccountResponse, err := client.ReadCloudAccount(cloudAccountId)
-		if readCloudAccountResponse.Errors == nil {
-			return fmt.Errorf("DSF Cloud Account %s should have received an error in the response", cloudAccountId)
-		}
-		if err == nil {
-			return fmt.Errorf("DSF Cloud Account %s still exists for gatewayId: %s", cloudAccountId, testGatewayId)
-		}
-	}
-	return nil
 }

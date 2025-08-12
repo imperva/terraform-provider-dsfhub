@@ -76,6 +76,13 @@ func resourceLogAggregator() *schema.Resource {
 				Default:     nil,
 				// ValidateFunc: validation.StringInSlice([]string{"BIGQUERY", "BIGTABLE", "BUCKET", "MSSQL", "MYSQL", "POSTGRESQL", "SPANNER"}, false),
 			},
+			"audit_data_type": {
+				Type:        schema.TypeString,
+				Description: "The type of audit data to pull from a bucket. See asset specific documentation for details.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
 			"available_bucket_account_ids": {
 				Type:        schema.TypeList,
 				Description: "A list of S3 bucket Account IDs",
@@ -498,6 +505,15 @@ func resourceLogAggregator() *schema.Resource {
 				Default:     nil,
 				Computed:    true,
 			},
+			"id": {
+				Type:        schema.TypeString,
+				Description: "Unique identifier for the asset",
+				// Required: true,
+				Required: false,
+				Optional: true,
+				Default:  nil,
+				Computed: true,
+			},
 			"jsonar_uid": {
 				Type:        schema.TypeString,
 				Description: "Unique identifier (UID) attached to the Sonar machine controlling the asset",
@@ -730,6 +746,7 @@ func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("asset_id", logAggregatorReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", logAggregatorReadResponse.Data.AssetData.AssetSource)
 	d.Set("audit_pull_enabled", logAggregatorReadResponse.Data.AssetData.AuditPullEnabled)
+	d.Set("audit_data_type", logAggregatorReadResponse.Data.AssetData.AuditDataType)
 	d.Set("audit_type", logAggregatorReadResponse.Data.AssetData.AuditType)
 	d.Set("available_bucket_account_ids", logAggregatorReadResponse.Data.AssetData.AvailableBucketAccountIds)
 	d.Set("available_regions", logAggregatorReadResponse.Data.AssetData.AvailableRegions)
@@ -741,6 +758,7 @@ func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("criticality", logAggregatorReadResponse.Data.AssetData.Criticality)
 	d.Set("gateway_id", logAggregatorReadResponse.Data.GatewayID)
 	d.Set("gateway_service", logAggregatorReadResponse.Data.AssetData.GatewayService)
+	d.Set("id", logAggregatorReadResponse.Data.ID)
 	d.Set("jsonar_uid", logAggregatorReadResponse.Data.AssetData.JsonarUID)
 	d.Set("location", logAggregatorReadResponse.Data.AssetData.Location)
 	d.Set("managed_by", logAggregatorReadResponse.Data.AssetData.ManagedBy)

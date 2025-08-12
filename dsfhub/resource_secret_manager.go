@@ -394,6 +394,14 @@ func resourceSecretManager() *schema.Resource {
 				Description: "The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'",
 				Required:    true,
 			},
+			"id": {
+				Type:        schema.TypeString,
+				Description: "Unique identifier for the asset",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+				Computed:    true,
+			},
 			"jsonar_uid": {
 				Type:        schema.TypeString,
 				Description: "Unique identifier (UID) attached to the Sonar machine controlling the asset",
@@ -573,6 +581,7 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("credentials_endpoint", secretManagerReadResponse.Data.AssetData.CredentialsEndpoint)
 	d.Set("criticality", secretManagerReadResponse.Data.AssetData.Criticality)
 	d.Set("gateway_id", secretManagerReadResponse.Data.GatewayID)
+	d.Set("id", secretManagerReadResponse.Data.ID)
 	d.Set("jsonar_uid", secretManagerReadResponse.Data.AssetData.JsonarUID)
 	d.Set("location", secretManagerReadResponse.Data.AssetData.Location)
 	d.Set("managed_by", secretManagerReadResponse.Data.AssetData.ManagedBy)
