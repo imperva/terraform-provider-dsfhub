@@ -509,7 +509,7 @@ func resourceCloudAccount() *schema.Resource {
 func resourceCloudAccountCreateContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*Client)
-	if isOk, err := checkResourceRequiredFields(requiredCloudAccountJson, ignoreCloudAccountParamsByServerType, d); !isOk {
+	if isOk, err := checkResourceRequiredFields(dsfCloudAccountResourceType, requiredCloudAccountJson, ignoreCloudAccountParamsByServerType, d); !isOk {
 		return diag.FromErr(err)
 	}
 
@@ -687,7 +687,7 @@ func resourceCloudAccountUpdateContext(ctx context.Context, d *schema.ResourceDa
 
 	// check provided fields against schema
 	cloudAccountId := d.Id()
-	if isOk, err := checkResourceRequiredFields(requiredCloudAccountJson, ignoreCloudAccountParamsByServerType, d); !isOk {
+	if isOk, err := checkResourceRequiredFields(dsfCloudAccountResourceType, requiredCloudAccountJson, ignoreCloudAccountParamsByServerType, d); !isOk {
 		return diag.FromErr(err)
 	}
 

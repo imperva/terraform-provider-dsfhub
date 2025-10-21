@@ -296,7 +296,7 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 	dsfDataSource.Data.AssetData.Connections = connectionsAry
 }
 
-func checkResourceRequiredFields(requiredFieldsJson string, ignoreParamsByServerType map[string]map[string]bool, d *schema.ResourceData) (bool, error) {
+func checkResourceRequiredFields(resourceType string, requiredFieldsJson string, ignoreParamsByServerType map[string]map[string]bool, d *schema.ResourceData) (bool, error) {
 	missingParams := []string{}
 	var requiredFields RequiredFieldsMap
 	err := json.Unmarshal([]byte(requiredFieldsJson), &requiredFields)
@@ -346,7 +346,7 @@ func checkResourceRequiredFields(requiredFieldsJson string, ignoreParamsByServer
 		}
 	}
 	if len(missingParams) > 0 {
-		return false, fmt.Errorf("missing required fields for dsfhub_data_source with serverType '%s', missing fields: %s\n", serverType, "\""+strings.Join(missingParams, ", ")+"\"")
+		return false, fmt.Errorf("missing required fields for %s with serverType '%s', missing fields: %s\n", resourceType, serverType, "\""+strings.Join(missingParams, ", ")+"\"")
 	} else {
 		return true, nil
 	}
@@ -653,9 +653,11 @@ func connectDisconnectGateway(ctx context.Context, d *schema.ResourceData, resou
 	return nil
 }
 
-// connectGateway connects an asset to gateway
+// connectGateway connects an asset to the gateway and confirms it is synced and connected
 func connectGateway(ctx context.Context, m interface{}, assetId string, resourceType string) error {
 	client := m.(*Client)
+
+	// TODO: look into how this runs when passed in a log aggregator assetId
 	_, err := client.EnableAuditDSFDataSource(assetId)
 
 	if err != nil {

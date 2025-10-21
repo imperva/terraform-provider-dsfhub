@@ -667,7 +667,7 @@ func resourceLogAggregatorCreateContext(ctx context.Context, d *schema.ResourceD
 	client := m.(*Client)
 
 	// check provided fields against schema
-	if isOk, err := checkResourceRequiredFields(requiredLogAggregatorJson, ignoreLogAggregatorParamsByServerType, d); !isOk {
+	if isOk, err := checkResourceRequiredFields(dsfLogAggregatorResourceType, requiredLogAggregatorJson, ignoreLogAggregatorParamsByServerType, d); !isOk {
 		return diag.FromErr(err)
 	}
 	// convert provided fields into API payload
@@ -886,7 +886,7 @@ func resourceLogAggregatorUpdateContext(ctx context.Context, d *schema.ResourceD
 
 	// check provided fields against schema
 	logAggregatorId := d.Id()
-	if isOk, err := checkResourceRequiredFields(requiredLogAggregatorJson, ignoreLogAggregatorParamsByServerType, d); !isOk {
+	if isOk, err := checkResourceRequiredFields(dsfLogAggregatorResourceType, requiredLogAggregatorJson, ignoreLogAggregatorParamsByServerType, d); !isOk {
 		return diag.FromErr(err)
 	}
 

@@ -1339,7 +1339,7 @@ func resourceDSFDataSourceCreateContext(ctx context.Context, d *schema.ResourceD
 	client := m.(*Client)
 
 	// check provided fields against schema
-	if isOk, err := checkResourceRequiredFields(requiredDataSourceFieldsJson, ignoreDataSourceParamsByServerType, d); !isOk {
+	if isOk, err := checkResourceRequiredFields(dsfDataSourceResourceType, requiredDataSourceFieldsJson, ignoreDataSourceParamsByServerType, d); !isOk {
 		return diag.FromErr(err)
 	}
 
@@ -1703,7 +1703,7 @@ func resourceDSFDataSourceUpdateContext(ctx context.Context, d *schema.ResourceD
 
 	// check provided fields against schema
 	dsfDataSourceId := d.Id()
-	if isOk, err := checkResourceRequiredFields(requiredDataSourceFieldsJson, ignoreDataSourceParamsByServerType, d); !isOk {
+	if isOk, err := checkResourceRequiredFields(dsfDataSourceResourceType, requiredDataSourceFieldsJson, ignoreDataSourceParamsByServerType, d); !isOk {
 		return diag.FromErr(err)
 	}
 

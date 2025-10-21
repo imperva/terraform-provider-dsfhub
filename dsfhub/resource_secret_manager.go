@@ -512,7 +512,7 @@ func resourceSecretManagerCreateContext(ctx context.Context, d *schema.ResourceD
 	client := m.(*Client)
 
 	// check provided fields against schema
-	if isOk, err := checkResourceRequiredFields(requiredSecretManagerFieldsJson, ignoreSecretManagerParamsByServerType, d); !isOk {
+	if isOk, err := checkResourceRequiredFields(dsfSecretManagerResourceType, requiredSecretManagerFieldsJson, ignoreSecretManagerParamsByServerType, d); !isOk {
 		return diag.FromErr(err)
 	}
 
@@ -699,7 +699,7 @@ func resourceSecretManagerUpdateContext(ctx context.Context, d *schema.ResourceD
 
 	// check provided fields against schema
 	secretManagerId := d.Id()
-	if isOk, err := checkResourceRequiredFields(requiredSecretManagerFieldsJson, ignoreSecretManagerParamsByServerType, d); !isOk {
+	if isOk, err := checkResourceRequiredFields(dsfSecretManagerResourceType, requiredSecretManagerFieldsJson, ignoreSecretManagerParamsByServerType, d); !isOk {
 		return diag.FromErr(err)
 	}
 
