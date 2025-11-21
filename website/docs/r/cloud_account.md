@@ -15,31 +15,213 @@ Documentation for the underlying APIs used in this resource can be found at
 
 ## Cloud Account Types
 <ul>
-	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/examples/dsfhub-aws-cloud-account/README.md">Amazon Web Services (AWS)</a></li>
 	<li>Alibaba</li>
+  <li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/examples/dsfhub-aws-cloud-account/README.md">Amazon Web Services (AWS)</a></li>
 	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/examples/dsfhub-azure-cloud-account/README.md">Azure</a></li>
 	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/examples/dsfhub-gcp-cloud-account/README.md">Google Cloud Platform (GCP)</a></li>
 </ul>
 
 ## Example Usage
 
-For more examples, please see the [DSFHub Agentless-Onboarding modules](https://github.com/imperva/terraform-dsfhub-agentless-onboarding).
+For integrated examples with cloud resource configuration and audit setup, please see the [DSFHub Agentless-Onboarding modules](https://github.com/imperva/terraform-dsfhub-agentless-onboarding).
 
-### Basic Usage
+### Basic AWS Cloud Account
 
-Example AWS Cloud Account:
+Example AWS Cloud Account with the `default` authentication mechanism:
 
 ```hcl
 resource "dsfhub_cloud_account" "example_aws_cloud_account" {
-  server_type = "AWS"
-  admin_email = "somebody@company.com"
+  server_type        = "AWS"
+  admin_email        = "somebody@company.com"
   asset_display_name = "example-display-name" 
-  asset_id = "arn:partition:service:region:account-id"
-  gateway_id = "12345-abcde-12345-abcde-12345-abcde"
+  asset_id           = "arn:partition:service:region:account-id"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
   asset_connection {
     auth_mechanism = "default"
-    reason = "default"
-    region = "us-east-2"
+    reason         = "default"
+    region         = "us-east-2"
+  }
+}
+```
+
+Example AWS Cloud Account with the `iam_role` authentication mechanism:
+
+```hcl
+resource "dsfhub_cloud_account" "example_aws_cloud_account" {
+  server_type        = "AWS"
+  admin_email        = "somebody@company.com"
+  asset_display_name = "example-display-name" 
+  asset_id           = "arn:partition:service:region:account-id"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
+  asset_connection {
+    auth_mechanism = "iam_role"
+    reason         = "default"
+    region         = "us-east-2"
+  }
+}
+```
+
+Example AWS Cloud Account with the `key` authentication mechanism:
+
+```hcl
+resource "dsfhub_cloud_account" "example_aws_cloud_account" {
+  server_type        = "AWS"
+  admin_email        = "somebody@company.com"
+  asset_display_name = "example-display-name" 
+  asset_id           = "arn:partition:service:region:account-id"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
+  asset_connection {
+    auth_mechanism = "key"
+    reason         = "default"
+    region         = "us-east-2"
+    access_id      = "your-access-id"
+    access_key     = "your-access-key"
+  }
+}
+```
+
+Example AWS Cloud Account with the `profile` authentication mechanism:
+
+```hcl
+resource "dsfhub_cloud_account" "example_aws_cloud_account" {
+  server_type        = "AWS"
+  admin_email        = "somebody@company.com"
+  asset_display_name = "example-display-name" 
+  asset_id           = "arn:partition:service:region:account-id"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
+  asset_connection {
+    auth_mechanism = "profile"
+    reason         = "default"
+    region         = "us-east-2"
+    username       = "your-username"
+  }
+}
+```
+
+### Basic Azure Cloud Account
+
+Example Azure Cloud Account with the `auth_file` authentication mechanism:
+
+```hcl
+resource "dsfhub_cloud_account" "example_azure_cloud_account" {
+  server_type        = "AZURE"
+  admin_email        = "somebody@company.com"
+  asset_display_name = "example-display-name" 
+  asset_id           = "/subscriptions/11111111-2222-3333-4444-123456789012/asset"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
+  asset_connection {
+    auth_mechanism = "auth_file"
+    reason         = "default"
+    key_file       = "your-key-file"
+  }
+}
+```
+
+Example Azure Cloud Account with the `client_secret` authentication mechanism:
+
+```hcl
+resource "dsfhub_cloud_account" "example_azure_cloud_account" {
+  server_type        = "AZURE"
+  admin_email        = "somebody@company.com"
+  asset_display_name = "example-display-name" 
+  asset_id           = "/subscriptions/11111111-2222-3333-4444-123456789012/asset"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
+  asset_connection {
+    auth_mechanism  = "client_secret"
+    reason          = "default"
+    directory_id    = "11111111-2222-3333-4444-123456789012"
+    application_id  = "12345678-1234-1234-1234-123456789012"
+    client_secret   = "your-secret"
+    subscription_id = "11111111-2222-3333-4444-123456789012"
+  }
+}
+```
+
+Example Azure Cloud Account with the `managed_identity` authentication mechanism:
+
+```hcl
+resource "dsfhub_cloud_account" "example_azure_cloud_account" {
+  server_type        = "AZURE"
+  admin_email        = "somebody@company.com"
+  asset_display_name = "example-display-name" 
+  asset_id           = "/subscriptions/11111111-2222-3333-4444-123456789012/asset"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
+  asset_connection {
+    auth_mechanism  = "managed_identity"
+    reason          = "default"
+    subscription_id = "11111111-2222-3333-4444-123456789012"
+    # user_assigned_managed_identity = "your-user-assigned-managed-identity"
+  }
+}
+```
+
+### Basic GCP Cloud Account
+
+Example GCP Cloud Account with the `default` authentication mechanism:
+
+```hcl
+resource "dsfhub_cloud_account" "example_gcp_cloud_account" {
+  server_type        = "GCP"
+  admin_email        = "somebody@company.com"
+  asset_display_name = "example-display-name" 
+  asset_id           = "my_service_account@project-name.iam.gserviceaccount.com:project-name"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
+  asset_connection {
+    auth_mechanism = "default"
+    reason         = "default"
+  }
+}
+```
+
+Example GCP Cloud Account with the `service_account` authentication mechanism:
+
+```hcl
+resource "dsfhub_cloud_account" "example_gcp_cloud_account" {
+  server_type        = "GCP"
+  admin_email        = "somebody@company.com"
+  asset_display_name = "example-display-name" 
+  asset_id           = "my_service_account@project-name.iam.gserviceaccount.com:project-name"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
+  asset_connection {
+    auth_mechanism = "service_account"
+    reason         = "default"
+    key_file       = "/path/to/gcp/credentials/service_account.json"
+  }
+}
+```
+
+### Basic Alibaba Cloud Account
+
+Example Alibaba Cloud Account with the `key` authentication mechanism:
+
+```hcl
+resource "dsfhub_cloud_account" "example_alibaba_cloud_account" {
+  server_type        = "ALIBABA"
+  admin_email        = "somebody@company.com"
+  asset_display_name = "example-display-name" 
+  asset_id           = "arn:acs:123456789012"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
+  asset_connection {
+    auth_mechanism = "key"
+    reason         = "default"
+    access_id      = "your-access-id"
+    access_key     = "your-access-key"
+  }
+}
+```
+
+Example Alibaba Cloud Account with the `machine_role` authentication mechanism:
+
+```hcl
+resource "dsfhub_cloud_account" "example_alibaba_cloud_account" {
+  server_type        = "ALIBABA"
+  admin_email        = "somebody@company.com"
+  asset_display_name = "example-display-name" 
+  asset_id           = "arn:acs:123456789012"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
+  asset_connection {
+    auth_mechanism = "machine_role"
+    reason         = "default"
   }
 }
 ```
@@ -49,7 +231,7 @@ resource "dsfhub_cloud_account" "example_aws_cloud_account" {
 The following arguments are required by all Cloud Account server types:
 
 - `admin_email` - (String) The email address to notify about this asset.
-- `asset_connection` - An `asset_connection` block as defined below.
+- `asset_connection` - (Block) An `asset_connection` block as defined below.
 - `asset_display_name` - (String) User-friendly name of the asset, defined by user.
 - `asset_id` - (String) The unique identifier of the asset.
 - `gateway_id` - (String) The unique identifier of the Agentless Gateway that will own the asset. Example: "12345-abcde-12345-abcde-12345-abcde". You can find the value by connecting to SonarW and running 
@@ -58,17 +240,16 @@ db.getSiblingDB("lmrm__sonarg").asset.find(
   { "Server Type": "IMPERVA AGENTLESS GATEWAY", "Server Host Name": "your-hostname" },
   { jsonar_uid: 1, _id: 0 }
 )
-
 ```
-- `server_type` - (String) The type of cloud platform to be created as a clound account. The available values are `AWS`, `AZURE`, `GCP` and `ALIBABA`.
+- `server_type` - (String) The type of cloud platform to be created as a clound account. The available values are `AWS`, `ALIBABA`, `AZURE`, and `GCP`.
 
 The following arguments are optional, however some are only supported for certain server types. Please see the [asset specifications](https://docs-cybersec.thalesgroup.com/bundle/onboarding-databases-to-sonar-reference-guide/page/Asset-Specifications_35815461.html) for more details:
 
 - `asset_source` - (String) The source platform/vendor/system of the asset data. Usually the service responsible for creating that asset document
-- `available_regions` - (String) A list of regions to iterate through while running the Discovery playbook actions.
+- `available_regions` - (List of string) A list of regions to iterate through while running the Discovery playbook actions.
 - `aws_proxy_config` - (Block) An `aws_proxy_config` block as defined below for an AWS proxy configuration.
 - `credentials_endpoint` - (String) A specific sts endpoint to use.
-- `criticality` (Number) The asset's importance to the business. These values are measured on a scale from "Most critical" (1) to "Least critical" (4). Allowed values: 1, 2, 3, 4.
+- `criticality` - (Number) The asset's importance to the business. These values are measured on a scale from "Most critical" (1) to "Least critical" (4). Allowed values: 1, 2, 3, 4.
 - `jsonar_uid` - (String) Unique identifier (UID) attached to the Agentless Gateway controlling the asset.
 - `location` - (String) Current human-readable description of the physical location of the asset, or region.
 - `managed_by` - (String) Email of the person who maintains the asset; can be different from the owner specified in the owned_by field. Defaults to admin_email.
@@ -77,7 +258,7 @@ The following arguments are optional, however some are only supported for certai
 - `region` - (String) For cloud systems with regions, the default region or region used with this asset.
 - `service_endpoints` - (Block) A `service_endpoints` block as defined below that specifies particular endpoints for a given service in the form of `<service name>: "endpoint"`.
 - `used_for` - (String) Designates how this asset is used / the environment that the asset is supporting.
-- `version` (Number) Denotes the version of the asset.
+- `version` - (Number) Denotes the database/service version of the asset
 
 ### aws_proxy_config
 
@@ -111,12 +292,13 @@ The following arguments are optional, however some are only supported for certai
 - `client_secret` - (String) This a string containing a secret used by the application to prove its identity when requesting a token. You can get a secret by going to Azure Active Directory -> App Registrations -> Owned Applications, selecting the desired application and then going to Certificates & secrets -> Client secrets -> + New client secret
 - `directory_id` - (String) This is also referred to as the Tenant ID and is a GUID representing the Active Directory Tenant. It can be found in the Azure Active Directory page under the Azure portal
 - `external_id` - (String) External ID to use when assuming a role
-- `key_file` - (String) Location on disk on the key to be used to authenticate
+- `key_file` - (String) Location on disk on the key to be used for authentication
 - `role_name` - (String) What role is used to get credentials from.
-- `secret_key` - (String) The Secret access key used to authenticate
+- `secret_key` - (String) The Secret access key used for authentication
+- `session_token` - (String) STS token used for session authentication
 - `ssl` (Boolean) If true, use SSL when connecting
 - `subscription_id` - (String) This is the Azure account subscription ID. You can find this number under the Subscriptions page on the Azure portal
-- `username` - (String) The name of a profile in `{$JSONAR_LOCALDIR}/credentials/.aws/credentials` to use for authenticating. The value of `$JSONAR_LOCALDIR` can be found in `/etc/sysconfig/jsonar` on your DSF machine.
+- `username` - (String) The name of a profile in `${JSONAR_LOCALDIR}/credentials/.aws/credentials` to use for authenticating. The value of `$JSONAR_LOCALDIR` can be found in `/etc/sysconfig/jsonar` on your DSF machine.
 
 The following secret manager blocks are optional:
 
@@ -130,9 +312,9 @@ A maximum of one block is supported.
 
 The following arguments are optional:
 
-- `field_mapping` (Map of Strings) Field mapping for amazon secret
-- `secret_asset_id` - (String) Amazon secret asset id
-- `secret_name` - (String) Amazon secret mane
+- `field_mapping` (Map of string) Field mapping for AWS secret
+- `secret_asset_id` - (String) AWS secret manager asset_id
+- `secret_name` - (String) AWS secret name
 
 #### CyberArk Secret Manager: `asset_connection.cyberark_secret`
 
@@ -140,18 +322,18 @@ A maximum of one block is supported.
 
 The following arguments are optional:
 
-- `field_mapping` (Map of String) Field mapping for amazon secret
-- `secret_asset_id` - (String) Amazon secret asset id
-- `secret_name` - (String) Amazon secret mane
+- `field_mapping` (Map of string) Field mapping for CyberArk secret
+- `secret_asset_id` - (String) CyberArk secret manager asset id
+- `secret_name` - (String) CyberArk secret name
 
 #### HashiCorp Secret Manager: `asset_connection.hashicorp_secret`
 
 The following arguments are optional:
 
-- `field_mapping` (Map of String) Field mapping for HashiCorp secret
+- `field_mapping` (Map of string) Field mapping for HashiCorp secret
 - `path` - (String) HashiCorp secret path
-- `secret_asset_id` - (String) HashiCorp secret asset id
-- `secret_name` - (String) HashiCorp secret mane
+- `secret_asset_id` - (String) HashiCorp secret manager asset id
+- `secret_name` - (String) HashiCorp secret name
 
 ## Import
 
@@ -167,7 +349,7 @@ import {
 Using terraform import, import Cloud Accounts using the `asset_id`. For example:
 
 ```
-$ terraform import dsf_cloud_account.example_aws_cloud_account "arn:partition:service:region:account-id"
+$ terraform import dsfhub_cloud_account.example_aws_cloud_account "arn:partition:service:region:account-id"
 ```
 
-For detailed instructions on importing existing assets to DSF, see [Importing and Onboarding Existing Data Sources with Terraform](https://docs-cybersec.thalesgroup.com/bundle/onboarding-databases-to-sonar-reference-guide/page/Importing-and-Onboarding-Existing-Data-Sources-with-Terraform_784990209.html).
+For detailed instructions on onboarding existing cloud resources to DSF using Terraform's import functionality, see [Importing and Onboarding Existing Data Sources with Terraform](https://docs-cybersec.thalesgroup.com/bundle/onboarding-databases-to-sonar-reference-guide/page/Importing-and-Onboarding-Existing-Data-Sources-with-Terraform_784990209.html).
