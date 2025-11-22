@@ -12,9 +12,10 @@ Terraform resource for managing a DSFHub secret manager.
 
 A secret manager is a service used to store configuration information such as database passwords, API keys, or TLS certificates needed by an application at runtime.
 
-The `dsfhub_secret_manager` resource contains the configuration parameters necessary to onboard a secret manager to DSF Hub. When configuring connections for assets (including data sources, cloud accounts, log aggregators and secret managers) in the DSF Hub, you have the option of using a secret manager as the source for fields such as user credentials or other secrets. If you use this option, certain configuration fields for a connection can be populated from an onboarded secret manager rather than from the configured fields in the asset itself.  Documentation for the underlying API used in this resource can be found at [Onboarding and Managing Secret Managers](https://docs-cybersec.thalesgroup.com/bundle/v15.0-sonar-user-guide/page/85338.htm).
+The `dsfhub_secret_manager` resource supports the configuration parameters necessary to onboard a secret manager to DSF Hub. When configuring connections for assets (including data sources, cloud accounts, log aggregators and secret managers) in the DSF Hub, you have the option of using a secret manager as the source for fields such as user credentials or other secrets. If you use this option, certain configuration fields for a connection can be populated from an onboarded secret manager rather than from the configured fields in the asset itself.  Documentation for the underlying API used in this resource can be found at [Onboarding and Managing Secret Managers](https://docs-cybersec.thalesgroup.com/bundle/v15.0-sonar-user-guide/page/85338.htm).
 
 ## Secret Manager Types
+
 <ul>
 	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/examples/dsfhub-aws-secret-manager/README.md">Amazon Web Services (AWS)</a></li>
 	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/examples/dsfhub-cyberark-secret-manager/README.md">CyberArk</a></li>
@@ -332,11 +333,14 @@ The following arguments are required:
 The following arguments are optional, however some are only supported for certain server types and authentication mechanism combinations. Please see the [asset specifications](https://docs-cybersec.thalesgroup.com/bundle/onboarding-databases-to-sonar-reference-guide/page/Asset-Specifications_35815461.html) for more details:
 
 - `access_id` - (String) The Access key ID of AWS secret access key used for authentication
+- `amazon_secret` - An `amazon_secret` block as defined below, to integrate the asset with AWS Secrets Manager.
 - `aws_iam_server_id` - (String) e.g. vault.example.com
 - `ca_certs_path` - (String) Certificate authority certificates path; what location should the sysetm look for certificate information from. Equivalent to --capath in a curl call
 - `cert_file` - (String) Certificate used for access
 - `credential_expiry` - (String)
+- `cyberark_secret` - A `cyberark_secret` block as defined below, to integrate the asset with CyberArk.
 - `external_id` - (String) External ID to use when assuming a role
+- `hashicorp_secret` - A `hashicorp_secret` block as defined below, to integrate the asset with a HashiCorp Vault.
 - `headers` - (List of string) Additional parameters to pass as HTTP headers when fetching credentials. Example: `["HEADER1: value1", "HEADER2: value2"]`
 - `key_file` - (String) Path to Key used for accessing CyberArk
 - `namespace` - (String) Specifies which HashiCorp namespace to fetch credentials from if not root.
@@ -354,10 +358,9 @@ The following arguments are optional, however some are only supported for certai
 - `v2_key_engine` - (String) Indicates whether the HashiCorp Key/Value (KV) version 2 secrets engine is used.
 
 The following secret manager blocks are optional (this relationship allows secret managers to store their secrets in another secret manager):
-
-- `amazon_secret` - An `amazon_secret` block as defined below, to integrate the asset with AWS Secrets Manager.
-- `cyberark_secret` - A `cyberark_secret` block as defined below, to integrate the asset with CyberArk.
-- `hashicorp_secret` - A `hashicorp_secret` block as defined below, to integrate the asset with a HashiCorp Vault.
+* amazon_secret
+* cyberark_secret
+* hashicorp_secret
 
 #### AWS Secret Manager: `asset_connection.amazon_secret`
 

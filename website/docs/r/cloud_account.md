@@ -14,6 +14,7 @@ Documentation for the underlying APIs used in this resource can be found at
 [Onboarding and Managing Cloud Accounts](https://docs-cybersec.thalesgroup.com/bundle/v15.0-sonar-user-guide/page/84557.htm).
 
 ## Cloud Account Types
+
 <ul>
 	<li>Alibaba</li>
   <li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/examples/dsfhub-aws-cloud-account/README.md">Amazon Web Services (AWS)</a></li>
@@ -150,7 +151,6 @@ resource "dsfhub_cloud_account" "example_azure_cloud_account" {
     auth_mechanism  = "managed_identity"
     reason          = "default"
     subscription_id = "11111111-2222-3333-4444-123456789012"
-    # user_assigned_managed_identity = "your-user-assigned-managed-identity"
   }
 }
 ```
@@ -250,6 +250,7 @@ The following arguments are optional, however some are only supported for certai
 - `aws_proxy_config` - (Block) An `aws_proxy_config` block as defined below for an AWS proxy configuration.
 - `credentials_endpoint` - (String) A specific sts endpoint to use.
 - `criticality` - (Number) The asset's importance to the business. These values are measured on a scale from "Most critical" (1) to "Least critical" (4). Allowed values: 1, 2, 3, 4.
+- `gateway_service` - (String) `gateway-aws@<DB type>.service` Not necessary to be set manually on the asset. Will be set by the Connect Gateway playbook.
 - `jsonar_uid` - (String) Unique identifier (UID) attached to the Agentless Gateway controlling the asset.
 - `location` - (String) Current human-readable description of the physical location of the asset, or region.
 - `managed_by` - (String) Email of the person who maintains the asset; can be different from the owner specified in the owned_by field. Defaults to admin_email.
@@ -287,11 +288,14 @@ The following arguments are optional, however some are only supported for certai
 
 - `access_id` - (String) The Access key ID of AWS secret access key used for authentication
 - `access_key` - (String) The Secret access key used for authentication
+- `amazon_secret` - An `amazon_secret` block as defined below, to integrate the asset with AWS Secrets Manager.
 - `application_id` - (String) This is also referred to as the Client ID and it’s the unique identifier for the registered application being used to execute Python SDK commands against Azure’s API services. You can find this number under Azure Active Directory -> App Registrations -> Owned Applications
 - `ca_certs_path` - (String) Certificate authority certificates path; what location should the sysetm look for certificate information from. Equivalent to --capath in a curl call
 - `client_secret` - (String) This a string containing a secret used by the application to prove its identity when requesting a token. You can get a secret by going to Azure Active Directory -> App Registrations -> Owned Applications, selecting the desired application and then going to Certificates & secrets -> Client secrets -> + New client secret
+- `cyberark_secret` - A `cyberark_secret` block as defined below, to integrate the asset with CyberArk.
 - `directory_id` - (String) This is also referred to as the Tenant ID and is a GUID representing the Active Directory Tenant. It can be found in the Azure Active Directory page under the Azure portal
 - `external_id` - (String) External ID to use when assuming a role
+- `hashicorp_secret` - A `hashicorp_secret` block as defined below, to integrate the asset with a HashiCorp Vault.
 - `key_file` - (String) Location on disk on the key to be used for authentication
 - `role_name` - (String) What role is used to get credentials from.
 - `secret_key` - (String) The Secret access key used for authentication
@@ -299,12 +303,6 @@ The following arguments are optional, however some are only supported for certai
 - `ssl` (Boolean) If true, use SSL when connecting
 - `subscription_id` - (String) This is the Azure account subscription ID. You can find this number under the Subscriptions page on the Azure portal
 - `username` - (String) The name of a profile in `${JSONAR_LOCALDIR}/credentials/.aws/credentials` to use for authenticating. The value of `$JSONAR_LOCALDIR` can be found in `/etc/sysconfig/jsonar` on your DSF machine.
-
-The following secret manager blocks are optional:
-
-- `amazon_secret` - An `amazon_secret` block as defined below, to integrate the asset with AWS Secrets Manager.
-- `cyberark_secret` - A `cyberark_secret` block as defined below, to integrate the asset with CyberArk.
-- `hashicorp_secret` - A `hashicorp_secret` block as defined below, to integrate the asset with a HashiCorp Vault.
 
 #### AWS Secret Manager: `asset_connection.amazon_secret`
 
