@@ -16,7 +16,7 @@ Documentation for the underlying APIs used in this resource can be found at
 ## Cloud Account Types
 
 <ul>
-	<li>Alibaba</li>
+	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/examples/dsfhub-alibaba-cloud-account/README.md">Alibaba</li>
   <li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/examples/dsfhub-aws-cloud-account/README.md">Amazon Web Services (AWS)</a></li>
 	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/examples/dsfhub-azure-cloud-account/README.md">Azure</a></li>
 	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/examples/dsfhub-gcp-cloud-account/README.md">Google Cloud Platform (GCP)</a></li>

@@ -12,7 +12,7 @@ Terraform resource for managing a DSFHub secret manager.
 
 A secret manager is a service used to store configuration information such as database passwords, API keys, or TLS certificates needed by an application at runtime.
 
-The `dsfhub_secret_manager` resource supports the configuration parameters necessary to onboard a secret manager to DSF Hub. When configuring connections for assets (including data sources, cloud accounts, log aggregators and secret managers) in the DSF Hub, you have the option of using a secret manager as the source for fields such as user credentials or other secrets. If you use this option, certain configuration fields for a connection can be populated from an onboarded secret manager rather than from the configured fields in the asset itself.  Documentation for the underlying API used in this resource can be found at [Onboarding and Managing Secret Managers](https://docs-cybersec.thalesgroup.com/bundle/v15.0-sonar-user-guide/page/85338.htm).
+The `dsfhub_secret_manager` resource supports the configuration parameters necessary to onboard a secret manager to DSF Hub. When configuring connections for assets (including data sources, cloud accounts, log aggregators and secret managers) in the DSF Hub, you have the option of using a secret manager as the source for fields such as user credentials or other secrets. If you use this option, certain configuration fields for a connection can be populated from an onboarded secret manager rather than from the configured fields in the asset itself. Documentation for the underlying API used in this resource can be found at [Onboarding and Managing Secret Managers](https://docs-cybersec.thalesgroup.com/bundle/v15.0-sonar-user-guide/page/85338.htm).
 
 ## Secret Manager Types
 

@@ -1,4 +1,12 @@
-## 1.3.7 (Unreleased)
+## 1.3.8 (Unreleased)
+
+ENHANCEMENTS:
+* Updated docs and README.md
+
+BUG FIXES:
+* 
+
+## 1.3.7 (May 5, 2025)
 
 ENHANCEMENTS:
 

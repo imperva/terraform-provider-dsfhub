@@ -17,7 +17,7 @@ The `dsfhub_log_aggregator` resource supports the configuration parameters neces
 ## Log Aggregator Types
 
 <ul>
-	<li>Alibaba Logstore</li>
+	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/modules/dsfhub-alibaba-logstore/README.md">Alibaba Logstore</li>
 	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/modules/dsfhub-aws-kinesis/README.md">AWS Kinesis</a></li>
 	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/modules/dsfhub-aws-log-group/README.md">AWS Log Group</a></li>
 	<li><a href="https://github.com/imperva/terraform-dsfhub-agentless-onboarding/blob/main/modules/dsfhub-aws-s3-bucket-la/README.md">Amazon S3</a></li>
@@ -307,7 +307,7 @@ resource "dsfhub_log_aggregator" "example_ssh_log_aggregator" {
 
 ## Argument Reference
 
-### Required
+The following arguments are required by all Log Aggregator server types:
 
 - `admin_email` - (String) The email address to notify about this asset
 - `asset_connection` - (Block) An `asset_connection` block as defined below.
@@ -321,16 +321,19 @@ db.getSiblingDB("lmrm__sonarg").asset.find(
 ```
 - `server_type` - (String) The type of cloud platform or service to be created as a log aggregator. The available values are `ALIBABA LOGSTORE`, `AWS KINESIS`, `AWS LOG GROUP`, `AWS S3`, `AZURE EVENTHUB`, `GCP CLOUD STORAGE BUCKET`, `GCP PUBSUB` and `SSH`.
 
-### Optional
+The following arguments are optional, however some are only supported for certain server types. Please see the [asset specifications](https://docs-cybersec.thalesgroup.com/bundle/onboarding-databases-to-sonar-reference-guide/page/Asset-Specifications_35815461.html) for more details:
 
 - `asset_display_name` - (String) User-friendly name of the asset, defined by user.
 - `asset_source` - (String) The source platform/vendor/system of the asset data. Usually the service responsible for creating that asset document
 - `audit_pull_enabled` (Boolean) If true, sonargateway will collect the audit logs for the associated data source if it can, on the successful Connect Gateway playbook run. 
-- `audit_type` - (String) Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details.  Example: "BIGQUERY","BIGTABLE","BUCKET","MSSQL","MYSQL","POSTGRESQL","SPANNER".
+- `audit_type` - (String) Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details. Example: "BIGQUERY","BIGTABLE","BUCKET","MSSQL","MYSQL","POSTGRESQL","SPANNER".
 - `available_bucket_account_ids` - (List of string) A list of AWS Account IDs to use when pulling account specific audit logs from this bucket. eg: ['123456789012', ‘123456789013’]
 - `available_regions` - (List of string) A list of regions to use in discovery actions that iterate through region
 - `aws_proxy_config` - (Block) An `aws_proxy_config` block as defined below for an AWS proxy configuration.
 - `bucket_account_id` - (String) AWS Account ID where the bucket resides. e.g: "123456789012" our of "redshift/AWSLogs/123456789012/redshift/us-east-1/2022/03/25/my_file.gz". Mandatory for audit_type `DYNAMODB`, `ORACLE` and `REDSHIFT`. 
+- `consumer_group` - (String) The name of the consumer group to use for the pull. Only applies to pull_type: consumer_group. Supported in DSF version 4.19+.
+- `consumer_group_workers` - (String) The number of workers. An integer between 1 and 64 (inclusive) or the string "dynamic" which will automatically retrieve the number of shards and set the workers to that number. Defaults to 2. Only applies when `pull_type` is `consumer_group`.
+- `consumer_worker_prefix` - (String) The prefix to use for the consumer group workers. By default the name of the consumer group is used. Supported in DSF version 4.19+.
 - `content_type` - (String) Content type should be set to the desired <'parent' asset "Server Type">, which is the one that uses this asset as a destination for logs. Note: The content_type field will take precedence on the lookup for parent_asset_id field when checking which server is sending logs to this asset.
 - `credentials_endpoint` - (String) A specific sts endpoint to use
 - `criticality` - (Number) The asset's importance to the business. These values are measured on a scale from "Most critical" (1) to "Least critical" (4). Allowed values: 1, 2, 3, 4
@@ -345,6 +348,7 @@ db.getSiblingDB("lmrm__sonarg").asset.find(
 - `project` - (String) Project separates different resources of multiple users and control access to specific resources
 - `proxy` - (String) Proxy to use for AWS calls if aws_proxy_config is populated the proxy field will get populated from the http value there
 - `pubsub_subscription` - (String) Pub/Sub subscription, e.g. "projects/my-project-name/subscriptions/my-subscription-name"
+- `pull_type` - (String) The method used to pull data from an Alibaba logstore. Possible values: "log_client", "consumer_group". Defaults to "log_client".
 - `region` - (String) For cloud systems with regions, the default region or region used with this asset
 - `s3_provider` - (String) The type of AWS RDS instance that the S3 asset is receiving audit logs from. Accepted value: \"aws-rds-mssql\", required only for AWS RDS MS SQL SERVER auditing workflow up to DSF version 4.19.
 - `server_host_name` - (String) Hostname (or IP if name is unknown)
@@ -360,7 +364,6 @@ The following arguments are optional:
 
 - `http` - (String) HTTP endpoint for AWS proxy config
 - `https` - (String) HTTPS endpoint for AWS proxy config
-
 
 ### service_endpoints
 
