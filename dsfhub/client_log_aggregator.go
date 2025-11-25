@@ -47,7 +47,7 @@ func (c *Client) CreateLogAggregator(logAggregator ResourceWrapper) (*ResourceWr
 
 // ReadLogAggregator gets the LogAggregator by ID
 func (c *Client) ReadLogAggregator(logAggregatorId string) (*ResourceWrapper, error) {
-	log.Printf("[INFO] Getting LogAggregator for logAggregatorId: %s)\n", logAggregatorId)
+	log.Printf("[INFO] Getting LogAggregator for logAggregatorId: %s\n", logAggregatorId)
 
 	reqURL := fmt.Sprintf(endpointLogAggregators+"/%s", url.PathEscape(logAggregatorId))
 	resp, err := c.MakeCall(http.MethodGet, reqURL, nil)

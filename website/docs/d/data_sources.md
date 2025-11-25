@@ -1,26 +1,26 @@
 ---
-subcategory: "Provider Reference"
+subcategory: ""
 layout: "dsfhub"
 page_title: "DSFHUB Data Sources - Terraform Data Source"
 description: |-
   Provides dsfhub_data_sources terraform data source.
 ---
 
-# dsfhub_data_sources (Data Source)
+# Data Source: dsfhub_data_sources
 
-Use this data source to get the asset_ids of DSFDataSources.
+Use this data source to get asset_ids of DSF Data Sources.
 
-### Example Usage
+## Example Usage
 
 ___
 
-All DSFDataSources on a DSF HUB
+All DSF Data Sources on a DSF HUB:
 
 ```hcl
 data "dsfhub_data_sources" "data_sources" {}
 ```
 
-DSFDataSources filtered by asset_id regex
+DSF Data Sources filtered by asset_id regex:
 
 ```hcl
 data "dsfhub_data_sources" "data_sources" {
@@ -28,7 +28,7 @@ data "dsfhub_data_sources" "data_sources" {
 }
 ```
 
-Look up a DSFDataSource by specific asset_id to see if it exists
+Look up a DSF Data Source by a specific asset_id to see if it exists:
 
 ```hcl
 data "dsfhub_data_sources" "data_sources" {
@@ -40,10 +40,10 @@ data "dsfhub_data_sources" "data_sources" {
 
 This data source supports the following arguments:
 
-- `asset_id_regex` (String) Optional - Regex string to apply to the DSFDataSource list returned by DSFHUB. This allows more advanced filtering not supported from the DSFHUB API. This filtering is done locally on what DSFHUB returns.
+- `asset_id_regex` (String) Optional - Regex string to apply to the Cloud Accounts list returned by DSFHUB. This allows for more advanced filtering not supported from the DSFHUB API. This filtering is done locally on what DSFHUB returns.
 
 ## Attribute Reference
 
 The following attributes are exported:
 
-- `asset_ids` (String) Set of asset_ids of the matched DSFDataSources.
+- `asset_ids` - (String) Set of asset_ids of the matched DSF Data Sources.

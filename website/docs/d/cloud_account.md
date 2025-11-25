@@ -26,9 +26,9 @@ resource "dsfhub_data_source" "aws_rds_mysql_asset" {
   gateway_id         = var.gateway_id
   region             = "us-east-2"
   server_host_name   = var.server_host_name	
-  server_port        = 3306
+  server_port        = "3306"
   
-  parent_asset_id = dsfhub_cloud_account.example_aws_cloud_account.asset_id
+  parent_asset_id = data.dsfhub_cloud_account.example_aws_cloud_account.asset_id
 
   asset_connection {
     auth_mechanism  = "password"
