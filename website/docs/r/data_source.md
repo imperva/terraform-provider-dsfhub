@@ -86,7 +86,7 @@ The following values for `server_type` are supported:
 * GCP SPANNER
 * GEMFIRE
 * GRAINITE
-* GRAINITE IGNITE
+* GRIDGAIN IGNITE
 * HBASE
 * HDFS
 * HIVE
@@ -188,6 +188,7 @@ The following arguments are optional, however some are only supported for certai
 - `proxy` - (String) Proxy to use for AWS calls if aws_proxy_config is populated the proxy field will get populated from the http value there
 - `pubsub_subscription` - (String) Pub/Sub subscription, e.g. "projects/my-project-name/subscriptions/my-subscription-name"
 - `region` - (String) For cloud systems with regions, the default region or region used with this asset
+- `resource_id` - (String) AWS Resource ID that the RDS Db2 audit logs will be stored under on S3. E.g. db-3TBJU4Y34IAVE2DQRQUWYOEX3I
 - `sdm_enabled` - (Boolean) Sensitive data management (SDM) is enabled if this parameter is set to True.
 - `searches` - (List of string) A list of searches
 - `server_host_name` - (String) Hostname (or IP if name is unknown)

@@ -114,7 +114,7 @@ func resourceSecretManager() *schema.Resource {
 						},
 						"access_id": {
 							Type:        schema.TypeString,
-							Description: "The Access key ID of AWS secret access key used to authenticate",
+							Description: "The Access key ID of AWS secret access key used for authentication",
 							Required:    false,
 							Optional:    true,
 						},
@@ -131,7 +131,7 @@ func resourceSecretManager() *schema.Resource {
 								Schema: map[string]*schema.Schema{
 									"field_mapping": {
 										Type:        schema.TypeMap,
-										Description: "Field mapping for amazon secret",
+										Description: "Field mapping for AWS secret",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -141,14 +141,14 @@ func resourceSecretManager() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret asset id",
+										Description: "AWS secret manager asset_id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret mane",
+										Description: "AWS secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -186,36 +186,9 @@ func resourceSecretManager() *schema.Resource {
 							Required:    false,
 							Optional:    true,
 						},
-						"credential_fields": {
-							Type:        schema.TypeSet,
-							Description: "Document containing values to build a profile from. Filling this will create a profile using the given profile name",
-							Required:    false,
-							Optional:    true,
-							Default:     nil,
-							MinItems:    0,
-							Set:         resourceConnectionDataCredentialFieldsHash,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"credential_source": {
-										Type:        schema.TypeString,
-										Description: "HashiCorp secret asset id",
-										Required:    false,
-										Optional:    true,
-										Default:     nil,
-									},
-									"role_arn": {
-										Type:        schema.TypeString,
-										Description: "HashiCorp secret mane",
-										Required:    false,
-										Optional:    true,
-										Default:     nil,
-									},
-								},
-							},
-						},
 						"cyberark_secret": {
 							Type:        schema.TypeSet,
-							Description: "Configuration to integrate with AWS Secrets Manager",
+							Description: "Configuration to integrate with CyberArk",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -226,7 +199,7 @@ func resourceSecretManager() *schema.Resource {
 								Schema: map[string]*schema.Schema{
 									"field_mapping": {
 										Type:        schema.TypeMap,
-										Description: "Field mapping for amazon secret",
+										Description: "Field mapping for CyberArk secret",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -236,14 +209,14 @@ func resourceSecretManager() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret asset id",
+										Description: "CyberArk secret manager asset_id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret mane",
+										Description: "CyberArk secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -286,14 +259,14 @@ func resourceSecretManager() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "HashiCorp secret asset id",
+										Description: "HashiCorp secret manager asset_id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "HashiCorp secret mane",
+										Description: "HashiCorp secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -301,9 +274,26 @@ func resourceSecretManager() *schema.Resource {
 								},
 							},
 						},
+						"headers": {
+							Type:        schema.TypeList,
+							Description: "A list of headers to include in the request",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+							Computed:    true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
 						"key_file": {
 							Type:        schema.TypeString,
 							Description: "",
+							Required:    false,
+							Optional:    true,
+						},
+						"namespace": {
+							Type:        schema.TypeString,
+							Description: "Specifies which namespace to fetch credentials from if not root.",
 							Required:    false,
 							Optional:    true,
 						},
@@ -339,7 +329,7 @@ func resourceSecretManager() *schema.Resource {
 						},
 						"secret_key": {
 							Type:        schema.TypeString,
-							Description: "The Secret access key used to authenticate",
+							Description: "The Secret access key used for authentication",
 							Required:    false,
 							Optional:    true,
 						},
@@ -348,6 +338,13 @@ func resourceSecretManager() *schema.Resource {
 							Description: "",
 							Required:    false,
 							Optional:    true,
+						},
+						"session_token": {
+							Type:        schema.TypeString,
+							Description: "STS token used for session authentication",
+							Required:    false,
+							Optional:    true,
+							Sensitive:   true,
 						},
 						"ssl": {
 							Type:        schema.TypeBool,
@@ -396,14 +393,14 @@ func resourceSecretManager() *schema.Resource {
 			},
 			"jsonar_uid": {
 				Type:        schema.TypeString,
-				Description: "Unique identifier (UID) attached to the Sonar machine controlling the asset",
+				Description: "Unique identifier (UID) attached to the Agentless Gateway controlling the asset",
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
 			},
 			"jsonar_uid_display_name": {
 				Type:        schema.TypeString,
-				Description: "Unique identifier (UID) attached to the Sonar machine controlling the asset",
+				Description: "Unique identifier (UID) attached to the Agentless Gateway controlling the asset",
 				Required:    false,
 				Optional:    true,
 				Computed:    true,
@@ -443,7 +440,8 @@ func resourceSecretManager() *schema.Resource {
 			"server_host_name": {
 				Type:        schema.TypeString,
 				Description: "Hostname (or IP if name is unknown)",
-				Required:    true,
+				Required:    false,
+				Optional:    true,
 			},
 			"server_ip": {
 				Type:        schema.TypeString,
@@ -459,7 +457,7 @@ func resourceSecretManager() *schema.Resource {
 			},
 			"server_type": {
 				Type:        schema.TypeString,
-				Description: "The type of server or data service to be created as a data source. The list of available data sources is documented at: https://docs.imperva.com/bundle/v4.11-sonar-user-guide/page/84552.htm",
+				Description: "The type of service to be created as a secret manager. Available values include AWS, CYBERARK, and HASHICORP.",
 				Required:    true,
 			},
 			"service_endpoints": {
@@ -620,7 +618,9 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 		connection["cert_file"] = v.ConnectionData.CaFile
 		connection["credential_expiry"] = v.ConnectionData.CredentialExpiry
 		connection["external_id"] = v.ConnectionData.ExternalID
+		connection["headers"] = v.ConnectionData.Headers
 		connection["key_file"] = v.ConnectionData.KeyFile
+		connection["namespace"] = v.ConnectionData.Namespace
 		connection["nonce"] = v.ConnectionData.Nonce
 		connection["protocol"] = v.ConnectionData.Protocol
 		connection["query"] = v.ConnectionData.Query
@@ -629,6 +629,7 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 		connection["role_name"] = v.ConnectionData.RoleName
 		connection["secret_key"] = v.ConnectionData.SecretKey
 		connection["self_signed"] = v.ConnectionData.SelfSigned
+		connection["session_token"] = v.ConnectionData.SessionToken
 		connection["ssl"] = v.ConnectionData.Ssl
 		connection["store_aws_credentials"] = v.ConnectionData.StoreAwsCredentials
 		connection["username"] = v.ConnectionData.Username
@@ -643,15 +644,6 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 			amazonSecretMap["secret_name"] = v.ConnectionData.AmazonSecret.SecretName
 			amazonSecret.Add(amazonSecretMap)
 			connection["amazon_secret"] = amazonSecret
-		}
-
-		if v.ConnectionData.CredentialFields != nil {
-			credentialFields := &schema.Set{F: resourceConnectionDataCredentialFieldsHash}
-			credentialFieldsMap := map[string]interface{}{}
-			credentialFieldsMap["credential_source"] = v.ConnectionData.CredentialFields.CredentialSource
-			credentialFieldsMap["role_arn"] = v.ConnectionData.CredentialFields.RoleArn
-			credentialFields.Add(credentialFieldsMap)
-			connection["credential_fields"] = credentialFields
 		}
 
 		if v.ConnectionData.CyberarkSecret != nil {
@@ -771,7 +763,24 @@ func resourceSecretManagerConnectionHash(v interface{}) int {
 		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
 	}
 
+	if v, ok := m["headers"]; ok && v != nil {
+		if headersSlice, ok := v.([]interface{}); ok {
+			for _, header := range headersSlice {
+				if headerStr, ok := header.(string); ok {
+					buf.WriteString(fmt.Sprintf("%s-", headerStr))
+				}
+			}
+		} else if headerStr, ok := v.(string); ok {
+			// fallback if it's a single string (shouldn't happen with TypeList, but safe)
+			buf.WriteString(fmt.Sprintf("%s-", headerStr))
+		}
+	}
+
 	if v, ok := m["key_file"]; ok {
+		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
+	}
+
+	if v, ok := m["namespace"]; ok {
 		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
 	}
 
@@ -805,6 +814,10 @@ func resourceSecretManagerConnectionHash(v interface{}) int {
 
 	if v, ok := m["self_signed"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(bool)))
+	}
+
+	if v, ok := m["session_token"]; ok {
+		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
 	}
 
 	if v, ok := m["ssl"]; ok {

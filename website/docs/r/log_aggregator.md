@@ -325,6 +325,7 @@ The following arguments are optional, however some are only supported for certai
 
 - `asset_display_name` - (String) User-friendly name of the asset, defined by user.
 - `asset_source` - (String) The source platform/vendor/system of the asset data. Usually the service responsible for creating that asset document
+- `audit_data_type` - (String) The type of audit data being collected
 - `audit_pull_enabled` (Boolean) If true, sonargateway will collect the audit logs for the associated data source if it can, on the successful Connect Gateway playbook run. 
 - `audit_type` - (String) Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details. Example: "BIGQUERY","BIGTABLE","BUCKET","MSSQL","MYSQL","POSTGRESQL","SPANNER".
 - `available_bucket_account_ids` - (List of string) A list of AWS Account IDs to use when pulling account specific audit logs from this bucket. eg: ['123456789012', ‘123456789013’]

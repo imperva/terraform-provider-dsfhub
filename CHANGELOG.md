@@ -2,9 +2,18 @@
 
 ENHANCEMENTS:
 * Updated docs and README.md
+* resource/log_aggregator: added the following attributes: audit_data_type, asset_connection.user_identity_client_id, consumer_group, consumer_group_workers, consumer_worker_prefix, pull_type, endpoint, logstore, project
+* resource/secret_manager: added the following attributes: asset_connection.headers, asset_connection.namespace, asset_connection.session_token, 
+* resource/cloud_account: added the following attributes: asset_connection.session_token
+* resource/data_source: added the following attributes: resource_id
+* resource/data_source: added support for AWS RDS DB2, CLICKHOUSE, DRUID CLUSTER, DRUID, GAUSSDB, GCP FIRESTORE, GEMFIRE, GRAINITE, GRIDGAIN IGNITE, MAPR FS, MAPR HBASE, SAP IQ, SINGLESTORE, TIGERGRAPH, VERTICA server types
 
 BUG FIXES:
-* 
+* all resources: deprecated asset_connection.credential_fields field
+* all resources: fixed aws_proxy_config and service_endpoints hash functions
+* all resources: fixed asset_connection.ssl
+* resource/data_source: fixed the data type of the asset field searches
+* resource/secret_manager: server_host_name is no longer required
 
 ## 1.3.7 (May 5, 2025)
 

@@ -238,7 +238,7 @@ var assetSchemaJson = `{
         },
         "ClientSecret": {
             "defaultValue": null,
-            "description": "Secret used to authenticate to the token endpoint",
+            "description": "Secret used for authentication to the token endpoint",
             "displayName": "Client Secret",
             "example": "",
             "id": "client_secret",
@@ -289,18 +289,6 @@ var assetSchemaJson = `{
             "id": "credential_expiry",
             "required": false,
             "type": "string"
-        },
-        "CredentialFields": {
-            "defaultValue": null,
-            "description": "Document containing values to build a profile from. Filling this will create a profile using the given profile name",
-            "displayName": "Credential Fields",
-            "example": {
-                "credential_source": "Ec2InstanceMetadata",
-                "role_arn": "arn:aws:iam::111777333222:role/other_role"
-            },
-            "id": "credential_fields",
-            "required": false,
-            "type": "map"
         },
         "Crn": {
             "defaultValue": null,
@@ -504,6 +492,15 @@ var assetSchemaJson = `{
             "required": false,
             "type": "map"
         },
+        "Headers": {
+            "defaultValue": null,
+            "description": "A list of additional parameters to pass as HTTP headers when fetching credentials.",
+            "displayName": "Headers",
+            "example": "\"header_name\": \"header_value\"",
+            "id": "headers",
+            "required": false,
+            "type": "string"
+        },
         "HiveServerType": {
             "defaultValue": null,
             "description": "",
@@ -632,7 +629,7 @@ var assetSchemaJson = `{
         },
         "KeyFile": {
             "defaultValue": null,
-            "description": "Location on disk on the key to be used to authenticate",
+            "description": "Location on disk on the key to be used for authentication",
             "displayName": "Key File",
             "example": "",
             "id": "key_file",
@@ -654,6 +651,15 @@ var assetSchemaJson = `{
             "displayName": "Kinit Program Path",
             "example": "",
             "id": "kinit_program_path",
+            "required": false,
+            "type": "string"
+        },
+        "Namespace": {
+            "defaultValue": null,
+            "description": "Specifies which namespace to fetch credentials from if not root",
+            "displayName": "Namespace",
+            "example": "hashicorp-namespace",
+            "id": "namespace",
             "required": false,
             "type": "string"
         },
@@ -726,7 +732,7 @@ var assetSchemaJson = `{
         },
         "Password": {
             "defaultValue": null,
-            "description": "The password of the user being used to authenticate",
+            "description": "The password of the user being used for authentication",
             "displayName": "Password",
             "example": "",
             "id": "password",
@@ -954,6 +960,15 @@ var assetSchemaJson = `{
             "required": true,
             "type": "string"
         },
+        "SessionToken": {
+            "defaultValue": null,
+            "description": "STS token used for session authentication",
+            "displayName": "Session Token",
+            "example": "",
+            "id": "session_token",
+            "required": false,
+            "type": "string"
+        },
         "SnowflakeRole": {
             "defaultValue": null,
             "description": "Role with which to log into Snowflake",
@@ -1031,7 +1046,7 @@ var assetSchemaJson = `{
         },
         "Token": {
             "defaultValue": null,
-            "description": "Saved token to use to authenticate",
+            "description": "Saved token to use for authentication",
             "displayName": "Token",
             "example": "",
             "id": "token",
@@ -1076,6 +1091,15 @@ var assetSchemaJson = `{
             "id": "use_keytab",
             "required": false,
             "type": "bool"
+        },
+        "UserIdentityClientID": {
+            "defaultValue": null,
+            "description": "The client ID of a user-assigned managed identity.",
+            "displayName": "User Identity Client ID",
+            "example": "a1b2c3de-123c-1234-ab12-ab12c2de3fg4",
+            "id": "user_identity_client_id",
+            "required": false,
+            "type": "string"
         },
         "Username": {
             "defaultValue": null,
@@ -1362,6 +1386,15 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
+        "ConsumerWorkerPrefix": {
+            "defaultValue": null,
+            "description": "The prefix to use for the consumer worker name. This can be useful if you are trying to pull from the same consumer group on different gateways.",
+            "displayName": "Consumer Worker Prefix",
+            "example": "sonar-consumer-",
+            "id": "consumer_worker_prefix",
+            "required": false,
+            "type": "string"
+        },
         "ContentType": {
             "defaultValue": null,
             "description": "Content type should be set to the desired <'parent' asset 'Server Type'>, which is the one that uses this asset as a destination for logs. NOTE: The content_type field will take precedence on the lookup for parent_asset_id field when checking which server is sending logs to this asset.",
@@ -1533,7 +1566,7 @@ var assetSchemaJson = `{
         },
         "JsonarUID": {
             "defaultValue": null,
-            "description": "Unique identifier (UID) attached to the Sonar machine controlling the asset",
+            "description": "Unique identifier (UID) attached to the Agentless Gateway controlling the asset",
             "displayName": "jSonar UID",
             "example": "",
             "id": "jsonar_uid",
@@ -1681,6 +1714,15 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
+        "ResourceID": {
+            "defaultValue": null,
+            "description": "AWS Resource ID that the audit logs will be stored under on S3. E.g. db-3TBJU4Y34IAVE2DQRQUWYOEX3I",
+            "displayName": "Resource ID",
+            "example": "db-3TBJU4Y34IAVE2DQRQUWYOEX3I",
+            "id": "resource_id",
+            "required": false,
+            "type": "string"
+        },
         "SdmEnabled": {
             "defaultValue": null,
             "description": "Sensitive data management (SDM) is enabled if this parameter is set to True.",
@@ -1778,7 +1820,7 @@ var assetSchemaJson = `{
         "Ssl": {
             "defaultValue": null,
             "description": "",
-            "displayName": "Ssl",
+            "displayName": "SSL",
             "example": "",
             "id": "ssl",
             "required": false,

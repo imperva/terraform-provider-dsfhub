@@ -91,7 +91,7 @@ func resourceDSFDataSource() *schema.Resource {
 								Schema: map[string]*schema.Schema{
 									"field_mapping": {
 										Type:        schema.TypeMap,
-										Description: "Field mapping for amazon secret",
+										Description: "Field mapping for AWS secret",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -101,14 +101,14 @@ func resourceDSFDataSource() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret asset id",
+										Description: "AWS secret asset id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret mane",
+										Description: "AWS secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -221,33 +221,6 @@ func resourceDSFDataSource() *schema.Resource {
 							Optional:    true,
 							Default:     nil,
 						},
-						"credential_fields": {
-							Type:        schema.TypeSet,
-							Description: "Document containing values to build a profile from. Filling this will create a profile using the given profile name",
-							Required:    false,
-							Optional:    true,
-							Default:     nil,
-							MinItems:    0,
-							Set:         resourceConnectionDataCredentialFieldsHash,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"credential_source": {
-										Type:        schema.TypeString,
-										Description: "HashiCorp secret asset id",
-										Required:    false,
-										Optional:    true,
-										Default:     nil,
-									},
-									"role_arn": {
-										Type:        schema.TypeString,
-										Description: "HashiCorp secret mane",
-										Required:    false,
-										Optional:    true,
-										Default:     nil,
-									},
-								},
-							},
-						},
 						"crn": {
 							Type:        schema.TypeString,
 							Description: "The CRN unique identifier of the resource",
@@ -257,7 +230,7 @@ func resourceDSFDataSource() *schema.Resource {
 						},
 						"cyberark_secret": {
 							Type:        schema.TypeSet,
-							Description: "Configuration to integrate with AWS Secrets Manager",
+							Description: "Configuration to integrate with CyberArk Secrets Manager",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -268,7 +241,7 @@ func resourceDSFDataSource() *schema.Resource {
 								Schema: map[string]*schema.Schema{
 									"field_mapping": {
 										Type:        schema.TypeMap,
-										Description: "Field mapping for amazon secret",
+										Description: "Field mapping for CyberArk secret",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -278,14 +251,14 @@ func resourceDSFDataSource() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret asset id",
+										Description: "CyberArk secret manager asset_id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret mane",
+										Description: "CyberArk secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -387,14 +360,14 @@ func resourceDSFDataSource() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "HashiCorp secret asset id",
+										Description: "HashiCorp secret manager asset_id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "HashiCorp secret mane",
+										Description: "HashiCorp secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -557,7 +530,7 @@ func resourceDSFDataSource() *schema.Resource {
 						},
 						"password": {
 							Type:        schema.TypeString,
-							Description: "The password of the user being used to authenticate",
+							Description: "The password of the user being used for authentication",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -565,7 +538,7 @@ func resourceDSFDataSource() *schema.Resource {
 						},
 						"principal": {
 							Type:        schema.TypeString,
-							Description: "The principal used to authenticate",
+							Description: "The principal used for authentication",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -703,7 +676,7 @@ func resourceDSFDataSource() *schema.Resource {
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
-							Computed:    true,
+							// Computed:    true,
 						},
 						"ssl_server_cert": {
 							Type:        schema.TypeString,
@@ -736,7 +709,7 @@ func resourceDSFDataSource() *schema.Resource {
 						},
 						"token": {
 							Type:        schema.TypeString,
-							Description: "Saved token to use to authenticate",
+							Description: "Saved token to use for authentication",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -1099,7 +1072,7 @@ func resourceDSFDataSource() *schema.Resource {
 			},
 			"jsonar_uid": {
 				Type:        schema.TypeString,
-				Description: "Unique identifier (UID) attached to the Sonar machine controlling the asset",
+				Description: "Unique identifier (UID) attached to the Agentless Gateway controlling the asset",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
@@ -1107,7 +1080,7 @@ func resourceDSFDataSource() *schema.Resource {
 			},
 			"jsonar_uid_display_name": {
 				Type:        schema.TypeString,
-				Description: "Unique identifier (UID) attached to the Sonar machine controlling the asset",
+				Description: "Unique identifier (UID) attached to the Agentless Gateway controlling the asset",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
@@ -1194,6 +1167,13 @@ func resourceDSFDataSource() *schema.Resource {
 				Optional:    true,
 				Default:     nil,
 			},
+			"resource_id": {
+				Type:        schema.TypeString,
+				Description: "AWS Resource ID that the audit logs will be stored under on S3. E.g. db-3TBJU4Y34IAVE2DQRQUWYOEX3I",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
 			"sdm_enabled": {
 				Type:        schema.TypeBool,
 				Description: "Sensitive data management (SDM) is enabled if this parameter is set to True.",
@@ -1202,11 +1182,14 @@ func resourceDSFDataSource() *schema.Resource {
 				Default:     nil,
 			},
 			"searches": {
-				Type:        schema.TypeString,
+				Type: schema.TypeList,
 				Description: "",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 			"server_host_name": {
 				Type:        schema.TypeString,
@@ -1412,7 +1395,6 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("asset_display_name", dsfDataSourceReadResponse.Data.AssetData.AssetDisplayName)
 	d.Set("asset_id", dsfDataSourceReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", dsfDataSourceReadResponse.Data.AssetData.AssetSource)
-	//d.Set("audit_data_type", dsfDataSourceReadResponse.Data.AssetData.AuditDataType)
 	d.Set("audit_pull_enabled", dsfDataSourceReadResponse.Data.AssetData.AuditPullEnabled)
 	d.Set("audit_type", dsfDataSourceReadResponse.Data.AssetData.AuditType)
 	d.Set("availability_zones", dsfDataSourceReadResponse.Data.AssetData.AvailabilityZones)
@@ -1424,8 +1406,6 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("cluster_id", dsfDataSourceReadResponse.Data.AssetData.ClusterID)
 	d.Set("cluster_member_id", dsfDataSourceReadResponse.Data.AssetData.ClusterMemberID)
 	d.Set("cluster_name", dsfDataSourceReadResponse.Data.AssetData.ClusterName)
-	//d.Set("consumer_group_workers", dsfDataSourceReadResponse.Data.AssetData.ConsumerGroupWorkers)
-	//d.Set("consumer_group", dsfDataSourceReadResponse.Data.AssetData.ConsumerGroup)
 	d.Set("content_type", dsfDataSourceReadResponse.Data.AssetData.ContentType)
 	d.Set("credentials_endpoint", dsfDataSourceReadResponse.Data.AssetData.CredentialsEndpoint)
 	d.Set("criticality", dsfDataSourceReadResponse.Data.AssetData.Criticality)
@@ -1436,7 +1416,6 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("enable_audit_management", dsfDataSourceReadResponse.Data.AssetData.EnableAuditManagement)
 	d.Set("enable_audit_monitoring", dsfDataSourceReadResponse.Data.AssetData.EnableAuditMonitoring)
 	d.Set("enabled_logs_exports", dsfDataSourceReadResponse.Data.AssetData.EnabledLogsExports)
-	//d.Set("endpoint", dsfDataSourceReadResponse.Data.AssetData.Endpoint)
 	d.Set("entitlement_enabled", dsfDataSourceReadResponse.Data.AssetData.EntitlementEnabled)
 	d.Set("gateway_id", dsfDataSourceReadResponse.Data.GatewayID)
 	d.Set("gateway_service", dsfDataSourceReadResponse.Data.AssetData.GatewayService)
@@ -1448,18 +1427,15 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("location", dsfDataSourceReadResponse.Data.AssetData.Location)
 	d.Set("log_bucket_id", dsfDataSourceReadResponse.Data.AssetData.LogBucketID)
 	d.Set("logs_destination_asset_id", dsfDataSourceReadResponse.Data.AssetData.LogsDestinationAssetID)
-	//d.Set("logstore", dsfDataSourceReadResponse.Data.AssetData.Logstore)
 	d.Set("managed_by", dsfDataSourceReadResponse.Data.AssetData.ManagedBy)
 	d.Set("max_concurrent_conn", dsfDataSourceReadResponse.Data.AssetData.MaxConcurrentConn)
 	d.Set("owned_by", dsfDataSourceReadResponse.Data.AssetData.OwnedBy)
 	d.Set("parent_asset_id", dsfDataSourceReadResponse.Data.AssetData.ParentAssetID)
-	//d.Set("project", dsfDataSourceReadResponse.Data.AssetData.Project)
 	d.Set("provider_url", dsfDataSourceReadResponse.Data.AssetData.ProviderUrl)
-	//d.Set("provider", dsfDataSourceReadResponse.Data.AssetData.Proxy)
 	d.Set("proxy", dsfDataSourceReadResponse.Data.AssetData.Proxy)
 	d.Set("pubsub_subscription", dsfDataSourceReadResponse.Data.AssetData.PubsubSubscription)
-	//d.Set("pull_type", dsfDataSourceReadResponse.Data.AssetData.PullType)
 	d.Set("region", dsfDataSourceReadResponse.Data.AssetData.Region)
+	d.Set("resource_id", dsfDataSourceReadResponse.Data.AssetData.ResourceID)
 	d.Set("sdm_enabled", dsfDataSourceReadResponse.Data.AssetData.SdmEnabled)
 	d.Set("searches", dsfDataSourceReadResponse.Data.AssetData.Searches)
 	d.Set("server_host_name", dsfDataSourceReadResponse.Data.AssetData.ServerHostName)
@@ -1518,21 +1494,14 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 		connection["reason"] = v.Reason
 
 		connection["access_id"] = v.ConnectionData.AccessID
-		//connection["access_key"] = v.ConnectionData.AccessKey
-		//connection["access_method"] = v.ConnectionData.AccessMethod
 		connection["account_name"] = v.ConnectionData.AccountName
 		connection["api_key"] = v.ConnectionData.ApiKey
-		//connection["application_id"] = v.ConnectionData.ApplicationID
 		connection["auth_mechanism"] = v.ConnectionData.AuthMechanism
 		connection["autocommit"] = v.ConnectionData.Autocommit
 		connection["aws_connection_id"] = v.ConnectionData.AwsConnectionID
-		//connection["aws_iam_server_id"] = v.ConnectionData.AwsIamServerID
-		//connection["azure_storage_account"] = v.ConnectionData.AzureStorageAccount
-		//connection["azure_storage_container"] = v.ConnectionData.AzureStorageContainer
-		//connection["azure_storage_secret_key"] = v.ConnectionData.AzureStorageSecretKey
 		if v.ConnectionData.BaseDn != "" {
 			connection["base_dn"] = v.ConnectionData.BaseDn
-		}
+		} // TODO
 		connection["bucket"] = v.ConnectionData.Bucket
 		connection["ca_certs_path"] = v.ConnectionData.CaCertsPath
 		connection["ca_file"] = v.ConnectionData.CaFile
@@ -1541,26 +1510,19 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 		connection["client_id"] = v.ConnectionData.ClientID
 		connection["client_secret"] = v.ConnectionData.ClientSecret
 		connection["cluster_id"] = v.ConnectionData.ClusterID
-		connection["cluster_member_id"] = v.ConnectionData.ClusterMemberID
-		connection["cluster_name"] = v.ConnectionData.ClusterName
-		connection["content_type"] = v.ConnectionData.ContentType
-		//connection["credential_expiry"] = v.ConnectionData.CredentialExpiry
+		connection["cluster_member_id"] = v.ConnectionData.ClusterMemberID // TODO
+		connection["cluster_name"] = v.ConnectionData.ClusterName // TODO
+		connection["content_type"] = v.ConnectionData.ContentType // TODO
 		connection["crn"] = v.ConnectionData.Crn
 		connection["database_name"] = v.ConnectionData.DatabaseName
 		connection["db_role"] = v.ConnectionData.DbRole
-		//connection["directory_id"] = v.ConnectionData.DirectoryID
 		connection["dn"] = v.ConnectionData.Dn
 		connection["dns_srv"] = v.ConnectionData.DnsSrv
 		connection["driver"] = v.ConnectionData.Driver
 		connection["dsn"] = v.ConnectionData.Dsn
-		//connection["eventhub_access_key"] = v.ConnectionData.EventhubAccessKey
-		//connection["eventhub_access_policy"] = v.ConnectionData.EventhubAccessPolicy
-		//connection["eventhub_name"] = v.ConnectionData.EventhubName
-		//connection["eventhub_namespace"] = v.ConnectionData.EventhubNamespace
 		connection["external_id"] = v.ConnectionData.ExternalID
 		connection["external"] = v.ConnectionData.External
 		connection["extra_kinit_parameters"] = v.ConnectionData.ExtraKinitParameters
-		//connection["format"] = v.ConnectionData.Format
 		connection["hive_server_type"] = v.ConnectionData.HiveServerType
 		connection["host_name_mismatch"] = v.ConnectionData.HostNameMismatch
 		connection["hosts"] = v.ConnectionData.Hosts
@@ -1579,7 +1541,7 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 		connection["keytab_file"] = v.ConnectionData.KeytabFile
 		connection["kinit_program_path"] = v.ConnectionData.KinitProgramPath
 		connection["net_service_name"] = v.ConnectionData.NetServiceName
-		//connection["nonce"] = v.ConnectionData.Nonce
+		// connection["nonce"] = v.ConnectionData.Nonce
 		//connection["ntlm"] = v.ConnectionData.Ntlm
 		connection["odbc_connection_string"] = v.ConnectionData.OdbcConnectionString
 		//connection["page_size"] = &v.ConnectionData.PageSize
@@ -1612,7 +1574,6 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 		connection["snowflake_role"] = v.ConnectionData.SnowflakeRole
 		connection["ssl_server_cert"] = v.ConnectionData.SslServerCert
 		connection["ssl"] = v.ConnectionData.Ssl
-		//connection["store_aws_credentials"] = v.ConnectionData.StoreAwsCredentials
 		if v.ConnectionData.SubscriptionID != "" {
 			connection["subscription_id"] = v.ConnectionData.SubscriptionID
 		}
@@ -1625,7 +1586,6 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 		//connection["url"] = v.ConnectionData.Url
 		connection["use_keytab"] = v.ConnectionData.UseKeytab
 		connection["username"] = v.ConnectionData.Username
-		//connection["v2_key_engine"] = v.ConnectionData.V2KeyEngine
 		connection["virtual_hostname"] = v.ConnectionData.VirtualHostname
 		connection["virtual_ip"] = v.ConnectionData.VirtualIp
 		connection["wallet_dir"] = v.ConnectionData.WalletDir
@@ -1640,15 +1600,6 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 			amazonSecretMap["secret_name"] = v.ConnectionData.AmazonSecret.SecretName
 			amazonSecret.Add(amazonSecretMap)
 			connection["amazon_secret"] = amazonSecret
-		}
-
-		if v.ConnectionData.CredentialFields != nil {
-			credentialFields := &schema.Set{F: resourceConnectionDataCredentialFieldsHash}
-			credentialFieldsMap := map[string]interface{}{}
-			credentialFieldsMap["credential_source"] = v.ConnectionData.CredentialFields.CredentialSource
-			credentialFieldsMap["role_arn"] = v.ConnectionData.CredentialFields.RoleArn
-			credentialFields.Add(credentialFieldsMap)
-			connection["credential_fields"] = credentialFields
 		}
 
 		if v.ConnectionData.CyberarkSecret != nil {
@@ -1869,6 +1820,10 @@ func resourceDataSourceConnectionHash(v interface{}) int {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 
+	if v, ok := m["bucket_account_id"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
 	if v, ok := m["ca_certs_path"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
@@ -1912,11 +1867,6 @@ func resourceDataSourceConnectionHash(v interface{}) int {
 	//if v, ok := m["credential_expiry"]; ok {
 	//	buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	//}
-
-	if _, ok := m["credential_fields"]; ok {
-		log.Printf("[DEBUG] m[\"credential_fields\"] %v", m["credential_fields"])
-		//buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
 
 	if v, ok := m["crn"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
