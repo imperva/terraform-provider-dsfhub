@@ -506,6 +506,11 @@ func resourceLogAggregator() *schema.Resource {
 				Default:     nil,
 				Computed:    true,
 			},
+			"id": {
+				Type:        schema.TypeString,
+				Description: "Unique identifier for the asset",
+				Computed:    true,
+			},
 			"jsonar_uid": {
 				Type:        schema.TypeString,
 				Description: "Unique identifier (UID) attached to the Agentless Gateway controlling the asset",
@@ -760,6 +765,7 @@ func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("criticality", logAggregatorReadResponse.Data.AssetData.Criticality)
 	d.Set("gateway_id", logAggregatorReadResponse.Data.GatewayID)
 	d.Set("gateway_service", logAggregatorReadResponse.Data.AssetData.GatewayService)
+	d.Set("id", logAggregatorReadResponse.Data.ID)
 	d.Set("jsonar_uid", logAggregatorReadResponse.Data.AssetData.JsonarUID)
 	d.Set("location", logAggregatorReadResponse.Data.AssetData.Location)
 	d.Set("managed_by", logAggregatorReadResponse.Data.AssetData.ManagedBy)

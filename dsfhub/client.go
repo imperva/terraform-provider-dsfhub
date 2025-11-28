@@ -71,7 +71,7 @@ type ResourceData struct {
 	AuditState      string    `json:"auditState,omitempty"`
 	GatewayID       string    `json:"gatewayId"`
 	GatewayName     string    `json:"gatewayName,omitempty"`
-	ID              string    `json:"id,omitempty"`
+	ID              string    `json:"id"`
 	IsMonitored     bool      `json:"isMonitored,omitempty"`
 	ParentAssetID   string    `json:"parentAssetId,omitempty"`
 	RemoteSyncState string    `json:"remoteSyncState,omitempty"`

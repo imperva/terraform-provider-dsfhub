@@ -12,6 +12,7 @@ BUG FIXES:
 * all resources: deprecated asset_connection.credential_fields field
 * all resources: fixed aws_proxy_config and service_endpoints hash functions
 * all resources: fixed asset_connection.ssl
+* all resources: populated ResourceData.ID read-only, computed attribute
 * resource/data_source: fixed the data type of the asset field searches
 * resource/secret_manager: server_host_name is no longer required
 

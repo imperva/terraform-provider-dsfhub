@@ -1048,6 +1048,11 @@ func resourceDSFDataSource() *schema.Resource {
 				Optional:    true,
 				Default:     nil,
 			},
+			"id": {
+				Type:        schema.TypeString,
+				Description: "Unique identifier for the asset",
+				Computed:    true,
+			},
 			"ignore_latest_of": {
 				Type:        schema.TypeString,
 				Description: "A regex defining a group. From all the files with the same group, the latest one will be ignored, so that it isn't archived until server is done writing",
@@ -1182,7 +1187,7 @@ func resourceDSFDataSource() *schema.Resource {
 				Default:     nil,
 			},
 			"searches": {
-				Type: schema.TypeList,
+				Type:        schema.TypeList,
 				Description: "",
 				Required:    false,
 				Optional:    true,
@@ -1420,6 +1425,7 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("gateway_id", dsfDataSourceReadResponse.Data.GatewayID)
 	d.Set("gateway_service", dsfDataSourceReadResponse.Data.AssetData.GatewayService)
 	d.Set("host_timezone_offset", dsfDataSourceReadResponse.Data.AssetData.HostTimezoneOffset)
+	d.Set("id", dsfDataSourceReadResponse.Data.ID)
 	d.Set("ignore_latest_of", dsfDataSourceReadResponse.Data.AssetData.IgnoreLatestOf)
 	d.Set("is_cluster", dsfDataSourceReadResponse.Data.AssetData.IsCluster)
 	d.Set("is_multi_zones", dsfDataSourceReadResponse.Data.AssetData.IsMultiZones)
@@ -1511,8 +1517,8 @@ func resourceDSFDataSourceReadContext(ctx context.Context, d *schema.ResourceDat
 		connection["client_secret"] = v.ConnectionData.ClientSecret
 		connection["cluster_id"] = v.ConnectionData.ClusterID
 		connection["cluster_member_id"] = v.ConnectionData.ClusterMemberID // TODO
-		connection["cluster_name"] = v.ConnectionData.ClusterName // TODO
-		connection["content_type"] = v.ConnectionData.ContentType // TODO
+		connection["cluster_name"] = v.ConnectionData.ClusterName          // TODO
+		connection["content_type"] = v.ConnectionData.ContentType          // TODO
 		connection["crn"] = v.ConnectionData.Crn
 		connection["database_name"] = v.ConnectionData.DatabaseName
 		connection["db_role"] = v.ConnectionData.DbRole

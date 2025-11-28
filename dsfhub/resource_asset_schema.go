@@ -1537,6 +1537,15 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
+        "ID": {
+            "defaultValue": null,
+            "description": "",
+            "displayName": "ID",
+            "example": "",
+            "id": "id",
+            "required": false,
+            "type": "string"
+        },
         "IgnoreLatestOf": {
             "defaultValue": null,
             "description": "A regex defining a group. From all the files with the same group, the latest one will be ignored, so that it isn't archived until server is done writing",
