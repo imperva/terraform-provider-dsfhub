@@ -245,7 +245,9 @@ db.getSiblingDB("lmrm__sonarg").asset.find(
 
 The following arguments are optional, however some are only supported for certain server types. Please see the [asset specifications](https://docs-cybersec.thalesgroup.com/bundle/onboarding-databases-to-sonar-reference-guide/page/Asset-Specifications_35815461.html) for more details:
 
+- `application` - (String) The Asset ID of the application asset that "owns" the asset.
 - `asset_source` - (String) The source platform/vendor/system of the asset data. Usually the service responsible for creating that asset document
+- `asset_version` - (Number) Denotes the database/service version of the asset
 - `available_regions` - (List of string) A list of regions to iterate through while running the Discovery playbook actions.
 - `aws_proxy_config` - (Block) An `aws_proxy_config` block as defined below for an AWS proxy configuration.
 - `credentials_endpoint` - (String) A specific sts endpoint to use.
@@ -259,7 +261,6 @@ The following arguments are optional, however some are only supported for certai
 - `region` - (String) For cloud systems with regions, the default region or region used with this asset.
 - `service_endpoints` - (Block) A `service_endpoints` block as defined below that specifies particular endpoints for a given service in the form of `<service name>: "endpoint"`.
 - `used_for` - (String) Designates how this asset is used / the environment that the asset is supporting.
-- `version` - (Number) Denotes the database/service version of the asset
 
 ### aws_proxy_config
 
@@ -297,6 +298,7 @@ The following arguments are optional, however some are only supported for certai
 - `external_id` - (String) External ID to use when assuming a role
 - `hashicorp_secret` - A `hashicorp_secret` block as defined below, to integrate the asset with a HashiCorp Vault.
 - `key_file` - (String) Location on disk on the key to be used for authentication
+- `project_id` - (String) Used when running Sonar on a GCP hosted environment that doesn't have a service account linked to it
 - `role_name` - (String) What role is used to get credentials from.
 - `secret_key` - (String) The Secret access key used for authentication
 - `session_token` - (String) STS token used for session authentication

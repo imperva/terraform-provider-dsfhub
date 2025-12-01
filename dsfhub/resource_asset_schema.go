@@ -48,15 +48,6 @@ var assetSchemaJson = `{
             "required": true,
             "type": "string"
         },
-        "AccessMethod": {
-            "defaultValue": "VSAM",
-            "description": "The z/OS file system access method to be used",
-            "displayName": "Access Method",
-            "example": "VSAM",
-            "id": "access_method",
-            "required": false,
-            "type": "string"
-        },
         "AccountName": {
             "defaultValue": null,
             "description": "The cloudant account name required when connecting a resource with IAM role",
@@ -171,16 +162,6 @@ var assetSchemaJson = `{
             "required": true,
             "type": "string"
         },
-        "BaseDn": {
-            "defaultValue": null,
-            "description": "",
-            "displayName": "Base DN",
-            "example": "",
-            "id": "base_dn",
-            "optional": false,
-            "required": true,
-            "type": "string"
-        },
         "Bucket": {
             "defaultValue": null,
             "description": "",
@@ -278,15 +259,6 @@ var assetSchemaJson = `{
             "displayName": "Content-Type",
             "example": "",
             "id": "content_type",
-            "required": false,
-            "type": "string"
-        },
-        "CredentialExpiry": {
-            "defaultValue": null,
-            "description": "",
-            "displayName": "Credential Expiry",
-            "example": "",
-            "id": "credential_expiry",
             "required": false,
             "type": "string"
         },
@@ -681,15 +653,6 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
-        "Ntlm": {
-            "defaultValue": false,
-            "description": "",
-            "displayName": "NTLM",
-            "example": false,
-            "id": "ntlm",
-            "required": false,
-            "type": "bool"
-        },
         "OauthParameters": {
             "defaultValue": null,
             "description": "Additional parameters to pass when requesting a token",
@@ -709,16 +672,6 @@ var assetSchemaJson = `{
             "example": ";MaxVarchar=65535",
             "id": "odbc_connection_string",
             "required": false,
-            "type": "string"
-        },
-        "PageSize": {
-            "defaultValue": null,
-            "description": "",
-            "displayName": "Page Size",
-            "example": "",
-            "id": "page_size",
-            "optional": false,
-            "required": true,
             "type": "string"
         },
         "Passphrase": {
@@ -758,6 +711,16 @@ var assetSchemaJson = `{
             "id": "principal",
             "optional": false,
             "required": true,
+            "type": "string"
+        },
+        "ProjectID": {
+            "defaultValue": null,
+            "description": "Used when running Sonar on a GCP hosted environment that doesn't have a service account linked to it.",
+            "displayName": "Project ID",
+            "example": "my-gcp-project",
+            "id": "project_id",
+            "optional": true,
+            "required": false,
             "type": "string"
         },
         "Protocol": {
@@ -816,7 +779,7 @@ var assetSchemaJson = `{
         },
         "Query": {
             "defaultValue": null,
-            "description": "",
+            "description": "Query parameters defining where the passwords, etc. should be retrieved from. Example: 'AppID=<your_CyberArk_Application_ID>&Safe=<your_CyberArk_Safe_Name>;'",
             "displayName": "Query",
             "example": "",
             "id": "query",
@@ -893,6 +856,16 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
+        "SecBeforeOperatingExpiredToken": {
+            "defaultValue": null,
+            "description": "How many more seconds should a token be valid for before the connections service will update it before returning a connection to a caller. Defaults to 300 seconds (5 minutes)",
+            "displayName": "sec_before_operating_expired_token",
+            "example": "300",
+            "id": "sec_before_operating_expired_token",
+            "optional": true,
+            "required": false,
+            "type": "string"
+        },
         "SecretKey": {
             "defaultValue": null,
             "description": "A secret string that the application uses to prove its identity when when requesting a token (same as Client Secret)",
@@ -902,15 +875,6 @@ var assetSchemaJson = `{
             "optional": false,
             "required": true,
             "type": "string"
-        },
-        "SecureConnection": {
-            "defaultValue": false,
-            "description": "",
-            "displayName": "Secure Connection",
-            "example": false,
-            "id": "secure_connection",
-            "required": false,
-            "type": "bool"
         },
         "SelfSigned": {
             "defaultValue": null,
@@ -966,6 +930,15 @@ var assetSchemaJson = `{
             "displayName": "Session Token",
             "example": "",
             "id": "session_token",
+            "required": false,
+            "type": "string"
+        },
+        "Sid": {
+            "defaultValue": null,
+            "description": "SID used to connect, e.g. ORCL",
+            "displayName": "SID",
+            "example": "",
+            "id": "sid",
             "required": false,
             "type": "string"
         },
@@ -1628,6 +1601,15 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
+        "MarkerAlias": {
+            "defaultValue": null,
+            "description": "Cluster or System name for a DR pair or similar system where all nodes share a single log. All machines sharing a marker alias will use the same marker. This means that the log will be pulled once rather than once per machine.",
+            "displayName": "Marker Alias",
+            "example": "",
+            "id": "marker_alias",
+            "required": false,
+            "type": "string"
+        },
         "MaxConcurrentConn": {
             "defaultValue": null,
             "description": "Maximum number of concurrent connections that sensitive data management should use at once.",
@@ -1817,15 +1799,6 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
-        "SmtpTimeout": {
-            "defaultValue": null,
-            "description": "",
-            "displayName": "SMTP Timeout",
-            "example": "",
-            "id": "smtp_timeout",
-            "required": false,
-            "type": "string"
-        },
         "Ssl": {
             "defaultValue": null,
             "description": "",
@@ -1868,7 +1841,7 @@ var assetSchemaJson = `{
             "description": "Denotes the version of the asset",
             "displayName": "Version",
             "example": 5.7,
-            "id": "version",
+            "id": "asset_version",
             "required": false,
             "type": "float"
         },

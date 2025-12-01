@@ -16,7 +16,7 @@ Terraform can natively import CSV data using the [csvdecode](https://www.terrafo
 Create a CSV file with the following format.  The first row is the header row and the remaining rows are the asset data.  The header row is used to map the column data to the asset attributes.
 
 ```csv
-id,asset_id,jsonar_uid,asset_display_name,Server Type,Server IP,Server Host Name,Service Name,Server Port,version,audit_type,auth_mechanism,username,password,reason,admin_email
+id,asset_id,jsonar_uid,asset_display_name,Server Type,Server IP,Server Host Name,Service Name,Server Port,asset_version,audit_type,auth_mechanism,username,password,reason,admin_email
 1,my.hostname1:ORACLE:ORA19C:1521,ABCDE-12345-ABCDE-12345,my.hostname1:ORACLE:ORA19C:1521,ORACLE,0.0.0.0,my.hostname1:ORACLE:ORA19C:1521,my-ora-service-name,3202,19,UNIFIED,kerberos,test,test,sonargateway,your@email.com
 2,my.hostname2:ORACLE:ORA19C:1521,ABCDE-12345-ABCDE-12345,my.hostname2:ORACLE:ORA19C:1521,ORACLE,0.0.0.0,my.hostname2:ORACLE:ORA19C:1521,my-ora-service-name,3202,19,UNIFIED,password,admin,password,sonargateway,your@email.com
 ```
@@ -87,7 +87,7 @@ resource "dsfhub_data_source" "bulk-database-import" {
 	server_ip           = each.value["Server IP"]
 	server_port         = each.value["Server Port"]
 	service_name		= each.value["Service Name"]
-	version             = each.value.version
+	asset_version       = each.value.asset_version
 
 	dynamic "asset_connection" {
     	for_each = each.value.auth_mechanism=="password" ? [1] : []

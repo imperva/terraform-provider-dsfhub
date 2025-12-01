@@ -129,6 +129,7 @@ type AssetData struct {
 	LogsDestinationAssetID    string            `json:"logs_destination_asset_id,omitempty"`
 	Logstore                  string            `json:"logstore,omitempty"`
 	ManagedBy                 string            `json:"managed_by,omitempty"`
+	MarkerAlias               string            `json:"marker_alias,omitempty"`
 	MaxConcurrentConn         string            `json:"max_concurrent_conn,omitempty"`
 	OwnedBy                   string            `json:"owned_by,omitempty"`
 	ParentAssetID             string            `json:"parent_asset_id,omitempty"`
@@ -149,7 +150,6 @@ type AssetData struct {
 	ServiceEndpoint  string            `json:"service_endpoint,omitempty"`
 	ServiceEndpoints *ServiceEndpoints `json:"service_endpoints,omitempty"`
 	ServiceName      string            `json:"Service Name,omitempty"`
-	SmtpTimeout      string            `json:"smtp_timeout,omitempty"`
 	Ssl              bool              `json:"SSL,omitempty"`
 	SubscriptionID   string            `json:"subscription_id,omitempty"`
 	UsedFor          string            `json:"used_for,omitempty"`
@@ -180,128 +180,126 @@ type ServiceEndpoints struct {
 }
 
 type ConnectionData struct {
-	AccessID                      string           `json:"access_id,omitempty"`
-	AccessKey                     string           `json:"access_key,omitempty"`
-	AccessMethod                  string           `json:"access_method,omitempty"`
-	AccountName                   string           `json:"account_name,omitempty"`
-	AmazonSecret                  *Secret          `json:"amazon_secret,omitempty"`
-	ApiKey                        string           `json:"api_key,omitempty"`
-	ApplicationID                 string           `json:"application_id,omitempty"`
-	AuthMechanism                 string           `json:"auth_mechanism,omitempty"`
-	Autocommit                    bool             `json:"autocommit,omitempty"`
-	AwsConnectionID               string           `json:"aws_connection_id,omitempty"`
-	AwsIamServerID                string           `json:"aws_iam_server_id,omitempty"`
-	AzureStorageAccount           string           `json:"azure_storage_account,omitempty"`
-	AzureStorageContainer         string           `json:"azure_storage_container,omitempty"`
-	AzureStorageSecretKey         string           `json:"azure_storage_secret_key,omitempty"`
-	BaseDn                        string           `json:"base_dn,omitempty"`
-	Bucket                        string           `json:"bucket,omitempty"`
-	CaCertsPath                   string           `json:"ca_certs_path,omitempty"`
-	CaFile                        string           `json:"ca_file,omitempty"`
-	CacheFile                     string           `json:"cache_file,omitempty"`
-	CertFile                      string           `json:"cert_file,omitempty"`
-	ClientID                      string           `json:"client_id,omitempty"`
-	ClientSecret                  string           `json:"client_secret,omitempty"`
-	ClusterID                     string           `json:"cluster_id,omitempty"`
-	ClusterMemberID               string           `json:"cluster_member_id,omitempty"`
-	ClusterName                   string           `json:"cluster_name,omitempty"`
-	ContentType                   string           `json:"content_type,omitempty"`
-	CredentialExpiry              string           `json:"credential_expiry,omitempty"`
-	Crn                           string           `json:"crn,omitempty"`
-	CyberarkSecret                *Secret          `json:"cyberark_secret,omitempty"`
-	DatabaseName                  string           `json:"database_name,omitempty"`
-	DbRole                        string           `json:"db_role,omitempty"`
-	DirectoryID                   string           `json:"directory_id,omitempty"`
-	Dn                            string           `json:"dn,omitempty"`
-	DnsSrv                        bool             `json:"dns_srv,omitempty"`
-	Driver                        string           `json:"driver,omitempty"`
-	Dsn                           string           `json:"DSN,omitempty"`
-	EventhubAccessKey             string           `json:"eventhub_access_key,omitempty"`
-	EventhubAccessPolicy          string           `json:"eventhub_access_policy,omitempty"`
-	EventhubName                  string           `json:"eventhub_name,omitempty"`
-	EventhubNamespace             string           `json:"eventhub_namespace,omitempty"`
-	External                      bool             `json:"external,omitempty"`
-	ExternalID                    string           `json:"external_id,omitempty"`
-	ExtraKinitParameters          string           `json:"extra_kinit_parameters,omitempty"`
-	Format                        string           `json:"format,omitempty"`
-	HashicorpSecret               *Secret          `json:"hashicorp_secret,omitempty"`
-	Headers                       []interface{}    `json:"headers,omitempty"`
-	HiveServerType                string           `json:"hive_server_type,omitempty"`
-	HostNameMismatch              bool             `json:"host_name_mismatch,omitempty"`
-	Hosts                         string           `json:"hosts,omitempty"`
-	Httppath                      string           `json:"httppath,omitempty"`
-	IsCluster                     bool             `json:"is_cluster,omitempty"`
-	JdbcSslTrustServerCertificate bool             `json:"jdbc_ssl_trust_server_certificate,omitempty"`
-	JdbcSslTrustStoreLocation     string           `json:"jdbc_ssl_trust_store_location,omitempty"`
-	JdbcSslTrustStorePassword     string           `json:"jdbc_ssl_trust_store_password,omitempty"`
-	KerberosHostFqdn              string           `json:"kerberos_host_fqdn,omitempty"`
-	KerberosKdc                   string           `json:"kerberos_kdc,omitempty"`
-	KerberosRetryCount            int              `json:"kerberos_retry_count,omitempty"`
-	KerberosServiceKdc            string           `json:"kerberos_service_kdc,omitempty"`
-	KerberosServiceRealm          string           `json:"kerberos_service_realm,omitempty"`
-	KerberosSpn                   string           `json:"kerberos_spn,omitempty"`
-	KeyFile                       string           `json:"key_file,omitempty"`
-	KeytabFile                    string           `json:"keytab_file,omitempty"`
-	KinitProgramPath              string           `json:"kinit_program_path,omitempty"`
-	Namespace                     string           `json:"namespace,omitempty"`
-	NetServiceName                string           `json:"net_service_name,omitempty"`
-	Nonce                         string           `json:"nonce,omitempty"`
-	Ntlm                          bool             `json:"ntlm,omitempty"`
-	OauthParameters               *OauthParameters `json:"oauth_parameters,omitempty"`
-	OdbcConnectionString          string           `json:"odbc_connection_string,omitempty"`
-	PageSize                      string           `json:"page_size,omitempty"`
-	Passphrase                    string           `json:"passphrase,omitempty"`
-	Password                      string           `json:"password,omitempty"`
-	Port                          string           `json:"port,omitempty"`
-	Principal                     string           `json:"principal,omitempty"`
-	Protocol                      string           `json:"protocol,omitempty"`
-	ProxyAutoDetect               string           `json:"proxy_auto_detect,omitempty"`
-	ProxyPassword                 string           `json:"proxy_password,omitempty"`
-	ProxyPort                     string           `json:"proxy_port,omitempty"`
-	ProxyServer                   string           `json:"proxy_server,omitempty"`
-	ProxySslType                  string           `json:"proxy_ssl_type,omitempty"`
-	Query                         string           `json:"query,omitempty"`
-	RedirectUri                   string           `json:"redirect_uri,omitempty"`
-	Region                        string           `json:"region,omitempty"`
-	ReplicaSet                    string           `json:"replica_set,omitempty"`
-	ResourceID                    string           `json:"resource_id,omitempty"`
-	RoleName                      string           `json:"role_name,omitempty"`
-	Schema                        string           `json:"schema,omitempty"`
-	SecretKey                     string           `json:"secret_key,omitempty"`
-	SecureConnection              bool             `json:"secure_connection,omitempty"`
-	SelfSigned                    bool             `json:"self_signed,omitempty"`
-	SelfSignedCert                bool             `json:"self_signed_cert,omitempty"`
-	ServerIp                      string           `json:"server_ip,omitempty"`
-	ServerPort                    int              `json:"server_port,omitempty"`
-	ServiceKey                    string           `json:"service_key,omitempty"`
-	SessionToken                  string           `json:"session_token,omitempty"`
-	SnowflakeRole                 string           `json:"snowflake_role,omitempty"`
-	Ssl                           bool             `json:"SSL,omitempty"`
-	SslServerCert                 string           `json:"ssl_server_cert,omitempty"`
-	StoreAwsCredentials           bool             `json:"store_aws_credentials,omitempty"`
-	SubscriptionID                string           `json:"subscription_id,omitempty"`
-	TenantID                      string           `json:"tenant_id,omitempty"`
-	ThriftTransport               int              `json:"thrift_transport,omitempty"`
-	TmpUser                       bool             `json:"tmp_user,omitempty"`
-	Token                         string           `json:"token,omitempty"`
-	TokenEndpoint                 string           `json:"token_endpoint,omitempty"`
-	Transportmode                 string           `json:"transportmode,omitempty"`
-	Url                           string           `json:"url,omitempty"`
-	UseKeytab                     bool             `json:"use_keytab,omitempty"`
-	Username                      string           `json:"username,omitempty"`
-	UserIdentityClientID          string           `json:"user_identity_client_id,omitempty"`
-	V2KeyEngine                   bool             `json:"v2_key_engine,omitempty"`
-	VirtualHostname               string           `json:"virtual_hostname,omitempty"`
-	VirtualIp                     string           `json:"virtual_ip,omitempty"`
-	WalletDir                     string           `json:"wallet_dir,omitempty"`
-	Warehouse                     string           `json:"warehouse,omitempty"`
+	AccessID string `json:"access_id,omitempty"`
+	// AccessID                      string           `json:"access_ID,omitempty"` // TODO: find better name, RedshiftAccessID?
+	AccessKey                      string           `json:"access_key,omitempty"`
+	AccountName                    string           `json:"account_name,omitempty"`
+	AmazonSecret                   *Secret          `json:"amazon_secret,omitempty"`
+	ApiKey                         string           `json:"api_key,omitempty"`
+	ApplicationID                  string           `json:"application_id,omitempty"`
+	AuthMechanism                  string           `json:"auth_mechanism,omitempty"`
+	Autocommit                     bool             `json:"autocommit,omitempty"`
+	AwsConnectionID                string           `json:"aws_connection_id,omitempty"`
+	AwsIamServerID                 string           `json:"aws_iam_server_id,omitempty"`
+	AzureStorageAccount            string           `json:"azure_storage_account,omitempty"`
+	AzureStorageContainer          string           `json:"azure_storage_container,omitempty"`
+	AzureStorageSecretKey          string           `json:"azure_storage_secret_key,omitempty"`
+	Bucket                         string           `json:"bucket,omitempty"`
+	CaCertsPath                    string           `json:"ca_certs_path,omitempty"`
+	CaFile                         string           `json:"ca_file,omitempty"`
+	CacheFile                      string           `json:"cache_file,omitempty"`
+	CertFile                       string           `json:"cert_file,omitempty"`
+	ClientID                       string           `json:"client_id,omitempty"`
+	ClientSecret                   string           `json:"client_secret,omitempty"`
+	ClusterID                      string           `json:"cluster_id,omitempty"`
+	ClusterMemberID                string           `json:"cluster_member_id,omitempty"`
+	ClusterName                    string           `json:"cluster_name,omitempty"`
+	ContentType                    string           `json:"content_type,omitempty"`
+	Crn                            string           `json:"crn,omitempty"`
+	CyberarkSecret                 *Secret          `json:"cyberark_secret,omitempty"`
+	DatabaseName                   string           `json:"database_name,omitempty"`
+	DbRole                         string           `json:"db_role,omitempty"`
+	DirectoryID                    string           `json:"directory_id,omitempty"`
+	Dn                             string           `json:"DN,omitempty"`
+	DnsSrv                         bool             `json:"DNS SRV,omitempty"`
+	Driver                         string           `json:"driver,omitempty"`
+	Dsn                            string           `json:"DSN,omitempty"`
+	EventhubAccessKey              string           `json:"eventhub_access_key,omitempty"`
+	EventhubAccessPolicy           string           `json:"eventhub_access_policy,omitempty"`
+	EventhubName                   string           `json:"eventhub_name,omitempty"`
+	EventhubNamespace              string           `json:"eventhub_namespace,omitempty"`
+	External                       bool             `json:"external,omitempty"`
+	ExternalID                     string           `json:"external_id,omitempty"`
+	ExtraKinitParameters           string           `json:"extra_kinit_parameters,omitempty"`
+	Format                         string           `json:"format,omitempty"`
+	HashicorpSecret                *Secret          `json:"hashicorp_secret,omitempty"`
+	Headers                        []interface{}    `json:"headers,omitempty"`
+	HiveServerType                 string           `json:"Hive Server Type,omitempty"`
+	HostNameMismatch               bool             `json:"host_name_mismatch,omitempty"`
+	Hosts                          string           `json:"hosts,omitempty"`
+	Httppath                       string           `json:"httppath,omitempty"`
+	IsCluster                      bool             `json:"is_cluster,omitempty"`
+	JdbcSslTrustServerCertificate  bool             `json:"jdbc_ssl_trust_server_certificate,omitempty"`
+	JdbcSslTrustStoreLocation      string           `json:"jdbc_ssl_trust_store_location,omitempty"`
+	JdbcSslTrustStorePassword      string           `json:"jdbc_ssl_trust_store_password,omitempty"`
+	KerberosHostFqdn               string           `json:"kerberos_host_FQDN,omitempty"`
+	KerberosKdc                    string           `json:"kerberos_kdc,omitempty"`
+	KerberosRetryCount             int              `json:"kerberos_retry_count,omitempty"`
+	KerberosServiceKdc             string           `json:"kerberos_service_kdc,omitempty"`
+	KerberosServiceRealm           string           `json:"kerberos_service_realm,omitempty"`
+	KerberosSpn                    string           `json:"kerberos_spn,omitempty"`
+	KeyFile                        string           `json:"key_file,omitempty"`
+	KeytabFile                     string           `json:"keytab_file,omitempty"`
+	KinitProgramPath               string           `json:"kinit_program_path,omitempty"`
+	Namespace                      string           `json:"namespace,omitempty"`
+	NetServiceName                 string           `json:"net_service_name,omitempty"`
+	Nonce                          string           `json:"nonce,omitempty"`
+	OauthParameters                *OauthParameters `json:"oauth_parameters,omitempty"`
+	OdbcConnectionString           string           `json:"odbc_connection_string,omitempty"`
+	Passphrase                     string           `json:"passphrase,omitempty"`
+	Password                       string           `json:"password,omitempty"`
+	Port                           string           `json:"port,omitempty"` // TODO
+	Principal                      string           `json:"principal,omitempty"`
+	ProjectID                      string           `json:"project_id,omitempty"`
+	Protocol                       string           `json:"protocol,omitempty"`
+	ProxyAutoDetect                string           `json:"proxy_auto_detect,omitempty"`
+	ProxyPassword                  string           `json:"proxy_password,omitempty"`
+	ProxyPort                      string           `json:"proxy_port,omitempty"`
+	ProxyServer                    string           `json:"proxy_server,omitempty"`
+	ProxySslType                   string           `json:"proxy_ssl_type,omitempty"`
+	Query                          string           `json:"query,omitempty"`
+	RedirectUri                    string           `json:"redirect_uri,omitempty"`
+	Region                         string           `json:"region,omitempty"`
+	ReplicaSet                     string           `json:"replica_set,omitempty"`
+	ResourceID                     string           `json:"resource_id,omitempty"`
+	RoleName                       string           `json:"role_name,omitempty"`
+	Schema                         string           `json:"schema,omitempty"`
+	SecBeforeOperatingExpiredToken int              `json:"sec_before_operating_expired_token,omitempty"`
+	SecretKey                      string           `json:"secret_key,omitempty"`
+	SelfSigned                     bool             `json:"self_signed,omitempty"`
+	SelfSignedCert                 bool             `json:"self_signed_cert,omitempty"`
+	ServerIp                       string           `json:"server_ip,omitempty"`
+	ServerPort                     int              `json:"server_port,omitempty"`
+	ServiceKey                     string           `json:"service_key,omitempty"`
+	SessionToken                   string           `json:"session_token,omitempty"`
+	Sid                            string           `json:"SID,omitempty"`
+	SnowflakeRole                  string           `json:"snowflake_role,omitempty"`
+	Ssl                            bool             `json:"SSL,omitempty"`
+	SslServerCert                  string           `json:"ssl_server_cert,omitempty"`
+	StoreAwsCredentials            bool             `json:"store_aws_credentials,omitempty"`
+	SubscriptionID                 string           `json:"subscription_id,omitempty"`
+	TenantID                       string           `json:"tenant_id,omitempty"`
+	ThriftTransport                int              `json:"Thrift Transport,omitempty"`
+	TmpUser                        bool             `json:"tmp_user,omitempty"`
+	Token                          string           `json:"token,omitempty"`
+	TokenEndpoint                  string           `json:"token_endpoint,omitempty"`
+	Transportmode                  string           `json:"transportMode,omitempty"`
+	Url                            string           `json:"url,omitempty"`
+	UseKeytab                      bool             `json:"use_keytab,omitempty"`
+	Username                       string           `json:"username,omitempty"`
+	UserIdentityClientID           string           `json:"user_identity_client_id,omitempty"`
+	V2KeyEngine                    bool             `json:"v2_key_engine,omitempty"`
+	VirtualHostname                string           `json:"virtual_hostname,omitempty"`
+	VirtualIp                      string           `json:"virtual_ip,omitempty"`
+	WalletDir                      string           `json:"wallet_dir,omitempty"`
+	Warehouse                      string           `json:"warehouse,omitempty"`
 }
 
 type Secret struct {
 	FieldMapping  map[string]string `json:"field_mapping,omitempty"`
 	Path          string            `json:"path,omitempty"`
-	SecretAssetID string            `json:"secret_asset_id,omitempty"`
-	SecretName    string            `json:"secret_name,omitempty"`
+	SecretAssetID string            `json:"secret_asset_id"`
+	SecretName    string            `json:"secret_name"`
 }
 
 type OauthParameters struct {
@@ -320,7 +318,7 @@ func NewClient(config *Config) *Client {
 		customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 	client := &http.Client{Transport: customTransport}
-	return &Client{config: config, httpClient: client, providerVersion: "1.0.0"}
+	return &Client{config: config, httpClient: client, providerVersion: "1.3.8"}
 }
 
 // Verify checks the API credentials

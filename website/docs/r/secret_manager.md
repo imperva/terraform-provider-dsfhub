@@ -243,7 +243,7 @@ resource "dsfhub_data_source" "example_sybase_kerberos" {
   server_host_name   = "example-server-host-name"
   server_ip          = "example-server-host-ip"
   server_port        = "5000"
-  version            = "16"
+  asset_version            = "16"
 
   asset_connection {
     auth_mechanism = "kerberos"
@@ -291,6 +291,7 @@ The following arguments are optional, however some are only supported for certai
 - `application` - (String) The Asset ID of the application asset that "owns" the asset.
 - `asset_connection` - (Block) An `asset_connection` block as defined below.
 - `asset_source` - (String) The source platform/vendor/system of the asset data. Usually the service responsible for creating that asset document
+- `asset_version` - (Number) Denotes the database/service version of the asset
 - `available_regions` - (List of string) A list of regions to iterate through while running the Discovery playbook actions.
 - `aws_proxy_config` - (Block) An `aws_proxy_config` block as defined below for an AWS proxy configuration.
 - `credentials_endpoint` - (String) A specific sts endpoint to use
@@ -307,7 +308,6 @@ The following arguments are optional, however some are only supported for certai
 - `server_port` - (String) Port used by the source server
 - `service_endpoints` - (Block) A `service_endpoints` block as defined below that specifies particular endpoints for a given service in the form of `<service name>: "endpoint"`.
 - `used_for` - (String) Designates how this asset is used / the environment that the asset is supporting.
-- `version` - (Number) Denotes the database/service version of the asset
 
 ### aws_proxy_config
 
@@ -337,7 +337,6 @@ The following arguments are optional, however some are only supported for certai
 - `aws_iam_server_id` - (String) e.g. vault.example.com
 - `ca_certs_path` - (String) Certificate authority certificates path; what location should the sysetm look for certificate information from. Equivalent to --capath in a curl call
 - `cert_file` - (String) Certificate used for access
-- `credential_expiry` - (String)
 - `cyberark_secret` - A `cyberark_secret` block as defined below, to integrate the asset with CyberArk.
 - `external_id` - (String) External ID to use when assuming a role
 - `hashicorp_secret` - A `hashicorp_secret` block as defined below, to integrate the asset with a HashiCorp Vault.

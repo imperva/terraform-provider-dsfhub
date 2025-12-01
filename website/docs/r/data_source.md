@@ -144,12 +144,15 @@ db.getSiblingDB("lmrm__sonarg").asset.find(
 
 The following arguments are optional, however some are only supported for certain server types. Please see the [asset specifications](https://docs-cybersec.thalesgroup.com/bundle/onboarding-databases-to-sonar-reference-guide/page/Asset-Specifications_35815461.html) for more details:
 
+- `application` - (String) The Asset ID of the application asset that "owns" the asset.
 - `asset_connection` - (Block) An `asset_connection` block as defined below.
 - `asset_source` - (String) The source platform/vendor/system of the asset data. Usually the service responsible for creating that asset document
+- `asset_version` - (Number) Denotes the database/service version of the asset
 - `audit_info` - (Block) An `audit_info` block as defined below. Normally auto-populated when enabling the audit policy, it is a sub-document in JSON format containing configuration information for audit management. See documentation for values that can be added manually depending on asset type. Editing this value does NOT enable the audit policy.
 - `audit_pull_enabled` - (Boolean) If true, sonargateway will collect the audit logs for the associated data source if it can, on the successful Connect Gateway playbook run. 
 - `audit_type` - (String) Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details
 - `availability_zones` - (List of string) List of regions where the cluster is available from AWS data.
+- `available_bucket_account_ids` - (List of string) A list of AWS Account IDs to use when pulling account specific audit logs from this bucket. eg: ['123456789012', ‘123456789013’]
 - `available_regions` - (List of string) A list of regions to use in discovery actions that iterate through region
 - `aws_proxy_config` - (Block) An `aws_proxy_config` block as defined below for an AWS proxy configuration.
 - `bucket_account_id` - (String) AWS account number in the prefix of the files we are pulling. E.g. "123456789012" out of "AWSLogs/123456789012/service/us-east-1/2022/03/25/my_file.gz"
@@ -181,11 +184,12 @@ The following arguments are optional, however some are only supported for certai
 - `log_bucket_id` - (String) Asset ID of the S3 bucket which stores the logs for this server
 - `logs_destination_asset_id` - (String) The asset name of the log aggregator that stores this asset's logs.
 - `managed_by` - (String) Email of the person who maintains the asset; can be different from the owner specified in the owned_by field. Defaults to admin_email.
+- `marker_alias` - (String) Cluster or System name for a DR pair or similar system where all nodes share a single log. All machines sharing a marker alias will use the same marker. This means that the log will be pulled once rather than once per machine.
 - `max_concurrent_conn` - (String) Maximum number of concurrent connections that sensitive data management should use at once.
 - `owned_by` - (String) Email of Owner / person responsible for the asset; can be different from the person in the managed_by field. Defaults to admin_email.
 - `parent_asset_id` - (String) The name of an asset that this asset is part of (or related to). E.g. an AWS resource will generally have an AWS account asset as its parent. Also used to connect some log aggregating asset with the sources of their logs. E.g. An AWS LOG GROUP asset can have an AWS RDS data source as its parent, indicating that that is the log group for that RDS instance.
 - `provider_url` - (String) URL for provider hosting the asset
-- `proxy` - (String) Proxy to use for AWS calls if aws_proxy_config is populated the proxy field will get populated from the http value there
+- `proxy` - (String) Proxy to use for AWS calls. If aws_proxy_config is populated, the proxy field will get populated from the http value there.
 - `pubsub_subscription` - (String) Pub/Sub subscription, e.g. "projects/my-project-name/subscriptions/my-subscription-name"
 - `region` - (String) For cloud systems with regions, the default region or region used with this asset
 - `resource_id` - (String) AWS Resource ID that the RDS Db2 audit logs will be stored under on S3. E.g. db-3TBJU4Y34IAVE2DQRQUWYOEX3I
@@ -199,7 +203,6 @@ The following arguments are optional, however some are only supported for certai
 - `service_name` - (String) Service name
 - `subscription_id` - (String) This is the Azure account subscription ID. You can find this number under the Subscriptions page on the Azure portal
 - `used_for` - (String) Designates how this asset is used / the environment that the asset is supporting.
-- `version` - (Number) Denotes the database/service version of the asset
 - `virtual_hostname` - (String) Hostname of the endpoint of the cluster
 - `virtual_ip` - (String) IP of the endpoint of the cluster
 - `xel_directory` - (String) Absolute path of the XEL files location
@@ -233,6 +236,7 @@ The following arguments are required:
 The following arguments are optional, however some are only supported for certain server types and authentication mechanism combinations. Please see the [asset specifications](https://docs-cybersec.thalesgroup.com/bundle/onboarding-databases-to-sonar-reference-guide/page/Asset-Specifications_35815461.html) for more details:
 
 - `access_id` - (String) The Account Name/Access ID to use for authentication
+- `access_key` - (String) The Secret access key used for authentication
 - `account_name` - (String) The cloudant account name required when connecting a resource with IAM role
 - `amazon_secret` - An `amazon_secret` block as defined below, to integrate the asset with AWS Secrets Manager.
 - `api_key` - (String) IAM authentication API key
@@ -241,7 +245,7 @@ The following arguments are optional, however some are only supported for certai
 - `bucket` - (String)
 - `ca_certs_path` - (String) Certificate authority certificates path; what location should the sysetm look for certificate information from. Equivalent to --capath in a curl call
 - `ca_file` - (String) Use the specified certificate file to verify the peer. The file may contain multiple CA certificates.
-- `cache_file` - (String)
+- `cache_file` - (String) Holds Kerberos protocol credentials (for example, tickets, session keys and other identifying information).
 - `cert_file` - (String) Use the specified client certificate file when getting a file with HTTPS, FTPS or another SSL-based protocol.
 - `client_id` - (String) Azure client application ID
 - `client_secret` - (String) Azure application client secret
@@ -270,11 +274,11 @@ The following arguments are optional, however some are only supported for certai
 - `jdbc_ssl_trust_store_location` - (String) JDBC SSL Trust Store Location
 - `jdbc_ssl_trust_store_password` - (String) JDBC SSL Trust Store Password
 - `kerberos_host_fqdn` - (String)
-- `kerberos_kdc` - (String)
+- `kerberos_kdc` - (String) The host name or IP Address of your Kerberos KDC machine
 - `kerberos_retry_count` - (Number)
-- `kerberos_service_kdc` - (String)
-- `kerberos_service_realm` - (String)
-- `kerberos_spn` - (String)
+- `kerberos_service_kdc` - (String) Kerberos Service KDC
+- `kerberos_service_realm` - (String) Kerberos Service Realm
+- `kerberos_spn` - (String) The service and host of the Sybase Kerberos Principal. This will be the value prior to the '@' symbol of the principal value
 - `key_file` - (String) Private key file name. Allows you to provide your private key in this separate file.
 - `keytab_file` - (String) Specify a non-default keytab location
 - `kinit_program_path` - (String)
@@ -295,11 +299,14 @@ The following arguments are optional, however some are only supported for certai
 - `resource_id` - (String) Azure resource application ID
 - `role_name` - (String) Role to use for authentication
 - `schema` - (String) Schema name. A schema is a logical grouping of database objects
+- `sec_before_operating_expired_token` (Number) How many more seconds should a token be valid for before the connections service will update it before returning a connection to a caller. Defaults to 300 seconds (5 minutes).
 - `secret_key` - (String) The Secret access key used for authentication
 - `self_signed` - (Boolean) Accept self-signed certificates
 - `self_signed_cert` - (Boolean)
 - `server_port` - (Number) Port used by the source server
 - `service_key` - (String) The service key required in the logdna url query to connect to logdna and pull the logs
+- `session_token` - (String) STS token used for session authentication
+- `sid` - (String) SID used to connect, e.g. ORCL
 - `snowflake_role` - (String) Role with which to log into Snowflake
 - `ssl` - (Boolean) If true, use SSL when connecting
 - `ssl_server_cert` - (String) Path to server certificate to use during authentication

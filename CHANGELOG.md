@@ -2,19 +2,23 @@
 
 ENHANCEMENTS:
 * Updated docs and README.md
-* resource/log_aggregator: added the following attributes: audit_data_type, asset_connection.user_identity_client_id, consumer_group, consumer_group_workers, consumer_worker_prefix, pull_type, endpoint, logstore, project
+* resource/log_aggregator: added the following asset_connection attributes: cache_file, db_role, external, extra_kinit_parameters, kerberos_kdc, kerberos_service_kdc, kerberos_service_realm, kerberos_spn, keytab_file, kinit_program_path, passphrase, password, principal, ssl_server_cert, use_keytab, user_identity_client_id
+* resource/log_aggregator: added the following attributes: audit_data_type, audit_info, ca_certs_file, ca_file, consumer_group, consumer_group_workers, consumer_worker_prefix, database_name, db_engine, endpoint, logstore, logs_destination_asset_id, max_concurrent_conn, project, pull_type, sdm_enabled
 * resource/secret_manager: added the following attributes: asset_connection.headers, asset_connection.namespace, asset_connection.session_token, 
-* resource/cloud_account: added the following attributes: asset_connection.session_token
-* resource/data_source: added the following attributes: resource_id
+* resource/cloud_account: added the following attributes: asset_connection.session_token, asset_connection.project_id
+* resource/data_source: added the following attributes: available_bucket_account_ids, resource_id, marker_alias, asset_connection.access_key, asset_connection.sec_before_operating_expired_token, asset_connection.session_token, asset_connection.sid
+* all resources: added application attribute
 * resource/data_source: added support for AWS RDS DB2, CLICKHOUSE, DRUID CLUSTER, DRUID, GAUSSDB, GCP FIRESTORE, GEMFIRE, GRAINITE, GRIDGAIN IGNITE, MAPR FS, MAPR HBASE, SAP IQ, SINGLESTORE, TIGERGRAPH, VERTICA server types
 
 BUG FIXES:
-* all resources: deprecated asset_connection.credential_fields field
+* all resources: deprecated asset_connection.base_dn, asset_connection.credential_fields, access_method, credential_expiry, smtp_timeout, ntlm, page_size fields
 * all resources: fixed aws_proxy_config and service_endpoints hash functions
-* all resources: fixed asset_connection.ssl
+* all resources: fixed asset_connection fields SSL, DN, DNS SRV, Thrift Transport, Hive Server Type, SID, kerberos_host_FQDN, transportMode
 * all resources: populated ResourceData.ID read-only, computed attribute
+* all resources: changed the `version` attribute to `asset_version`
 * resource/data_source: fixed the data type of the asset field searches
 * resource/secret_manager: server_host_name is no longer required
+* resource/secret_manager: CyberArk secrets manager is supported
 
 ## 1.3.7 (May 5, 2025)
 

@@ -59,6 +59,12 @@ func resourceSecretManager() *schema.Resource {
 				Required:    false,
 				Optional:    true,
 			},
+			"asset_version": {
+				Type:        schema.TypeFloat,
+				Description: "Denotes the version of the asset",
+				Required:    false,
+				Optional:    true,
+			},
 			"available_regions": {
 				Type:        schema.TypeList,
 				Description: "A list of regions to use in discovery actions that iterate through region",
@@ -175,12 +181,6 @@ func resourceSecretManager() *schema.Resource {
 							Optional:    true,
 						},
 						"cert_file": {
-							Type:        schema.TypeString,
-							Description: "",
-							Required:    false,
-							Optional:    true,
-						},
-						"credential_expiry": {
 							Type:        schema.TypeString,
 							Description: "",
 							Required:    false,
@@ -492,12 +492,6 @@ func resourceSecretManager() *schema.Resource {
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice([]string{"Development", "Staging", "Test", "Disaster Recovery", "Demonstration", "Production", "QA", "Training"}, false),
 			},
-			"version": {
-				Type:        schema.TypeFloat,
-				Description: "Denotes the version of the asset",
-				Required:    false,
-				Optional:    true,
-			},
 		},
 	}
 }
@@ -572,6 +566,7 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 	d.Set("asset_display_name", secretManagerReadResponse.Data.AssetData.AssetDisplayName)
 	d.Set("asset_id", secretManagerReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", secretManagerReadResponse.Data.AssetData.AssetSource)
+	d.Set("asset_version", secretManagerReadResponse.Data.AssetData.Version)
 	d.Set("available_regions", secretManagerReadResponse.Data.AssetData.AvailableRegions)
 	d.Set("credentials_endpoint", secretManagerReadResponse.Data.AssetData.CredentialsEndpoint)
 	d.Set("criticality", secretManagerReadResponse.Data.AssetData.Criticality)
@@ -596,7 +591,6 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 	}
 	d.Set("server_type", secretManagerReadResponse.Data.ServerType)
 	d.Set("used_for", secretManagerReadResponse.Data.AssetData.UsedFor)
-	d.Set("version", secretManagerReadResponse.Data.AssetData.Version)
 
 	if secretManagerReadResponse.Data.AssetData.AwsProxyConfig != nil {
 		awsProxyConfig := &schema.Set{F: resourceAssetDataAWSProxyConfigHash}
@@ -622,7 +616,6 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 		connection["aws_iam_server_id"] = v.ConnectionData.AwsIamServerID
 		connection["ca_certs_path"] = v.ConnectionData.CaCertsPath
 		connection["cert_file"] = v.ConnectionData.CaFile
-		connection["credential_expiry"] = v.ConnectionData.CredentialExpiry
 		connection["external_id"] = v.ConnectionData.ExternalID
 		connection["headers"] = v.ConnectionData.Headers
 		connection["key_file"] = v.ConnectionData.KeyFile
@@ -645,7 +638,6 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 		if v.ConnectionData.AmazonSecret != nil {
 			amazonSecret := &schema.Set{F: resourceConnectionDataAmazonSecretHash}
 			amazonSecretMap := map[string]interface{}{}
-			//amazonSecretMap["field_mapping"] = v.ConnectionData.AmazonSecret.FieldMapping
 			amazonSecretMap["secret_asset_id"] = v.ConnectionData.AmazonSecret.SecretAssetID
 			amazonSecretMap["secret_name"] = v.ConnectionData.AmazonSecret.SecretName
 			amazonSecret.Add(amazonSecretMap)
@@ -653,19 +645,17 @@ func resourceSecretManagerReadContext(ctx context.Context, d *schema.ResourceDat
 		}
 
 		if v.ConnectionData.CyberarkSecret != nil {
-			amazonSecret := &schema.Set{F: resourceConnectionDataCyberarkSecretHash}
-			amazonSecretMap := map[string]interface{}{}
-			//amazonSecretMap["field_mapping"] = v.ConnectionData.AmazonSecret.FieldMapping
-			amazonSecretMap["secret_asset_id"] = v.ConnectionData.CyberarkSecret.SecretAssetID
-			amazonSecretMap["secret_name"] = v.ConnectionData.CyberarkSecret.SecretName
-			amazonSecret.Add(amazonSecretMap)
-			connection["cyberark_secret"] = amazonSecret
+			cyberarkSecret := &schema.Set{F: resourceConnectionDataCyberarkSecretHash}
+			cyberarkSecretMap := map[string]interface{}{}
+			cyberarkSecretMap["secret_asset_id"] = v.ConnectionData.CyberarkSecret.SecretAssetID
+			cyberarkSecretMap["secret_name"] = v.ConnectionData.CyberarkSecret.SecretName
+			cyberarkSecret.Add(cyberarkSecretMap)
+			connection["cyberark_secret"] = cyberarkSecret
 		}
 
 		if v.ConnectionData.HashicorpSecret != nil {
 			hashicorpSecret := &schema.Set{F: resourceConnectionDataHashicorpSecretHash}
 			hashicorpSecretMap := map[string]interface{}{}
-			//hashicorpSecretMap["field_mapping"] = v.ConnectionData.HashicorpSecret.Path
 			hashicorpSecretMap["path"] = v.ConnectionData.HashicorpSecret.Path
 			hashicorpSecretMap["secret_asset_id"] = v.ConnectionData.HashicorpSecret.SecretAssetID
 			hashicorpSecretMap["secret_name"] = v.ConnectionData.HashicorpSecret.SecretName
@@ -758,10 +748,6 @@ func resourceSecretManagerConnectionHash(v interface{}) int {
 	}
 
 	if v, ok := m["cert_file"]; ok {
-		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
-	}
-
-	if v, ok := m["credential_expiry"]; ok {
 		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
 	}
 

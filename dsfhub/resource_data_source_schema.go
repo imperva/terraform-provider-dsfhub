@@ -39,34 +39,6 @@ var ignoreDataSourceParamsByServerType = map[string]map[string]bool{
 	"AZURE STORAGE ACCOUNT":             {"arn": true, "asset_display_name": true},
 }
 
-//var ignoreDataSourceConnectionFields = map[string]bool{
-//	"access_key":               true,
-//	"access_method":            true,
-//	"application_id":           true,
-//	"aws_iam_server_id":        true,
-//	"azure_storage_account":    true,
-//	"azure_storage_container":  true,
-//	"azure_storage_secret_key": true,
-//	"base_dn":                  true,
-//	"credential_expiry":        true,
-//	"directory_id":             true,
-//	"eventhub_access_key":      true,
-//	"eventhub_access_policy":   true,
-//	"eventhub_name":            true,
-//	"eventhub_namespace":       true,
-//	"format":                   true,
-//	"nonce":                    true,
-//	"ntlm":                     true,
-//	"page_size":                true,
-//	"port":                     true,
-//	"protocol":                 true,
-//	"query":                    true,
-//	"secure_connection":        true,
-//	"store_aws_credentials":    true,
-//	"url":                      true,
-//	"v2_key_engine":            true,
-//}
-
 var requiredDataSourceFieldsJson = `{
     "ServerTypes": {
         "AEROSPIKE": {
