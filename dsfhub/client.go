@@ -318,7 +318,7 @@ func NewClient(config *Config) *Client {
 		customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 	client := &http.Client{Transport: customTransport}
-	return &Client{config: config, httpClient: client, providerVersion: "1.3.8"}
+	return &Client{config: config, httpClient: client, providerVersion: "1.4.0"}
 }
 
 // Verify checks the API credentials

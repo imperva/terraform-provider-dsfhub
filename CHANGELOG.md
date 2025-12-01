@@ -1,4 +1,4 @@
-## 1.3.8 (Unreleased)
+## 1.4.0 (Unreleased)
 
 ENHANCEMENTS:
 * Updated docs and README.md
