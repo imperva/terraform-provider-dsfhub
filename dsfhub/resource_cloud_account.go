@@ -27,12 +27,12 @@ func resourceCloudAccount() *schema.Resource {
 				Description: "The email address to notify about this asset",
 				Required:    true,
 			},
-			//"application": {
-			//	Type:        schema.TypeString,
-			//	Description: "The Asset ID of the application asset that \"owns\" the asset.",
-			//	Required:    false,
-			//	Optional:    true,
-			//},
+			"application": {
+				Type:        schema.TypeString,
+				Description: "The Asset ID of the application asset that \"owns\" the asset.",
+				Required:    false,
+				Optional:    true,
+			},
 			"arn": {
 				Type:        schema.TypeString,
 				Description: "Amazon Resource Name - format is arn:partition:service:region:account-id and used as the asset_id",
@@ -56,6 +56,13 @@ func resourceCloudAccount() *schema.Resource {
 			"asset_source": {
 				Type:        schema.TypeString,
 				Description: "The source platform/vendor/system of the asset data. Usually the service responsible for creating that asset document",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
+			"asset_version": {
+				Type:        schema.TypeFloat,
+				Description: "Denotes the version of the asset",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
@@ -108,13 +115,13 @@ func resourceCloudAccount() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"access_id": {
 							Type:        schema.TypeString,
-							Description: "The Access key ID of AWS secret access key used to authenticate",
+							Description: "The Access key ID of AWS secret access key used for authentication",
 							Optional:    true,
 							Default:     nil,
 						},
 						"access_key": {
 							Type:        schema.TypeString,
-							Description: "The Secret access key used to authenticate",
+							Description: "The Secret access key used for authentication",
 							Optional:    true,
 							Default:     nil,
 							Required:    false,
@@ -132,7 +139,7 @@ func resourceCloudAccount() *schema.Resource {
 								Schema: map[string]*schema.Schema{
 									"field_mapping": {
 										Type:        schema.TypeMap,
-										Description: "Field mapping for amazon secret",
+										Description: "Field mapping for AWS secret",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -142,14 +149,14 @@ func resourceCloudAccount() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret asset id",
+										Description: "AWS secret manager asset_id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret mane",
+										Description: "AWS secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -184,36 +191,9 @@ func resourceCloudAccount() *schema.Resource {
 							Default:     nil,
 							Sensitive:   true,
 						},
-						"credential_fields": {
-							Type:        schema.TypeSet,
-							Description: "Document containing values to build a profile from. Filling this will create a profile using the given profile name",
-							Required:    false,
-							Optional:    true,
-							Default:     nil,
-							MinItems:    0,
-							Set:         resourceConnectionDataCredentialFieldsHash,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"credential_source": {
-										Type:        schema.TypeString,
-										Description: "HashiCorp secret asset id",
-										Required:    false,
-										Optional:    true,
-										Default:     nil,
-									},
-									"role_arn": {
-										Type:        schema.TypeString,
-										Description: "HashiCorp secret mane",
-										Required:    false,
-										Optional:    true,
-										Default:     nil,
-									},
-								},
-							},
-						},
 						"cyberark_secret": {
 							Type:        schema.TypeSet,
-							Description: "Configuration to integrate with AWS Secrets Manager",
+							Description: "Configuration to integrate with CyberArk",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -224,7 +204,7 @@ func resourceCloudAccount() *schema.Resource {
 								Schema: map[string]*schema.Schema{
 									"field_mapping": {
 										Type:        schema.TypeMap,
-										Description: "Field mapping for amazon secret",
+										Description: "Field mapping for CyberArk secret",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -234,14 +214,14 @@ func resourceCloudAccount() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret asset id",
+										Description: "CyberArk secret manager asset_id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret mane",
+										Description: "CyberArk secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -292,14 +272,14 @@ func resourceCloudAccount() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "HashiCorp secret asset id",
+										Description: "HashiCorp secret manager asset_id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "HashiCorp secret mane",
+										Description: "HashiCorp secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -309,7 +289,14 @@ func resourceCloudAccount() *schema.Resource {
 						},
 						"key_file": {
 							Type:        schema.TypeString,
-							Description: "Location on disk on the key to be used to authenticate",
+							Description: "Location on disk on the key to be used for authentication",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"project_id": {
+							Type:        schema.TypeString,
+							Description: "Used when running Sonar on a GCP hosted environment that doesn't have a service account linked to it.",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -337,7 +324,15 @@ func resourceCloudAccount() *schema.Resource {
 						},
 						"secret_key": {
 							Type:        schema.TypeString,
-							Description: "The Secret access key used to authenticate",
+							Description: "The Secret access key used for authentication",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+							Sensitive:   true,
+						},
+						"session_token": {
+							Type:        schema.TypeString,
+							Description: "The session token used for authentication",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -387,9 +382,14 @@ func resourceCloudAccount() *schema.Resource {
 				Description: "The jsonarUid unique identifier of the agentless gateway. Example: '7a4af7cf-4292-89d9-46ec-183756ksdjd'",
 				Required:    true,
 			},
+			"id": {
+				Type:        schema.TypeString,
+				Description: "Unique identifier for the asset",
+				Computed:    true,
+			},
 			"jsonar_uid": {
 				Type:        schema.TypeString,
-				Description: "Unique identifier (UID) attached to the Sonar machine controlling the asset",
+				Description: "Unique identifier (UID) attached to the Agentless Gateway controlling the asset",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
@@ -487,13 +487,6 @@ func resourceCloudAccount() *schema.Resource {
 				ValidateFunc: validation.StringInSlice([]string{"Development", "Staging", "Test", "Disaster Recovery", "Demonstration", "Production", "QA", "Training"}, false),
 				Default:      nil,
 			},
-			"version": {
-				Type:        schema.TypeFloat,
-				Description: "Denotes the version of the asset",
-				Required:    false,
-				Optional:    true,
-				Default:     nil,
-			},
 		},
 	}
 }
@@ -561,25 +554,27 @@ func resourceCloudAccountReadContext(ctx context.Context, d *schema.ResourceData
 	log.Printf("[DEBUG] cloudAccountReadResponse: %s\n", cloudAccountReadResponse.Data.ID)
 	// Set returned and computed values
 	d.Set("admin_email", cloudAccountReadResponse.Data.AssetData.AdminEmail)
-	//d.Set("application", cloudAccountReadResponse.Data.AssetData.Application)
+	d.Set("application", cloudAccountReadResponse.Data.AssetData.Application)
 	d.Set("arn", cloudAccountReadResponse.Data.AssetData.Arn)
 	d.Set("asset_display_name", cloudAccountReadResponse.Data.AssetData.AssetDisplayName)
 	d.Set("asset_id", cloudAccountReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", cloudAccountReadResponse.Data.AssetData.AssetSource)
+	d.Set("asset_version", cloudAccountReadResponse.Data.AssetData.Version)
 	d.Set("available_regions", cloudAccountReadResponse.Data.AssetData.AvailableRegions)
 	if cloudAccountReadResponse.Data.AssetData.CredentialsEndpoint != "" {
-		d.Set("credential_endpoint", cloudAccountReadResponse.Data.AssetData.CredentialsEndpoint)
+		d.Set("credentials_endpoint", cloudAccountReadResponse.Data.AssetData.CredentialsEndpoint)
 	}
 	d.Set("criticality", cloudAccountReadResponse.Data.AssetData.Criticality)
 	d.Set("gateway_id", cloudAccountReadResponse.Data.GatewayID)
+	d.Set("id", cloudAccountReadResponse.Data.ID)
 	d.Set("jsonar_uid", cloudAccountReadResponse.Data.AssetData.JsonarUID)
 	d.Set("location", cloudAccountReadResponse.Data.AssetData.Location)
 	d.Set("managed_by", cloudAccountReadResponse.Data.AssetData.ManagedBy)
 	d.Set("owned_by", cloudAccountReadResponse.Data.AssetData.OwnedBy)
 	d.Set("proxy", cloudAccountReadResponse.Data.AssetData.Proxy)
 	d.Set("region", cloudAccountReadResponse.Data.AssetData.Region)
-	d.Set("server_host_name", cloudAccountReadResponse.Data.AssetData.ServerHostName)
-	d.Set("server_ip", cloudAccountReadResponse.Data.AssetData.ServerIP)
+	d.Set("server_host_name", cloudAccountReadResponse.Data.AssetData.ServerHostName) // TODO SR-4549
+	d.Set("server_ip", cloudAccountReadResponse.Data.AssetData.ServerIP)              // TODO SR-4549
 	d.Set("server_type", cloudAccountReadResponse.Data.ServerType)
 	if cloudAccountReadResponse.Data.AssetData.ServerPort != nil {
 		var serverPort string
@@ -591,7 +586,6 @@ func resourceCloudAccountReadContext(ctx context.Context, d *schema.ResourceData
 		d.Set("server_port", serverPort)
 	}
 	d.Set("used_for", cloudAccountReadResponse.Data.AssetData.UsedFor)
-	d.Set("version", cloudAccountReadResponse.Data.AssetData.Version)
 
 	// Handle Structs
 	if cloudAccountReadResponse.Data.AssetData.AwsProxyConfig != nil {
@@ -620,14 +614,15 @@ func resourceCloudAccountReadContext(ctx context.Context, d *schema.ResourceData
 		connection["auth_mechanism"] = v.ConnectionData.AuthMechanism
 		connection["ca_certs_path"] = v.ConnectionData.CaCertsPath
 		connection["client_secret"] = v.ConnectionData.ClientSecret
-		connection["cyberark_secret"] = v.ConnectionData.CyberarkSecret
 		connection["directory_id"] = v.ConnectionData.DirectoryID
 		connection["external_id"] = v.ConnectionData.ExternalID
 		connection["key_file"] = v.ConnectionData.KeyFile
+		connection["project_id"] = v.ConnectionData.ProjectID
 		connection["reason"] = v.Reason
 		connection["region"] = v.ConnectionData.Region
 		connection["role_name"] = v.ConnectionData.RoleName
 		connection["secret_key"] = v.ConnectionData.SecretKey
+		connection["session_token"] = v.ConnectionData.SessionToken
 		connection["ssl"] = v.ConnectionData.Ssl
 		connection["subscription_id"] = v.ConnectionData.SubscriptionID
 		connection["username"] = v.ConnectionData.Username
@@ -636,26 +631,24 @@ func resourceCloudAccountReadContext(ctx context.Context, d *schema.ResourceData
 		if v.ConnectionData.AmazonSecret != nil {
 			amazonSecret := &schema.Set{F: resourceConnectionDataAmazonSecretHash}
 			amazonSecretMap := map[string]interface{}{}
-			//amazonSecretMap["field_mapping"] = v.ConnectionData.AmazonSecret.FieldMapping
 			amazonSecretMap["secret_asset_id"] = v.ConnectionData.AmazonSecret.SecretAssetID
 			amazonSecretMap["secret_name"] = v.ConnectionData.AmazonSecret.SecretName
 			amazonSecret.Add(amazonSecretMap)
 			connection["amazon_secret"] = amazonSecret
 		}
 
-		if v.ConnectionData.CredentialFields != nil {
-			credentialFields := &schema.Set{F: resourceConnectionDataCredentialFieldsHash}
-			credentialFieldsMap := map[string]interface{}{}
-			credentialFieldsMap["credential_source"] = v.ConnectionData.CredentialFields.CredentialSource
-			credentialFieldsMap["role_arn"] = v.ConnectionData.CredentialFields.RoleArn
-			credentialFields.Add(credentialFieldsMap)
-			connection["credential_fields"] = credentialFields
+		if v.ConnectionData.CyberarkSecret != nil {
+			cyberarkSecret := &schema.Set{F: resourceConnectionDataCyberarkSecretHash}
+			cyberarkSecretMap := map[string]interface{}{}
+			cyberarkSecretMap["secret_asset_id"] = v.ConnectionData.CyberarkSecret.SecretAssetID
+			cyberarkSecretMap["secret_name"] = v.ConnectionData.CyberarkSecret.SecretName
+			cyberarkSecret.Add(cyberarkSecretMap)
+			connection["cyberark_secret"] = cyberarkSecret
 		}
 
 		if v.ConnectionData.HashicorpSecret != nil {
 			hashicorpSecret := &schema.Set{F: resourceConnectionDataHashicorpSecretHash}
 			hashicorpSecretMap := map[string]interface{}{}
-			//hashicorpSecretMap["field_mapping"] = v.ConnectionData.HashicorpSecret.Path
 			hashicorpSecretMap["path"] = v.ConnectionData.HashicorpSecret.Path
 			hashicorpSecretMap["secret_asset_id"] = v.ConnectionData.HashicorpSecret.SecretAssetID
 			hashicorpSecretMap["secret_name"] = v.ConnectionData.HashicorpSecret.SecretName
@@ -771,6 +764,10 @@ func resourceCloudAccountConnectionHash(v interface{}) int {
 		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
 	}
 
+	if v, ok := m["project_id"]; ok {
+		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
+	}
+
 	if v, ok := m["reason"]; ok {
 		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
 	}
@@ -784,6 +781,10 @@ func resourceCloudAccountConnectionHash(v interface{}) int {
 	}
 
 	if v, ok := m["secret_key"]; ok {
+		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
+	}
+
+	if v, ok := m["session_token"]; ok {
 		buf.WriteString(fmt.Sprintf("%s-", v.(string)))
 	}
 

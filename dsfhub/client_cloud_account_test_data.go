@@ -75,10 +75,6 @@ var cloudAccountTestDataJson = `{
                                     "secret_name": "<secret_name>"
                                 },
                                 "ca_certs_path": "string",
-                                "credential_fields": {
-                                    "credential_source": "Ec2InstanceMetadata",
-                                    "role_arn": "arn:aws:iam::111777333222:role/other_role"
-                                },
                                 "external_id": "string",
                                 "hashicorp_secret": {
                                     "field_mapping": {

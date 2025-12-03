@@ -5,7 +5,7 @@ HOSTNAME=registry.terraform.io
 NAMESPACE=terraform-providers
 PKG_NAME=dsfhub
 BINARY=terraform-provider-${PKG_NAME}
-VERSION=1.2.46
+VERSION=1.4.0
 OS_ARCH=darwin_amd64
 
 default: install

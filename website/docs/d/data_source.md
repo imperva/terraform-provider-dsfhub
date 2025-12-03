@@ -1,14 +1,14 @@
 ---
-subcategory: "Provider Reference"
+subcategory: ""
 layout: "dsfhub"
 page_title: "DSFHUB Data Source - Terraform Data Source"
 description: |-
   Provides a dsfhub_data_source terraform data source.
 ---
 
-# dsfhub_data_source (Data Source)
+# Data Source: dsfhub_data_source
 
-Provides DSFDataSource resource configuration from a unique asset_id.
+Use this data source to get a Data Source resource given a unique asset_id.
 
 ## Example Usage
 
@@ -18,27 +18,27 @@ data "dsfhub_data_source" "example_aws_rds_mysql" {
 }
 
 resource "dsfhub_log_aggregator" "example_aws_log_group" {
-  server_type = "AWS LOG GROUP"
-  admin_email = "your@email.com"
-  asset_display_name = "arn:partition:service:region:account-id" # User-friendly name of the asset
-  asset_id = "arn:partition:service:region:account-id" # Use arn for aws resources
-  gateway_id = "12345-abcde-12345-abcde-12345-abcde"
-  parent_asset_id = dsf_data_source.example_aws_rds_mysql.asset_id # asset_id of the data_source resource to be consumed by the log aggregator
+  server_type        = "AWS LOG GROUP"
+  admin_email        = "your@email.com"
+  asset_display_name = "arn:partition:service:region:account-id"
+  asset_id           = "arn:partition:service:region:account-id"
+  gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
+  parent_asset_id    = data.dsf_data_source.example_aws_rds_mysql.asset_id
   asset_connection {
     auth_mechanism = "default"
-    reason = "default"
-    region = "us-east-2"
+    reason         = "default"
+    region         = "us-east-2"
   }
 }
 ```
 
 ## Argument Reference
 
-- `asset_id` (String) Current asset ID
+- `asset_id` - (String) The asset_id of the asset.
 
 ## Attribute Reference
 
 The following attributes are exported:
 
-- `id` (String) The asset_id of this resource.
-- `asset_id` (String) Current asset_id
+- `id` - (String) The asset_id of the asset.
+- `asset_id` - (String) The asset_id of the asset.

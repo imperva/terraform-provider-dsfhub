@@ -48,15 +48,6 @@ var assetSchemaJson = `{
             "required": true,
             "type": "string"
         },
-        "AccessMethod": {
-            "defaultValue": "VSAM",
-            "description": "The z/OS file system access method to be used",
-            "displayName": "Access Method",
-            "example": "VSAM",
-            "id": "access_method",
-            "required": false,
-            "type": "string"
-        },
         "AccountName": {
             "defaultValue": null,
             "description": "The cloudant account name required when connecting a resource with IAM role",
@@ -171,16 +162,6 @@ var assetSchemaJson = `{
             "required": true,
             "type": "string"
         },
-        "BaseDn": {
-            "defaultValue": null,
-            "description": "",
-            "displayName": "Base DN",
-            "example": "",
-            "id": "base_dn",
-            "optional": false,
-            "required": true,
-            "type": "string"
-        },
         "Bucket": {
             "defaultValue": null,
             "description": "",
@@ -238,7 +219,7 @@ var assetSchemaJson = `{
         },
         "ClientSecret": {
             "defaultValue": null,
-            "description": "Secret used to authenticate to the token endpoint",
+            "description": "Secret used for authentication to the token endpoint",
             "displayName": "Client Secret",
             "example": "",
             "id": "client_secret",
@@ -280,27 +261,6 @@ var assetSchemaJson = `{
             "id": "content_type",
             "required": false,
             "type": "string"
-        },
-        "CredentialExpiry": {
-            "defaultValue": null,
-            "description": "",
-            "displayName": "Credential Expiry",
-            "example": "",
-            "id": "credential_expiry",
-            "required": false,
-            "type": "string"
-        },
-        "CredentialFields": {
-            "defaultValue": null,
-            "description": "Document containing values to build a profile from. Filling this will create a profile using the given profile name",
-            "displayName": "Credential Fields",
-            "example": {
-                "credential_source": "Ec2InstanceMetadata",
-                "role_arn": "arn:aws:iam::111777333222:role/other_role"
-            },
-            "id": "credential_fields",
-            "required": false,
-            "type": "map"
         },
         "Crn": {
             "defaultValue": null,
@@ -504,6 +464,15 @@ var assetSchemaJson = `{
             "required": false,
             "type": "map"
         },
+        "Headers": {
+            "defaultValue": null,
+            "description": "A list of additional parameters to pass as HTTP headers when fetching credentials.",
+            "displayName": "Headers",
+            "example": "\"header_name\": \"header_value\"",
+            "id": "headers",
+            "required": false,
+            "type": "string"
+        },
         "HiveServerType": {
             "defaultValue": null,
             "description": "",
@@ -632,7 +601,7 @@ var assetSchemaJson = `{
         },
         "KeyFile": {
             "defaultValue": null,
-            "description": "Location on disk on the key to be used to authenticate",
+            "description": "Location on disk on the key to be used for authentication",
             "displayName": "Key File",
             "example": "",
             "id": "key_file",
@@ -657,6 +626,15 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
+        "Namespace": {
+            "defaultValue": null,
+            "description": "Specifies which namespace to fetch credentials from if not root",
+            "displayName": "Namespace",
+            "example": "hashicorp-namespace",
+            "id": "namespace",
+            "required": false,
+            "type": "string"
+        },
         "NetServiceName": {
             "defaultValue": null,
             "description": "Alias in tnsnames.ora replaces hostname, service name, and port in connection string",
@@ -674,15 +652,6 @@ var assetSchemaJson = `{
             "id": "nonce",
             "required": false,
             "type": "string"
-        },
-        "Ntlm": {
-            "defaultValue": false,
-            "description": "",
-            "displayName": "NTLM",
-            "example": false,
-            "id": "ntlm",
-            "required": false,
-            "type": "bool"
         },
         "OauthParameters": {
             "defaultValue": null,
@@ -705,16 +674,6 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
-        "PageSize": {
-            "defaultValue": null,
-            "description": "",
-            "displayName": "Page Size",
-            "example": "",
-            "id": "page_size",
-            "optional": false,
-            "required": true,
-            "type": "string"
-        },
         "Passphrase": {
             "defaultValue": null,
             "description": "",
@@ -726,7 +685,7 @@ var assetSchemaJson = `{
         },
         "Password": {
             "defaultValue": null,
-            "description": "The password of the user being used to authenticate",
+            "description": "The password of the user being used for authentication",
             "displayName": "Password",
             "example": "",
             "id": "password",
@@ -752,6 +711,16 @@ var assetSchemaJson = `{
             "id": "principal",
             "optional": false,
             "required": true,
+            "type": "string"
+        },
+        "ProjectID": {
+            "defaultValue": null,
+            "description": "Used when running Sonar on a GCP hosted environment that doesn't have a service account linked to it.",
+            "displayName": "Project ID",
+            "example": "my-gcp-project",
+            "id": "project_id",
+            "optional": true,
+            "required": false,
             "type": "string"
         },
         "Protocol": {
@@ -810,7 +779,7 @@ var assetSchemaJson = `{
         },
         "Query": {
             "defaultValue": null,
-            "description": "",
+            "description": "Query parameters defining where the passwords, etc. should be retrieved from. Example: 'AppID=<your_CyberArk_Application_ID>&Safe=<your_CyberArk_Safe_Name>;'",
             "displayName": "Query",
             "example": "",
             "id": "query",
@@ -887,6 +856,16 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
+        "SecBeforeOperatingExpiredToken": {
+            "defaultValue": null,
+            "description": "How many more seconds should a token be valid for before the connections service will update it before returning a connection to a caller. Defaults to 300 seconds (5 minutes)",
+            "displayName": "sec_before_operating_expired_token",
+            "example": "300",
+            "id": "sec_before_operating_expired_token",
+            "optional": true,
+            "required": false,
+            "type": "string"
+        },
         "SecretKey": {
             "defaultValue": null,
             "description": "A secret string that the application uses to prove its identity when when requesting a token (same as Client Secret)",
@@ -896,15 +875,6 @@ var assetSchemaJson = `{
             "optional": false,
             "required": true,
             "type": "string"
-        },
-        "SecureConnection": {
-            "defaultValue": false,
-            "description": "",
-            "displayName": "Secure Connection",
-            "example": false,
-            "id": "secure_connection",
-            "required": false,
-            "type": "bool"
         },
         "SelfSigned": {
             "defaultValue": null,
@@ -952,6 +922,24 @@ var assetSchemaJson = `{
             "id": "service_key",
             "optional": false,
             "required": true,
+            "type": "string"
+        },
+        "SessionToken": {
+            "defaultValue": null,
+            "description": "STS token used for session authentication",
+            "displayName": "Session Token",
+            "example": "",
+            "id": "session_token",
+            "required": false,
+            "type": "string"
+        },
+        "Sid": {
+            "defaultValue": null,
+            "description": "SID used to connect, e.g. ORCL",
+            "displayName": "SID",
+            "example": "",
+            "id": "sid",
+            "required": false,
             "type": "string"
         },
         "SnowflakeRole": {
@@ -1031,7 +1019,7 @@ var assetSchemaJson = `{
         },
         "Token": {
             "defaultValue": null,
-            "description": "Saved token to use to authenticate",
+            "description": "Saved token to use for authentication",
             "displayName": "Token",
             "example": "",
             "id": "token",
@@ -1076,6 +1064,15 @@ var assetSchemaJson = `{
             "id": "use_keytab",
             "required": false,
             "type": "bool"
+        },
+        "UserIdentityClientID": {
+            "defaultValue": null,
+            "description": "The client ID of a user-assigned managed identity.",
+            "displayName": "User Identity Client ID",
+            "example": "a1b2c3de-123c-1234-ab12-ab12c2de3fg4",
+            "id": "user_identity_client_id",
+            "required": false,
+            "type": "string"
         },
         "Username": {
             "defaultValue": null,
@@ -1362,6 +1359,15 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
+        "ConsumerWorkerPrefix": {
+            "defaultValue": null,
+            "description": "The prefix to use for the consumer worker name. This can be useful if you are trying to pull from the same consumer group on different gateways.",
+            "displayName": "Consumer Worker Prefix",
+            "example": "sonar-consumer-",
+            "id": "consumer_worker_prefix",
+            "required": false,
+            "type": "string"
+        },
         "ContentType": {
             "defaultValue": null,
             "description": "Content type should be set to the desired <'parent' asset 'Server Type'>, which is the one that uses this asset as a destination for logs. NOTE: The content_type field will take precedence on the lookup for parent_asset_id field when checking which server is sending logs to this asset.",
@@ -1504,6 +1510,15 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
+        "ID": {
+            "defaultValue": null,
+            "description": "",
+            "displayName": "ID",
+            "example": "",
+            "id": "id",
+            "required": false,
+            "type": "string"
+        },
         "IgnoreLatestOf": {
             "defaultValue": null,
             "description": "A regex defining a group. From all the files with the same group, the latest one will be ignored, so that it isn't archived until server is done writing",
@@ -1533,7 +1548,7 @@ var assetSchemaJson = `{
         },
         "JsonarUID": {
             "defaultValue": null,
-            "description": "Unique identifier (UID) attached to the Sonar machine controlling the asset",
+            "description": "Unique identifier (UID) attached to the Agentless Gateway controlling the asset",
             "displayName": "jSonar UID",
             "example": "",
             "id": "jsonar_uid",
@@ -1583,6 +1598,15 @@ var assetSchemaJson = `{
             "displayName": "Managed By",
             "example": "person@company.com",
             "id": "managed_by",
+            "required": false,
+            "type": "string"
+        },
+        "MarkerAlias": {
+            "defaultValue": null,
+            "description": "Cluster or System name for a DR pair or similar system where all nodes share a single log. All machines sharing a marker alias will use the same marker. This means that the log will be pulled once rather than once per machine.",
+            "displayName": "Marker Alias",
+            "example": "",
+            "id": "marker_alias",
             "required": false,
             "type": "string"
         },
@@ -1681,6 +1705,15 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
+        "ResourceID": {
+            "defaultValue": null,
+            "description": "AWS Resource ID that the audit logs will be stored under on S3. E.g. db-3TBJU4Y34IAVE2DQRQUWYOEX3I",
+            "displayName": "Resource ID",
+            "example": "db-3TBJU4Y34IAVE2DQRQUWYOEX3I",
+            "id": "resource_id",
+            "required": false,
+            "type": "string"
+        },
         "SdmEnabled": {
             "defaultValue": null,
             "description": "Sensitive data management (SDM) is enabled if this parameter is set to True.",
@@ -1766,19 +1799,10 @@ var assetSchemaJson = `{
             "required": false,
             "type": "string"
         },
-        "SmtpTimeout": {
-            "defaultValue": null,
-            "description": "",
-            "displayName": "SMTP Timeout",
-            "example": "",
-            "id": "smtp_timeout",
-            "required": false,
-            "type": "string"
-        },
         "Ssl": {
             "defaultValue": null,
             "description": "",
-            "displayName": "Ssl",
+            "displayName": "SSL",
             "example": "",
             "id": "ssl",
             "required": false,
@@ -1817,7 +1841,7 @@ var assetSchemaJson = `{
             "description": "Denotes the version of the asset",
             "displayName": "Version",
             "example": 5.7,
-            "id": "version",
+            "id": "asset_version",
             "required": false,
             "type": "float"
         },
