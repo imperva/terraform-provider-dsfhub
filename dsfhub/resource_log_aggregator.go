@@ -27,12 +27,12 @@ func resourceLogAggregator() *schema.Resource {
 				Description: "The email address to notify about this asset",
 				Required:    true,
 			},
-			//"application": {
-			//	Type:        schema.TypeString,
-			//	Description: "The Asset ID of the application asset that \"owns\" the asset.",
-			//	Required:    false,
-			//	Optional:    true,
-			//},
+			"application": {
+				Type:        schema.TypeString,
+				Description: "The Asset ID of the application asset that \"owns\" the asset.",
+				Required:    false,
+				Optional:    true,
+			},
 			"arn": {
 				Type:        schema.TypeString,
 				Description: "Amazon Resource Name - format is arn:partition:service:region:account-id and used as the asset_id",
@@ -60,6 +60,40 @@ func resourceLogAggregator() *schema.Resource {
 				Optional:    true,
 				Default:     nil,
 			},
+			"asset_version": {
+				Type:        schema.TypeFloat,
+				Description: "Denotes the version of the asset",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
+			"audit_data_type": {
+				Type:        schema.TypeString,
+				Description: "The type of audit data being collected",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
+			"audit_info": {
+				Type:        schema.TypeSet,
+				Description: "Normally auto-populated when enabling the audit policy, it is a sub-document in JSON format containing configuration information for audit management. See documentation for values that can be added manually depending on asset type. Editing this value does NOT enable the audit policy.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+				MinItems:    0,
+				Set:         resourceAssetDataAuditInfoHash,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"policy_template_name": {
+							Type:        schema.TypeString,
+							Description: "Policy template name",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+					},
+				},
+			},
 			"audit_pull_enabled": {
 				Type:        schema.TypeBool,
 				Description: "If true, sonargateway will collect the audit logs for this system if it can.",
@@ -71,14 +105,6 @@ func resourceLogAggregator() *schema.Resource {
 			"audit_type": {
 				Type:        schema.TypeString,
 				Description: "Used to indicate what mechanism should be used to fetch logs on systems supporting multiple ways to get logs, see asset specific documentation for details.  Example: \"BIGQUERY\",\"BIGTABLE\",\"BUCKET\",\"MSSQL\",\"MYSQL\",\"POSTGRESQL\",\"SPANNER\"",
-				Required:    false,
-				Optional:    true,
-				Default:     nil,
-				// ValidateFunc: validation.StringInSlice([]string{"BIGQUERY", "BIGTABLE", "BUCKET", "MSSQL", "MYSQL", "POSTGRESQL", "SPANNER"}, false),
-			},
-			"audit_data_type": {
-				Type:        schema.TypeString,
-				Description: "The type of audit data to pull from a bucket. See asset specific documentation for details.",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
@@ -142,14 +168,14 @@ func resourceLogAggregator() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"access_id": {
 							Type:        schema.TypeString,
-							Description: "The Access key ID of AWS secret access key used to authenticate",
+							Description: "The Access key ID of AWS secret access key used for authentication",
 							Optional:    true,
 							Default:     nil,
 							Computed:    true,
 						},
 						"access_key": {
 							Type:        schema.TypeString,
-							Description: "The Secret access key used to authenticate",
+							Description: "The Secret access key used for authentication",
 							Optional:    true,
 							Default:     nil,
 							Computed:    true,
@@ -167,7 +193,7 @@ func resourceLogAggregator() *schema.Resource {
 								Schema: map[string]*schema.Schema{
 									"field_mapping": {
 										Type:        schema.TypeMap,
-										Description: "Field mapping for amazon secret",
+										Description: "Field mapping for AWS secret",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -177,14 +203,14 @@ func resourceLogAggregator() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret asset id",
+										Description: "AWS secret asset id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret mane",
+										Description: "AWS secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -226,6 +252,13 @@ func resourceLogAggregator() *schema.Resource {
 							Optional:    true,
 							Default:     nil,
 						},
+						"cache_file": {
+							Type:        schema.TypeString,
+							Description: "Holds Kerberos protocol credentials (for example, tickets, session keys and other identifying information).",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
 						"ca_certs_path": {
 							Type:        schema.TypeString,
 							Description: "Certificate authority certificates path; what location should the sysetm look for certificate information from. Equivalent to --capath in a curl call",
@@ -240,36 +273,9 @@ func resourceLogAggregator() *schema.Resource {
 							Optional:    true,
 							Default:     nil,
 						},
-						"credential_fields": {
-							Type:        schema.TypeSet,
-							Description: "Document containing values to build a profile from. Filling this will create a profile using the given profile name",
-							Required:    false,
-							Optional:    true,
-							Default:     nil,
-							MinItems:    0,
-							Set:         resourceConnectionDataCredentialFieldsHash,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"credential_source": {
-										Type:        schema.TypeString,
-										Description: "HashiCorp secret asset id",
-										Required:    false,
-										Optional:    true,
-										Default:     nil,
-									},
-									"role_arn": {
-										Type:        schema.TypeString,
-										Description: "HashiCorp secret mane",
-										Required:    false,
-										Optional:    true,
-										Default:     nil,
-									},
-								},
-							},
-						},
 						"cyberark_secret": {
 							Type:        schema.TypeSet,
-							Description: "Configuration to integrate with AWS Secrets Manager",
+							Description: "Configuration to integrate with CyberArk Secrets Manager",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -280,7 +286,7 @@ func resourceLogAggregator() *schema.Resource {
 								Schema: map[string]*schema.Schema{
 									"field_mapping": {
 										Type:        schema.TypeMap,
-										Description: "Field mapping for amazon secret",
+										Description: "Field mapping for CyberArk secret",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -290,20 +296,27 @@ func resourceLogAggregator() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret asset id",
+										Description: "CyberArk secret manager asset_id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "Amazon secret mane",
+										Description: "CyberArk secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 								},
 							},
+						},
+						"db_role": {
+							Type:        schema.TypeString,
+							Description: "",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
 						},
 						"directory_id": {
 							Type:        schema.TypeString,
@@ -328,7 +341,7 @@ func resourceLogAggregator() *schema.Resource {
 						},
 						"eventhub_name": {
 							Type:        schema.TypeString,
-							Description: "EventHub Namespace",
+							Description: "EventHub Name",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -343,6 +356,21 @@ func resourceLogAggregator() *schema.Resource {
 						"external_id": {
 							Type:        schema.TypeString,
 							Description: "External ID to use when assuming a role",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"external": {
+							Type:        schema.TypeBool,
+							Description: "",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+							Computed:    true,
+						},
+						"extra_kinit_parameters": {
+							Type:        schema.TypeString,
+							Description: "",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -383,14 +411,14 @@ func resourceLogAggregator() *schema.Resource {
 									},
 									"secret_asset_id": {
 										Type:        schema.TypeString,
-										Description: "HashiCorp secret asset id",
+										Description: "HashiCorp secret asset_id",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
 									},
 									"secret_name": {
 										Type:        schema.TypeString,
-										Description: "HashiCorp secret mane",
+										Description: "HashiCorp secret name",
 										Required:    false,
 										Optional:    true,
 										Default:     nil,
@@ -398,9 +426,76 @@ func resourceLogAggregator() *schema.Resource {
 								},
 							},
 						},
+
+						"kerberos_kdc": {
+							Type:        schema.TypeString,
+							Description: "",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+
+						"kerberos_service_kdc": {
+							Type:        schema.TypeString,
+							Description: "",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"kerberos_service_realm": {
+							Type:        schema.TypeString,
+							Description: "",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"kerberos_spn": {
+							Type:        schema.TypeString,
+							Description: "",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
 						"key_file": {
 							Type:        schema.TypeString,
-							Description: "Location on disk on the key to be used to authenticate",
+							Description: "Location on disk on the key to be used for authentication",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+
+						"keytab_file": {
+							Type:        schema.TypeString,
+							Description: "Specify a non-default keytab location",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"kinit_program_path": {
+							Type:        schema.TypeString,
+							Description: "",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"passphrase": {
+							Type:        schema.TypeString,
+							Description: "Passphrase for the private key.",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"password": {
+							Type:        schema.TypeString,
+							Description: "The password of the user being used for authentication",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+							Sensitive:   true,
+						},
+						"principal": {
+							Type:        schema.TypeString,
+							Description: "The principal used for authentication",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -427,7 +522,7 @@ func resourceLogAggregator() *schema.Resource {
 						},
 						"secret_key": {
 							Type:        schema.TypeString,
-							Description: "The Secret access key used to authenticate",
+							Description: "The Secret access key used for authentication",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -439,6 +534,13 @@ func resourceLogAggregator() *schema.Resource {
 							Optional:    true,
 							Default:     false,
 						},
+						"ssl_server_cert": {
+							Type:        schema.TypeString,
+							Description: "Path to server certificate to use during authentication",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
 						"subscription_id": {
 							Type:        schema.TypeString,
 							Description: "This is the Azure account subscription ID. You can find this number under the Subscriptions page on the Azure portal",
@@ -446,9 +548,24 @@ func resourceLogAggregator() *schema.Resource {
 							Optional:    true,
 							Default:     nil,
 						},
+						"use_keytab": {
+							Type:        schema.TypeBool,
+							Description: "If true, authenticate using a key tab",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+							Computed:    true,
+						},
 						"username": {
 							Type:        schema.TypeString,
 							Description: "The name of a profile in /imperva/local/credentials/.aws/credentials to use for authenticating",
+							Required:    false,
+							Optional:    true,
+							Default:     nil,
+						},
+						"user_identity_client_id": {
+							Type:        schema.TypeString,
+							Description: "The client ID of a user-assigned managed identity.",
 							Required:    false,
 							Optional:    true,
 							Default:     nil,
@@ -459,6 +576,41 @@ func resourceLogAggregator() *schema.Resource {
 			"bucket_account_id": {
 				Type:        schema.TypeString,
 				Description: "S3 bucket Account ID",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
+			"ca_certs_path": {
+				Type:        schema.TypeString,
+				Description: "Certificate authority certificates path; what location should the sysetm look for certificate information from. Equivalent to --capath in a curl call",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
+			"ca_file": {
+				Type:        schema.TypeString,
+				Description: "Path to a certificate authority file to use with the call. Equivalent to --cacert in a curl call",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
+			"consumer_group": {
+				Type:        schema.TypeString,
+				Description: "The name of the consumer group to use when pulling data from the logstore.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
+			"consumer_group_workers": {
+				Type:        schema.TypeString,
+				Description: "Only applies if Pull Type is consumer_group. The number of consumers that will be part of the consumer group. For best performance this should match the number of shards in your logstore.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
+			"consumer_worker_prefix": {
+				Type:        schema.TypeString,
+				Description: "The prefix to use for the consumer worker name. This can be useful if you are trying to pull from the same consumer group on different gateways",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
@@ -485,6 +637,21 @@ func resourceLogAggregator() *schema.Resource {
 				ValidateFunc: validation.IntInSlice([]int{1, 2, 3, 4}),
 				Default:      nil,
 			},
+			"database_name": {
+				Type:        schema.TypeString,
+				Description: "Specifies the name of the database (or default DB) to connect to.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+				Computed:    true,
+			},
+			"db_engine": {
+				Type:        schema.TypeString,
+				Description: "Specifies the version of the engine being used by the database (e.g. oracle-ee, oracle-se, oracle-se1, oracle-se2)",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
 			"endpoint": {
 				Type:        schema.TypeString,
 				Description: "Logstore's endpoint",
@@ -508,15 +675,11 @@ func resourceLogAggregator() *schema.Resource {
 			"id": {
 				Type:        schema.TypeString,
 				Description: "Unique identifier for the asset",
-				// Required: true,
-				Required: false,
-				Optional: true,
-				Default:  nil,
-				Computed: true,
+				Computed:    true,
 			},
 			"jsonar_uid": {
 				Type:        schema.TypeString,
-				Description: "Unique identifier (UID) attached to the Sonar machine controlling the asset",
+				Description: "Unique identifier (UID) attached to the Agentless Gateway controlling the asset",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
@@ -538,6 +701,14 @@ func resourceLogAggregator() *schema.Resource {
 				Default:     nil,
 				Computed:    true,
 			},
+			"logs_destination_asset_id": {
+				Type:        schema.TypeString,
+				Description: "The asset name of the log aggregator that stores this asset's logs.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+				Computed:    true,
+			},
 			"managed_by": {
 				Type:        schema.TypeString,
 				Description: "Email of the person who maintains the asset; can be different from the owner specified in the owned_by field. Defaults to admin_email.",
@@ -545,6 +716,13 @@ func resourceLogAggregator() *schema.Resource {
 				Optional:    true,
 				Default:     nil,
 				Computed:    true,
+			},
+			"max_concurrent_conn": {
+				Type:        schema.TypeString,
+				Description: "Maximum number of concurrent connections that sensitive data management should use at once.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
 			},
 			"owned_by": {
 				Type:        schema.TypeString,
@@ -582,6 +760,13 @@ func resourceLogAggregator() *schema.Resource {
 				Optional:    true,
 				Default:     nil,
 			},
+			"pull_type": {
+				Type:        schema.TypeString,
+				Description: "The method used to pull data from the logstore.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
 			"region": {
 				Type:        schema.TypeString,
 				Description: "For cloud systems with regions, the default region or region used with this asset",
@@ -592,6 +777,13 @@ func resourceLogAggregator() *schema.Resource {
 			"s3_provider": {
 				Type:        schema.TypeString,
 				Description: "Accepted value: \"aws-rds-mssql\", required only for AWS RDS MS SQL SERVER auditing workflow.",
+				Required:    false,
+				Optional:    true,
+				Default:     nil,
+			},
+			"sdm_enabled": {
+				Type:        schema.TypeBool,
+				Description: "Sensitive data management (SDM) is enabled if this parameter is set to True.",
 				Required:    false,
 				Optional:    true,
 				Default:     nil,
@@ -650,13 +842,6 @@ func resourceLogAggregator() *schema.Resource {
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice([]string{"Development", "Staging", "Test", "Disaster Recovery", "Demonstration", "Production", "QA", "Training"}, false),
 				Default:      nil,
-			},
-			"version": {
-				Type:        schema.TypeFloat,
-				Description: "Denotes the version of the asset",
-				Required:    false,
-				Optional:    true,
-				Default:     nil,
 			},
 		},
 	}
@@ -740,34 +925,52 @@ func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceDat
 	log.Printf("[DEBUG] logAggregatorReadResponse: %s\n", logAggregatorReadResponse.Data.ID)
 	// Set returned and computed values
 	d.Set("admin_email", logAggregatorReadResponse.Data.AssetData.AdminEmail)
-	//d.Set("application", logAggregatorReadResponse.Data.AssetData.Application)
+	d.Set("application", logAggregatorReadResponse.Data.AssetData.Application)
 	d.Set("arn", logAggregatorReadResponse.Data.AssetData.Arn)
 	d.Set("asset_display_name", logAggregatorReadResponse.Data.AssetData.AssetDisplayName)
 	d.Set("asset_id", logAggregatorReadResponse.Data.AssetData.AssetID)
 	d.Set("asset_source", logAggregatorReadResponse.Data.AssetData.AssetSource)
+	d.Set("asset_version", logAggregatorReadResponse.Data.AssetData.Version)
+	d.Set("audit_data_type", logAggregatorReadResponse.Data.AssetData.AuditDataType)
 	d.Set("audit_pull_enabled", logAggregatorReadResponse.Data.AssetData.AuditPullEnabled)
 	d.Set("audit_data_type", logAggregatorReadResponse.Data.AssetData.AuditDataType)
 	d.Set("audit_type", logAggregatorReadResponse.Data.AssetData.AuditType)
 	d.Set("available_bucket_account_ids", logAggregatorReadResponse.Data.AssetData.AvailableBucketAccountIds)
 	d.Set("available_regions", logAggregatorReadResponse.Data.AssetData.AvailableRegions)
 	d.Set("bucket_account_id", logAggregatorReadResponse.Data.AssetData.BucketAccountId)
+	d.Set("ca_certs_path", logAggregatorReadResponse.Data.AssetData.CaCertsPath)
+	d.Set("ca_file", logAggregatorReadResponse.Data.AssetData.CaFile)
+	d.Set("consumer_group", logAggregatorReadResponse.Data.AssetData.ConsumerGroup)
+	d.Set("consumer_group_workers", logAggregatorReadResponse.Data.AssetData.ConsumerGroupWorkers)
+	d.Set("consumer_worker_prefix", logAggregatorReadResponse.Data.AssetData.ConsumerWorkerPrefix)
 	d.Set("content_type", logAggregatorReadResponse.Data.AssetData.ContentType)
 	if logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint != "" {
-		d.Set("credential_endpoint", logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint)
+		d.Set("credentials_endpoint", logAggregatorReadResponse.Data.AssetData.CredentialsEndpoint)
 	}
 	d.Set("criticality", logAggregatorReadResponse.Data.AssetData.Criticality)
+	d.Set("database_name", logAggregatorReadResponse.Data.AssetData.DatabaseName)
+	d.Set("db_engine", logAggregatorReadResponse.Data.AssetData.DbEngine)
+	// enable_audit_management / enable_audit_monitoring
+	d.Set("endpoint", logAggregatorReadResponse.Data.AssetData.Endpoint)
+	// entitlement_enabled
 	d.Set("gateway_id", logAggregatorReadResponse.Data.GatewayID)
 	d.Set("gateway_service", logAggregatorReadResponse.Data.AssetData.GatewayService)
 	d.Set("id", logAggregatorReadResponse.Data.ID)
 	d.Set("jsonar_uid", logAggregatorReadResponse.Data.AssetData.JsonarUID)
 	d.Set("location", logAggregatorReadResponse.Data.AssetData.Location)
+	d.Set("logs_destination_asset_id", logAggregatorReadResponse.Data.AssetData.LogsDestinationAssetID)
+	d.Set("logstore", logAggregatorReadResponse.Data.AssetData.Logstore)
 	d.Set("managed_by", logAggregatorReadResponse.Data.AssetData.ManagedBy)
+	d.Set("max_concurrent_conn", logAggregatorReadResponse.Data.AssetData.MaxConcurrentConn)
 	d.Set("owned_by", logAggregatorReadResponse.Data.AssetData.OwnedBy)
 	d.Set("parent_asset_id", logAggregatorReadResponse.Data.AssetData.ParentAssetID)
+	// prefix
+	d.Set("project", logAggregatorReadResponse.Data.AssetData.Project)
 	d.Set("proxy", logAggregatorReadResponse.Data.AssetData.Proxy)
 	d.Set("pubsub_subscription", logAggregatorReadResponse.Data.AssetData.PubsubSubscription)
+	d.Set("pull_type", logAggregatorReadResponse.Data.AssetData.PullType)
 	d.Set("region", logAggregatorReadResponse.Data.AssetData.Region)
-	d.Set("s3_provider", logAggregatorReadResponse.Data.AssetData.S3Provider)
+	d.Set("s3_provider", logAggregatorReadResponse.Data.AssetData.S3Provider) // TODO: may not be supported in all DSF versions
 	d.Set("server_host_name", logAggregatorReadResponse.Data.AssetData.ServerHostName)
 	d.Set("server_ip", logAggregatorReadResponse.Data.AssetData.ServerIP)
 	d.Set("server_type", logAggregatorReadResponse.Data.ServerType)
@@ -780,8 +983,18 @@ func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceDat
 		}
 		d.Set("server_port", serverPort)
 	}
+	d.Set("sdm_enabled", logAggregatorReadResponse.Data.AssetData.SdmEnabled)
+	// subscribers
+	// unmask
 	d.Set("used_for", logAggregatorReadResponse.Data.AssetData.UsedFor)
-	d.Set("version", logAggregatorReadResponse.Data.AssetData.Version)
+
+	if logAggregatorReadResponse.Data.AssetData.AuditInfo != nil {
+		auditInfo := &schema.Set{F: resourceAssetDataAuditInfoHash}
+		auditInfoMap := map[string]interface{}{}
+		auditInfoMap["policy_template_name"] = logAggregatorReadResponse.Data.AssetData.AuditInfo.PolicyTemplateName
+		auditInfo.Add(auditInfoMap)
+		d.Set("audit_info", auditInfo)
+	}
 
 	if logAggregatorReadResponse.Data.AssetData.AwsProxyConfig != nil {
 		awsProxyConfig := &schema.Set{F: resourceAssetDataAWSProxyConfigHash}
@@ -803,67 +1016,70 @@ func resourceLogAggregatorReadContext(ctx context.Context, d *schema.ResourceDat
 	connections := &schema.Set{F: resourceLogAggregatorConnectionHash}
 	for _, v := range logAggregatorReadResponse.Data.AssetData.Connections {
 		connection := map[string]interface{}{}
-		connection["access_id"] = v.ConnectionData.AccessID
-		connection["access_key"] = v.ConnectionData.AccessKey
+		connection["access_id"] = v.ConnectionData.AccessID   // TODO SR-4549
+		connection["access_key"] = v.ConnectionData.AccessKey // TODO SR-4549
 		connection["application_id"] = v.ConnectionData.ApplicationID
 		connection["auth_mechanism"] = v.ConnectionData.AuthMechanism
 		connection["azure_storage_account"] = v.ConnectionData.AzureStorageAccount
 		connection["azure_storage_container"] = v.ConnectionData.AzureStorageContainer
 		connection["azure_storage_secret_key"] = v.ConnectionData.AzureStorageSecretKey
-		connection["ca_certs_path"] = v.ConnectionData.CaCertsPath
+		connection["cache_file"] = v.ConnectionData.CacheFile
+		connection["ca_certs_path"] = v.ConnectionData.CaCertsPath // TODO SR-4549
 		connection["client_secret"] = v.ConnectionData.ClientSecret
-		connection["cyberark_secret"] = v.ConnectionData.CyberarkSecret
+		connection["db_role"] = v.ConnectionData.DbRole
 		connection["directory_id"] = v.ConnectionData.DirectoryID
 		connection["eventhub_access_key"] = v.ConnectionData.EventhubAccessKey
 		connection["eventhub_access_policy"] = v.ConnectionData.EventhubAccessPolicy
 		connection["eventhub_name"] = v.ConnectionData.EventhubName
 		connection["eventhub_namespace"] = v.ConnectionData.EventhubNamespace
-		connection["external_id"] = v.ConnectionData.ExternalID
+		connection["external"] = v.ConnectionData.External
+		connection["external_id"] = v.ConnectionData.ExternalID // TODO SR-4549
+		connection["extra_kinit_parameters"] = v.ConnectionData.ExtraKinitParameters
 		connection["format"] = v.ConnectionData.Format
-		connection["hashicorp_secret"] = v.ConnectionData.HashicorpSecret
+		connection["kerberos_kdc"] = v.ConnectionData.KerberosKdc
+		connection["kerberos_service_realm"] = v.ConnectionData.KerberosServiceRealm
+		connection["kerberos_service_kdc"] = v.ConnectionData.KerberosServiceKdc
+		connection["kerberos_spn"] = v.ConnectionData.KerberosSpn
 		connection["key_file"] = v.ConnectionData.KeyFile
+		connection["keytab_file"] = v.ConnectionData.KeytabFile
+		connection["kinit_program_path"] = v.ConnectionData.KinitProgramPath
+		connection["passphrase"] = v.ConnectionData.Passphrase
+		connection["password"] = v.ConnectionData.Password
+		connection["principal"] = v.ConnectionData.Principal
 		connection["reason"] = v.Reason
 		connection["region"] = v.ConnectionData.Region
-		connection["role_name"] = v.ConnectionData.RoleName
+		connection["role_name"] = v.ConnectionData.RoleName // TODO SR-4549
 		connection["secret_key"] = v.ConnectionData.SecretKey
+		// sftp_test TODO SR-4549
 		connection["ssl"] = v.ConnectionData.Ssl
+		connection["ssl_server_cert"] = v.ConnectionData.SslServerCert
 		connection["subscription_id"] = v.ConnectionData.SubscriptionID
+		connection["use_keytab"] = v.ConnectionData.UseKeytab
+		connection["user_identity_client_id"] = v.ConnectionData.UserIdentityClientID
 		connection["username"] = v.ConnectionData.Username
 
 		// Handle structs
 		if v.ConnectionData.AmazonSecret != nil {
 			amazonSecret := &schema.Set{F: resourceConnectionDataAmazonSecretHash}
 			amazonSecretMap := map[string]interface{}{}
-			//amazonSecretMap["field_mapping"] = v.ConnectionData.AmazonSecret.FieldMapping
 			amazonSecretMap["secret_asset_id"] = v.ConnectionData.AmazonSecret.SecretAssetID
 			amazonSecretMap["secret_name"] = v.ConnectionData.AmazonSecret.SecretName
 			amazonSecret.Add(amazonSecretMap)
 			connection["amazon_secret"] = amazonSecret
 		}
 
-		if v.ConnectionData.CredentialFields != nil {
-			credentialFields := &schema.Set{F: resourceConnectionDataCredentialFieldsHash}
-			credentialFieldsMap := map[string]interface{}{}
-			credentialFieldsMap["credential_source"] = v.ConnectionData.CredentialFields.CredentialSource
-			credentialFieldsMap["role_arn"] = v.ConnectionData.CredentialFields.RoleArn
-			credentialFields.Add(credentialFieldsMap)
-			connection["credential_fields"] = credentialFields
-		}
-
 		if v.ConnectionData.CyberarkSecret != nil {
-			amazonSecret := &schema.Set{F: resourceConnectionDataCyberarkSecretHash}
-			amazonSecretMap := map[string]interface{}{}
-			//amazonSecretMap["field_mapping"] = v.ConnectionData.AmazonSecret.FieldMapping
-			amazonSecretMap["secret_asset_id"] = v.ConnectionData.CyberarkSecret.SecretAssetID
-			amazonSecretMap["secret_name"] = v.ConnectionData.CyberarkSecret.SecretName
-			amazonSecret.Add(amazonSecretMap)
-			connection["cyberark_secret"] = amazonSecret
+			cyberarkSecret := &schema.Set{F: resourceConnectionDataCyberarkSecretHash}
+			cyberarkSecretMap := map[string]interface{}{}
+			cyberarkSecretMap["secret_asset_id"] = v.ConnectionData.CyberarkSecret.SecretAssetID
+			cyberarkSecretMap["secret_name"] = v.ConnectionData.CyberarkSecret.SecretName
+			cyberarkSecret.Add(cyberarkSecretMap)
+			connection["cyberark_secret"] = cyberarkSecret
 		}
 
 		if v.ConnectionData.HashicorpSecret != nil {
 			hashicorpSecret := &schema.Set{F: resourceConnectionDataHashicorpSecretHash}
 			hashicorpSecretMap := map[string]interface{}{}
-			//hashicorpSecretMap["field_mapping"] = v.ConnectionData.HashicorpSecret.Path
 			hashicorpSecretMap["path"] = v.ConnectionData.HashicorpSecret.Path
 			hashicorpSecretMap["secret_asset_id"] = v.ConnectionData.HashicorpSecret.SecretAssetID
 			hashicorpSecretMap["secret_name"] = v.ConnectionData.HashicorpSecret.SecretName
@@ -986,11 +1202,19 @@ func resourceLogAggregatorConnectionHash(v interface{}) int {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 
+	if v, ok := m["cache_file"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
 	if v, ok := m["ca_certs_path"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 
 	if v, ok := m["client_secret"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["db_role"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 
@@ -1018,11 +1242,55 @@ func resourceLogAggregatorConnectionHash(v interface{}) int {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 
+	if v, ok := m["external"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(bool)))
+	}
+
+	if v, ok := m["extra_kinit_parameters"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
 	if v, ok := m["format"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 
 	if v, ok := m["key_file"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["kerberos_kdc"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["kerberos_service_kdc"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["kerberos_service_realm"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["kerberos_spn"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["keytab_file"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["kinit_program_path"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["passphrase"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["password"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["principal"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 
@@ -1046,11 +1314,23 @@ func resourceLogAggregatorConnectionHash(v interface{}) int {
 		buf.WriteString(fmt.Sprintf("%v-", v.(bool)))
 	}
 
+	if v, ok := m["ssl_server_cert"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
 	if v, ok := m["subscription_id"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 
+	if v, ok := m["use_keytab"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(bool)))
+	}
+
 	if v, ok := m["username"]; ok {
+		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	}
+
+	if v, ok := m["user_identity_client_id"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
 

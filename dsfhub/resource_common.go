@@ -165,24 +165,6 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 									curConnection.ConnectionData.AmazonSecret = &as
 								}
 							}
-						case "credential_fields":
-							inputVal := connection[schemaField.ID].(*schema.Set)
-							if inputVal.Len() > 0 {
-								for _, schemaFieldInt := range inputVal.List() {
-									cf := CredentialFields{}
-									schemaField := schemaFieldInt.(map[string]interface{})
-									for fieldName, fieldObjInt := range schemaField {
-										fieldObj := fieldObjInt.(interface{})
-										switch fieldName {
-										case "secret_asset_id":
-											cf.CredentialSource = fieldObj.(string)
-										case "secret_name":
-											cf.RoleArn = fieldObj.(string)
-										}
-									}
-									curConnection.ConnectionData.CredentialFields = &cf
-								}
-							}
 						case "cyberark_secret":
 							inputVal := connection[schemaField.ID].(*schema.Set)
 							if inputVal.Len() > 0 {
@@ -271,11 +253,12 @@ func createResource(dsfDataSource *ResourceWrapper, serverType string, d *schema
 								log.Printf("[DEBUG] schemaField.ID %v, Type=Bool: %v\n", schemaField.ID, value)
 								value := connection[schemaField.ID].(bool)
 								structField.SetBool(value)
-							//case reflect.Slice:
-							//	value := d.Get(schemaField.ID)
-							//	structField.SetBool(value)
-							//	log.Printf("Slice: %v\n", value)
-							//	// Handle slices or arrays here
+							case reflect.Slice:
+								value := connection[schemaField.ID].([]interface{})
+								for _, v := range value {
+									log.Printf("[DEBUG] slice value v: %v\n", v)
+								}
+								structField.Set(reflect.ValueOf(value))
 							//case reflect.Map:
 							//	log.Printf("Map: %v\n", value)
 							//	// Handle maps here
@@ -425,8 +408,8 @@ func readAsset(client Client, resourceType string, assetId string) (*ResourceWra
 	readFuncs := map[string]func(string) (*ResourceWrapper, error){
 		dsfDataSourceResourceType:    client.ReadDSFDataSource,
 		dsfLogAggregatorResourceType: client.ReadLogAggregator,
-		dsfCloudAccountResourceType:  client.ReadSecretManager,
-		dsfSecretManagerResourceType: client.ReadLogAggregator,
+		dsfCloudAccountResourceType:  client.ReadCloudAccount,
+		dsfSecretManagerResourceType: client.ReadSecretManager,
 	}
 
 	readFn, ok := readFuncs[resourceType]
@@ -436,6 +419,7 @@ func readAsset(client Client, resourceType string, assetId string) (*ResourceWra
 
 	log.Printf("[INFO] reading %s asset %v", resourceType, assetId)
 	result, err = readFn(assetId)
+
 	if err != nil {
 		return result, err
 	}
@@ -741,18 +725,6 @@ func resourceConnectionDataAmazonSecretHash(v interface{}) int {
 	return PositiveHash(buf.String())
 }
 
-func resourceConnectionDataCredentialFieldsHash(v interface{}) int {
-	var buf bytes.Buffer
-	m := v.(map[string]interface{})
-	if v, ok := m["credential_source"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["role_arn"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	return PositiveHash(buf.String())
-}
-
 func resourceConnectionDataCyberarkSecretHash(v interface{}) int {
 	var buf bytes.Buffer
 	m := v.(map[string]interface{})
@@ -810,21 +782,27 @@ func resourceAssetDataAuditInfoHash(v interface{}) int {
 
 func resourceAssetDataAWSProxyConfigHash(v interface{}) int {
 	var buf bytes.Buffer
-	m := v.(map[string]interface{})
-	if v, ok := m["http"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	m, ok := v.(map[string]interface{})
+	if !ok || m == nil {
+		return 0
 	}
-	if v, ok := m["https"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	if v, ok := m["http"]; ok && v != nil {
+		buf.WriteString(fmt.Sprintf("%v-", v))
+	}
+	if v, ok := m["https"]; ok && v != nil {
+		buf.WriteString(fmt.Sprintf("%v-", v))
 	}
 	return PositiveHash(buf.String())
 }
 
 func resourceAssetDataServiceEndpointsHash(v interface{}) int {
 	var buf bytes.Buffer
-	m := v.(map[string]interface{})
-	if v, ok := m["logs"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
+	m, ok := v.(map[string]interface{})
+	if !ok || m == nil {
+		return 0
+	}
+	if logs, ok := m["logs"]; ok && logs != nil {
+		buf.WriteString(fmt.Sprintf("%v-", logs))
 	}
 	return PositiveHash(buf.String())
 }

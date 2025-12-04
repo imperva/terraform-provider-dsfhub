@@ -1,22 +1,22 @@
 ---
 subcategory: ""
 layout: "dsfhub"
-page_title: "Manage Bulk Assets from CSV"
+page_title: "Import and Manage Bulk Assets from CSV"
 description: |-
-  Manage Bulk Assets from CSV
+  Import and Manage Bulk Assets from CSV
 ---
 
-# Manage Bulk Assets from CSV
+# Import and Manage Bulk Assets from CSV
 
-Terraform can natively import csv data using the [csvdecode](https://www.terraform.io/docs/language/functions/csvdecode.html) function. The following example shows how to use the csvdecode function to manage [dsf_data_source](https://registry.terraform.io/modules/imperva/dsf-agentless-gw/aws/latest) resources in bulk from a csv file.
+Terraform can natively import CSV data using the [csvdecode](https://www.terraform.io/docs/language/functions/csvdecode.html) function. The following example shows how to use the csvdecode function to manage `dsfhub_data_source` resources in bulk from a CSV file.
 
 <details>
 <summary>Example CSV file format</summary>
 
-Create a csv file with the following format.  The first row is the header row and the remaining rows are the asset data.  The header row is used to map the column data to the asset attributes.
+Create a CSV file with the following format.  The first row is the header row and the remaining rows are the asset data.  The header row is used to map the column data to the asset attributes.
 
 ```csv
-id,asset_id,jsonar_uid,asset_display_name,Server Type,Server IP,Server Host Name,Service Name,Server Port,version,audit_type,auth_mechanism,username,password,reason,admin_email
+id,asset_id,jsonar_uid,asset_display_name,Server Type,Server IP,Server Host Name,Service Name,Server Port,asset_version,audit_type,auth_mechanism,username,password,reason,admin_email
 1,my.hostname1:ORACLE:ORA19C:1521,ABCDE-12345-ABCDE-12345,my.hostname1:ORACLE:ORA19C:1521,ORACLE,0.0.0.0,my.hostname1:ORACLE:ORA19C:1521,my-ora-service-name,3202,19,UNIFIED,kerberos,test,test,sonargateway,your@email.com
 2,my.hostname2:ORACLE:ORA19C:1521,ABCDE-12345-ABCDE-12345,my.hostname2:ORACLE:ORA19C:1521,ORACLE,0.0.0.0,my.hostname2:ORACLE:ORA19C:1521,my-ora-service-name,3202,19,UNIFIED,password,admin,password,sonargateway,your@email.com
 ```
@@ -26,8 +26,6 @@ id,asset_id,jsonar_uid,asset_display_name,Server Type,Server IP,Server Host Name
 
 <details>
 <summary>Example Variables for Bulk Import</summary>
-
-## Example Variables for Bulk Import
 
 ```
 # DSFHUB Provider Required Variables
@@ -48,17 +46,16 @@ variable "gateway_id" {
 }
 
 variable "csv_file_path" {
-	description =  "Path to the csv file to import"
+	description =  "Path to the CSV file to import"
 	type = string
 	default = "sample_assets.csv"
 }
 ```
 </details>
 
-## Proviers and Resources for Bulk Import
+### Providers and Resources for Bulk Import
 
 ```hcl
-# Specify path for provider
 terraform {
   required_providers {
     dsfhub = {
@@ -90,7 +87,7 @@ resource "dsfhub_data_source" "bulk-database-import" {
 	server_ip           = each.value["Server IP"]
 	server_port         = each.value["Server Port"]
 	service_name		= each.value["Service Name"]
-	version             = each.value.version
+	asset_version       = each.value.asset_version
 
 	dynamic "asset_connection" {
     	for_each = each.value.auth_mechanism=="password" ? [1] : []
@@ -111,13 +108,3 @@ resource "dsfhub_data_source" "bulk-database-import" {
   	}
 }
 ```
-
-## Bulk Import of Exising Assets into Terraform State
-
-For exising assets that are already managed by DSF, you can import them using the [DSF-CLI](https://github.com/imperva/dsf-cli) into Terraform state using the following command.  Execute the following command in the same directory where you have the bulk import tf file shown above.
-
-```
-for ASSET_ID in $(dsf data_source read | jq -r '.data[].id'); do terraform import "dsfhub_data_source.bulk-database-import[\"$ASSET_ID\"]" "${ASSET_ID}"; done
-```
-
-
