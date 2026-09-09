@@ -36,7 +36,7 @@ func (c *Client) CreateSecretManager(secretManager ResourceWrapper) (*ResourceWr
 
 	// Parse the JSON
 	var createSecretManagerResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &createSecretManagerResponse)
+	err = parseJSONResponse(responseBody, &createSecretManagerResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing add SecretManager JSON response serverType: %s and gatewayID: %s | err: %s\n", secretManager.Data.ServerType, secretManager.Data.GatewayID, err)
 	}
@@ -65,9 +65,9 @@ func (c *Client) ReadSecretManager(secretManagerId string) (*ResourceWrapper, er
 
 	// Parse the JSON
 	var readSecretManagerResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &readSecretManagerResponse)
+	err = parseJSONResponse(responseBody, &readSecretManagerResponse)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing SecretManager JSON response for secretManagerId: %s | secretManager: %s err: %s\n", secretManagerId, responseBody, err)
+		return nil, fmt.Errorf("error parsing SecretManager JSON response for secretManagerId: %s | err: %s\n", secretManagerId, err)
 	}
 	if readSecretManagerResponse.Errors != nil {
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
@@ -94,9 +94,9 @@ func (c *Client) ReadSecretManagers() (*ResourcesWrapper, error) {
 
 	// Parse the JSON
 	var readSecretManagersResponse ResourcesWrapper
-	err = json.Unmarshal([]byte(responseBody), &readSecretManagersResponse)
+	err = parseJSONResponse(responseBody, &readSecretManagersResponse)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing SecretManagers JSON response: %s err: %s\n", responseBody, err)
+		return nil, fmt.Errorf("error parsing SecretManagers JSON response: %s\n", err)
 	}
 	if readSecretManagersResponse.Errors != nil {
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
@@ -130,7 +130,7 @@ func (c *Client) UpdateSecretManager(secretManagerId string, secretManager Resou
 
 	// Parse the JSON
 	var updateSecretManagerResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &updateSecretManagerResponse)
+	err = parseJSONResponse(responseBody, &updateSecretManagerResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing update SecretManager JSON response for secretManagerId: %s | err: %s\n", secretManagerId, err)
 	}
@@ -160,9 +160,9 @@ func (c *Client) DeleteSecretManager(secretManagerId string) (*ResourceResponse,
 
 	// Parse the JSON
 	var deleteSecretManagerResponse ResourceResponse
-	err = json.Unmarshal([]byte(responseBody), &deleteSecretManagerResponse)
+	err = parseJSONResponse(responseBody, &deleteSecretManagerResponse)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing delete SecretManager JSON response for dataSourceId: %s, %s\n", secretManagerId, err)
+		return nil, fmt.Errorf("error parsing delete SecretManager JSON response for secretManagerId: %s, %s\n", secretManagerId, err)
 	}
 	if deleteSecretManagerResponse.Errors != nil {
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)

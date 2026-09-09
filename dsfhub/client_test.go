@@ -68,6 +68,32 @@ func TestClientVerifyInvalidDSFHUBToken(t *testing.T) {
 	}
 }
 
+// covers the case where the API returns a plain-text error (not JSON)
+func TestClientVerifyPlainTextErrorResponse(t *testing.T) {
+	log.Printf("======================== BEGIN TEST ========================")
+	log.Printf("[INFO] Running test TestClientVerifyPlainTextErrorResponse \n")
+	plainTextError := "Invalid service name  : Invalid API Url : //api/v2/data-sources: timestamp=2026-09-09T09:29:01.197-0700"
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		if req.URL.String() != baseAPIPrefix+endpointGateways {
+			t.Errorf("Should have have hit %s endpoint. Got: %s", endpointGateways, req.URL.String())
+		}
+		rw.Write([]byte(plainTextError))
+	}))
+	defer server.Close()
+	config := &Config{DSFHUBToken: "foo", DSFHUBHost: server.URL}
+	client := &Client{config: config, httpClient: &http.Client{}}
+	_, err := client.Verify()
+	if err == nil {
+		t.Errorf("Should have received an error")
+	}
+	if !strings.HasPrefix(err.Error(), "error parsing gateways JSON response") {
+		t.Errorf("Should have received a JSON parse error, got: %s", err)
+	}
+	if !strings.Contains(err.Error(), plainTextError) {
+		t.Errorf("Should have included the raw response body in the error, got: %s", err)
+	}
+}
+
 func TestClientVerifyValidAccount(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientVerifyValidAccount \n")

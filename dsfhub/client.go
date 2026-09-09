@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
 const contentTypeApplicationJson = "application/json"
@@ -337,7 +338,7 @@ func (c *Client) Verify() (*GatewaysResponse, error) {
 
 	// Parse the JSON
 	var gatewaysResponse GatewaysResponse
-	err = json.Unmarshal([]byte(responseBody), &gatewaysResponse)
+	err = parseJSONResponse(responseBody, &gatewaysResponse)
 	log.Printf("[DEBUG] gatewaysResponse: %s\n", responseBody)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing gateways JSON response: %s", err)
@@ -392,6 +393,13 @@ func SetHeaders(c *Client, req *http.Request) {
 	req.Header.Set("Content-Type", contentTypeApplicationJson)
 	req.Header.Set("Authorization", "Bearer "+c.config.DSFHUBToken)
 	req.Header.Set("Accept", contentTypeApplicationJson)
+}
+
+func parseJSONResponse(responseBody []byte, v interface{}) error {
+	if err := json.Unmarshal(responseBody, v); err != nil {
+		return fmt.Errorf("%s | response body: %s", err, strings.TrimSpace(string(responseBody)))
+	}
+	return nil
 }
 
 func PositiveHash(s string) int {

@@ -37,7 +37,7 @@ func (c *Client) CreateDSFDataSource(dsfDataSource ResourceWrapper) (*ResourceWr
 
 	// Parse the JSON
 	var createDSFDataSourceResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &createDSFDataSourceResponse)
+	err = parseJSONResponse(responseBody, &createDSFDataSourceResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing add DSFDataSource JSON response serverType: %s and gatewayId: %s | err: %s", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, err)
 	}
@@ -66,9 +66,9 @@ func (c *Client) ReadDSFDataSource(dataSourceId string) (*ResourceWrapper, error
 
 	// Parse the JSON
 	var readDSFDataSourceDataResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &readDSFDataSourceDataResponse)
+	err = parseJSONResponse(responseBody, &readDSFDataSourceDataResponse)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing DSFDataSource JSON response for dataSourceId: %s | dsfDataSource: %s err: %s", dataSourceId, responseBody, err)
+		return nil, fmt.Errorf("error parsing DSFDataSource JSON response for dataSourceId: %s | err: %s", dataSourceId, err)
 	}
 
 	if readDSFDataSourceDataResponse.Errors != nil {
@@ -96,9 +96,9 @@ func (c *Client) ReadDSFDataSources() (*ResourcesWrapper, error) {
 
 	// Parse the JSON
 	var readDSFDataSourcesDataResponse ResourcesWrapper
-	err = json.Unmarshal([]byte(responseBody), &readDSFDataSourcesDataResponse)
+	err = parseJSONResponse(responseBody, &readDSFDataSourcesDataResponse)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing DSFDataSource JSON response: %v err: %s", responseBody, err)
+		return nil, fmt.Errorf("error parsing DSFDataSource JSON response: %s", err)
 	}
 
 	if readDSFDataSourcesDataResponse.Errors != nil {
@@ -134,7 +134,7 @@ func (c *Client) UpdateDSFDataSource(dataSourceId string, dsfDataSourceData Reso
 
 	// Parse the JSON
 	var updateDSFDataSourceDataResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &updateDSFDataSourceDataResponse)
+	err = parseJSONResponse(responseBody, &updateDSFDataSourceDataResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing update DSFDataSource JSON response for dataSourceId: %s | err: %s", dataSourceId, err)
 	}
@@ -165,7 +165,7 @@ func (c *Client) DeleteDSFDataSource(dataSourceId string) (*ResourceResponse, er
 
 	// Parse the JSON
 	var deleteDSFDataSourceResponse ResourceResponse
-	err = json.Unmarshal([]byte(responseBody), &deleteDSFDataSourceResponse)
+	err = parseJSONResponse(responseBody, &deleteDSFDataSourceResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing delete DSFDataSource JSON response for dataSourceId: %s, %s", dataSourceId, err)
 	}
@@ -196,7 +196,7 @@ func (c *Client) EnableAuditDSFDataSource(dataSourceId string) (*UpdateAuditResp
 
 	// Parse the JSON
 	var enableAuditResponse UpdateAuditResponse
-	err = json.Unmarshal([]byte(responseBody), &enableAuditResponse)
+	err = parseJSONResponse(responseBody, &enableAuditResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing enable audit DSFDataSource JSON response dataSourceId: %s | err: %s\n", dataSourceId, err)
 	}
@@ -225,7 +225,7 @@ func (c *Client) DisableAuditDSFDataSource(dataSourceId string) (*UpdateAuditRes
 
 	// Parse the JSON
 	var disableAuditResponse UpdateAuditResponse
-	err = json.Unmarshal([]byte(responseBody), &disableAuditResponse)
+	err = parseJSONResponse(responseBody, &disableAuditResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing disable audit DSFDataSource JSON response dataSourceId: %s | err: %s\n", dataSourceId, err)
 	}

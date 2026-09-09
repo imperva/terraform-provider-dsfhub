@@ -36,7 +36,7 @@ func (c *Client) CreateCloudAccount(cloudAccount ResourceWrapper) (*ResourceWrap
 
 	// Parse the JSON
 	var createCloudAccountResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &createCloudAccountResponse)
+	err = parseJSONResponse(responseBody, &createCloudAccountResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing add CloudAccount JSON response serverType: %s and gatewayID: %s | err: %s\n", cloudAccount.Data.ServerType, cloudAccount.Data.GatewayID, err)
 	}
@@ -65,9 +65,9 @@ func (c *Client) ReadCloudAccount(cloudAccountId string) (*ResourceWrapper, erro
 
 	// Parse the JSON
 	var readCloudAccountResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &readCloudAccountResponse)
+	err = parseJSONResponse(responseBody, &readCloudAccountResponse)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing CloudAccount JSON response for cloudAccountId: %s | responseBody: %s err: %s\n", cloudAccountId, responseBody, err)
+		return nil, fmt.Errorf("error parsing CloudAccount JSON response for cloudAccountId: %s | err: %s\n", cloudAccountId, err)
 	}
 	if readCloudAccountResponse.Errors != nil {
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
@@ -92,9 +92,9 @@ func (c *Client) ReadCloudAccounts() (*ResourcesWrapper, error) {
 
 	// Parse the JSON
 	var readCloudAccountsResponse ResourcesWrapper
-	err = json.Unmarshal([]byte(responseBody), &readCloudAccountsResponse)
+	err = parseJSONResponse(responseBody, &readCloudAccountsResponse)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing ReadCloudAccounts JSON response: %s err: %s\n", responseBody, err)
+		return nil, fmt.Errorf("error parsing ReadCloudAccounts JSON response: %s\n", err)
 	}
 	if readCloudAccountsResponse.Errors != nil {
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
@@ -128,7 +128,7 @@ func (c *Client) UpdateCloudAccount(cloudAccountId string, cloudAccountIdData Re
 
 	// Parse the JSON
 	var updateCloudAccountResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &updateCloudAccountResponse)
+	err = parseJSONResponse(responseBody, &updateCloudAccountResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing update CloudAccount JSON response for cloudAccountId: %s | err: %s\n", cloudAccountId, err)
 	}
@@ -158,7 +158,7 @@ func (c *Client) DeleteCloudAccount(cloudAccountId string) (*ResourceResponse, e
 
 	// Parse the JSON
 	var deleteCloudAccountResponse ResourceResponse
-	err = json.Unmarshal([]byte(responseBody), &deleteCloudAccountResponse)
+	err = parseJSONResponse(responseBody, &deleteCloudAccountResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing delete CloudAccount JSON response for cloudAccountId: %s, %s\n", cloudAccountId, err)
 	}

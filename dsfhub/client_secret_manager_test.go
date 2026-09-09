@@ -111,6 +111,61 @@ func TestClientAddSecretManagerBadJSON(t *testing.T) {
 	}
 }
 
+func TestClientAddSecretManagerPlainTextErrorResponse(t *testing.T) {
+	log.Printf("======================== BEGIN TEST ========================")
+	log.Printf("[INFO] Running test TestClientAddSecretManagerPlainTextErrorResponse \n")
+	DSFHUBToken := "foo"
+	endpoint := fmt.Sprintf(baseAPIPrefix + endpointSecretManagers)
+	plainTextError := "Invalid service name  : Invalid API Url : //api/v2/secret-managers: timestamp=2026-09-09T09:29:01.197-0700"
+
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		if req.URL.String() != endpoint {
+			t.Errorf("Should have have hit %s endpoint. Got: %s", endpoint, req.URL.String())
+		}
+		rw.Write([]byte(plainTextError))
+	}))
+	defer server.Close()
+
+	config := &Config{DSFHUBToken: DSFHUBToken, DSFHUBHost: server.URL}
+	client := &Client{config: config, httpClient: &http.Client{}}
+
+	secretManager := ResourceWrapper{
+		Data: ResourceData{
+			AssetData: AssetData{
+				AdminEmail:       testAdminEmail,
+				AssetDisplayName: testAssetDisplayName,
+				AssetID:          testSMAssetId,
+				ServerHostName:   testServerHostName,
+				ServerIP:         testServerIP,
+				ServerPort:       testServerPort,
+				Connections: []AssetConnection{{
+					Reason: testSMConnectionReason,
+					ConnectionData: ConnectionData{
+						RoleName:      testSMRoleName,
+						AuthMechanism: testSMAuthMechanism,
+					},
+				}},
+			},
+			ServerType: testSMServerType,
+			GatewayID:  testGatewayId,
+		},
+	}
+
+	createSecretManagerResponse, err := client.CreateSecretManager(secretManager)
+	if err == nil {
+		t.Errorf("Should have received an error")
+	}
+	if !strings.HasPrefix(err.Error(), fmt.Sprintf("error parsing add SecretManager JSON response serverType: %s and gatewayID: %s", testSMServerType, testGatewayId)) {
+		t.Errorf("Should have received a JSON parse error, got: %s", err)
+	}
+	if !strings.Contains(err.Error(), plainTextError) {
+		t.Errorf("Should have included the raw response body in the error, got: %s", err)
+	}
+	if createSecretManagerResponse != nil {
+		t.Errorf("Should have received a nil createSecretManagerResponse instance")
+	}
+}
+
 func TestClientAddSecretManagerInvalidSecretManager(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientAddSecretManagerInvalidSecretManager \n")
