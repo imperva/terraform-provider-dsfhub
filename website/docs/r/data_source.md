@@ -10,7 +10,7 @@ description: |-
 
 Terraform resource for managing a DSFHub data source. 
 
-The `dsf_data_source` resource supports the configuration parameters necessary to onboard a data source to DSF Hub, which allows for the management of its audit data via data analytics and management tools. Documentation for the underlying API used in this resource can be found at [Onboarding and Managing Data Sources](https://docs-cybersec.thalesgroup.com/bundle/v15.0-sonar-user-guide/page/84558.htm).
+The `dsfhub_data_source` resource supports the configuration parameters necessary to onboard a data source to DSF Hub, which allows for the management of its audit data via data analytics and management tools. Documentation for the underlying API used in this resource can be found at [Onboarding and Managing Data Sources](https://docs-cybersec.thalesgroup.com/bundle/v15.0-sonar-user-guide/page/84558.htm).
 
 ## Data Source Types
 
@@ -372,7 +372,7 @@ import {
 Using terraform import, import DSF Data Sources using the `asset_id`. For example:
 
 ```
-$ terraform import dsf_cloud_account.example "arn:aws:rds:region:123456789012:db:my-rds-oracle"
+$ terraform import dsfhub_data_source.example_rds_oracle "arn:aws:rds:region:123456789012:db:my-rds-oracle"
 ```
 
 For detailed instructions on onboarding existing cloud resources to DSF using Terraform's import functionality, see [Importing and Onboarding Existing Data Sources with Terraform](https://docs-cybersec.thalesgroup.com/bundle/onboarding-databases-to-sonar-reference-guide/page/Importing-and-Onboarding-Existing-Data-Sources-with-Terraform_784990209.html).

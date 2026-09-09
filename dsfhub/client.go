@@ -14,6 +14,7 @@ import (
 
 const contentTypeApplicationJson = "application/json"
 const endpointGateways = "/gateways"
+const maxResponseBodyInError = 400
 
 // Client represents an internal client that brokers calls to the DSF API
 type Client struct {
@@ -319,7 +320,7 @@ func NewClient(config *Config) *Client {
 		customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 	client := &http.Client{Transport: customTransport}
-	return &Client{config: config, httpClient: client, providerVersion: "1.4.0"}
+	return &Client{config: config, httpClient: client, providerVersion: "1.4.1"}
 }
 
 // Verify checks the API credentials
@@ -397,9 +398,22 @@ func SetHeaders(c *Client, req *http.Request) {
 
 func parseJSONResponse(responseBody []byte, v interface{}) error {
 	if err := json.Unmarshal(responseBody, v); err != nil {
-		return fmt.Errorf("%s | response body: %s", err, strings.TrimSpace(string(responseBody)))
+		body := strings.TrimSpace(string(responseBody))
+		hint := ""
+		if isHTML(body) {
+			hint = "received an HTML page instead of a JSON API response, check that the DSFHub host is up and the health of the USC application | "
+		}
+		if len(body) > maxResponseBodyInError {
+			body = body[:maxResponseBodyInError] + "... (truncated)"
+		}
+		return fmt.Errorf("%s%s | response body: %s", hint, err, body)
 	}
 	return nil
+}
+
+func isHTML(body string) bool {
+	lower := strings.ToLower(strings.TrimSpace(body))
+	return strings.HasPrefix(lower, "<!doctype html") || strings.HasPrefix(lower, "<html")
 }
 
 func PositiveHash(s string) int {

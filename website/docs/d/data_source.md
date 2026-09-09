@@ -23,7 +23,7 @@ resource "dsfhub_log_aggregator" "example_aws_log_group" {
   asset_display_name = "arn:partition:service:region:account-id"
   asset_id           = "arn:partition:service:region:account-id"
   gateway_id         = "12345-abcde-12345-abcde-12345-abcde"
-  parent_asset_id    = data.dsf_data_source.example_aws_rds_mysql.asset_id
+  parent_asset_id    = data.dsfhub_data_source.example_aws_rds_mysql.asset_id
   asset_connection {
     auth_mechanism = "default"
     reason         = "default"
