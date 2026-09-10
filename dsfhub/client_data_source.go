@@ -32,12 +32,12 @@ func (c *Client) CreateDSFDataSource(dsfDataSource ResourceWrapper) (*ResourceWr
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] Add DSFDataSource JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var createDSFDataSourceResponse ResourceWrapper
-	err = parseJSONResponse(responseBody, &createDSFDataSourceResponse)
+	err = parseResponseBody(responseBody, &createDSFDataSourceResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing add DSFDataSource JSON response serverType: %s and gatewayId: %s | err: %s", dsfDataSource.Data.ServerType, dsfDataSource.Data.GatewayID, err)
 	}
@@ -61,12 +61,12 @@ func (c *Client) ReadDSFDataSource(dataSourceId string) (*ResourceWrapper, error
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] ReadDSFDataSource JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var readDSFDataSourceDataResponse ResourceWrapper
-	err = parseJSONResponse(responseBody, &readDSFDataSourceDataResponse)
+	err = parseResponseBody(responseBody, &readDSFDataSourceDataResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing DSFDataSource JSON response for dataSourceId: %s | err: %s", dataSourceId, err)
 	}
@@ -91,12 +91,12 @@ func (c *Client) ReadDSFDataSources() (*ResourcesWrapper, error) {
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] ReadDSFDataSources JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var readDSFDataSourcesDataResponse ResourcesWrapper
-	err = parseJSONResponse(responseBody, &readDSFDataSourcesDataResponse)
+	err = parseResponseBody(responseBody, &readDSFDataSourcesDataResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing DSFDataSource JSON response: %s", err)
 	}
@@ -129,12 +129,12 @@ func (c *Client) UpdateDSFDataSource(dataSourceId string, dsfDataSourceData Reso
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] Update DSFDataSource JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var updateDSFDataSourceDataResponse ResourceWrapper
-	err = parseJSONResponse(responseBody, &updateDSFDataSourceDataResponse)
+	err = parseResponseBody(responseBody, &updateDSFDataSourceDataResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing update DSFDataSource JSON response for dataSourceId: %s | err: %s", dataSourceId, err)
 	}
@@ -160,12 +160,12 @@ func (c *Client) DeleteDSFDataSource(dataSourceId string) (*ResourceResponse, er
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] Delete DSFDataSource with JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var deleteDSFDataSourceResponse ResourceResponse
-	err = parseJSONResponse(responseBody, &deleteDSFDataSourceResponse)
+	err = parseResponseBody(responseBody, &deleteDSFDataSourceResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing delete DSFDataSource JSON response for dataSourceId: %s, %s", dataSourceId, err)
 	}
@@ -191,12 +191,12 @@ func (c *Client) EnableAuditDSFDataSource(dataSourceId string) (*UpdateAuditResp
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] Enable audit for DSFDataSource '%v' JSON response: %s\n", dataSourceId, string(responseBody))
 
 	// Parse the JSON
 	var enableAuditResponse UpdateAuditResponse
-	err = parseJSONResponse(responseBody, &enableAuditResponse)
+	err = parseResponseBody(responseBody, &enableAuditResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing enable audit DSFDataSource JSON response dataSourceId: %s | err: %s\n", dataSourceId, err)
 	}
@@ -220,12 +220,12 @@ func (c *Client) DisableAuditDSFDataSource(dataSourceId string) (*UpdateAuditRes
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] Disable audit for DSFDataSource '%v' JSON response: %s\n", dataSourceId, string(responseBody))
 
 	// Parse the JSON
 	var disableAuditResponse UpdateAuditResponse
-	err = parseJSONResponse(responseBody, &disableAuditResponse)
+	err = parseResponseBody(responseBody, &disableAuditResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing disable audit DSFDataSource JSON response dataSourceId: %s | err: %s\n", dataSourceId, err)
 	}

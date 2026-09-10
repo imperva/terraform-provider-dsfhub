@@ -339,7 +339,7 @@ func (c *Client) Verify() (*GatewaysResponse, error) {
 
 	// Parse the JSON
 	var gatewaysResponse GatewaysResponse
-	err = parseJSONResponse(responseBody, &gatewaysResponse)
+	err = parseResponseBody(responseBody, &gatewaysResponse)
 	log.Printf("[DEBUG] gatewaysResponse: %s\n", responseBody)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing gateways JSON response: %s", err)
@@ -350,7 +350,6 @@ func (c *Client) Verify() (*GatewaysResponse, error) {
 		log.Printf("[INFO] Successfully authenticated to DSF API\n")
 	}
 	// resp.StatusCode
-	// Dump JSON
 	return &gatewaysResponse, nil
 }
 
@@ -396,7 +395,9 @@ func SetHeaders(c *Client, req *http.Request) {
 	req.Header.Set("Accept", contentTypeApplicationJson)
 }
 
-func parseJSONResponse(responseBody []byte, v interface{}) error {
+// When the response body is JSON, unmarshals it into v
+// Otherwise returns the JSON error and the stringified response body
+func parseResponseBody(responseBody []byte, v interface{}) error {
 	if err := json.Unmarshal(responseBody, v); err != nil {
 		body := strings.TrimSpace(string(responseBody))
 		hint := ""

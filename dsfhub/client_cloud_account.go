@@ -31,12 +31,12 @@ func (c *Client) CreateCloudAccount(cloudAccount ResourceWrapper) (*ResourceWrap
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] Add CloudAccount JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var createCloudAccountResponse ResourceWrapper
-	err = parseJSONResponse(responseBody, &createCloudAccountResponse)
+	err = parseResponseBody(responseBody, &createCloudAccountResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing add CloudAccount JSON response serverType: %s and gatewayID: %s | err: %s\n", cloudAccount.Data.ServerType, cloudAccount.Data.GatewayID, err)
 	}
@@ -60,12 +60,12 @@ func (c *Client) ReadCloudAccount(cloudAccountId string) (*ResourceWrapper, erro
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] ReadCloudAcount JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var readCloudAccountResponse ResourceWrapper
-	err = parseJSONResponse(responseBody, &readCloudAccountResponse)
+	err = parseResponseBody(responseBody, &readCloudAccountResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing CloudAccount JSON response for cloudAccountId: %s | err: %s\n", cloudAccountId, err)
 	}
@@ -87,12 +87,12 @@ func (c *Client) ReadCloudAccounts() (*ResourcesWrapper, error) {
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] ReadCloudAcounts JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var readCloudAccountsResponse ResourcesWrapper
-	err = parseJSONResponse(responseBody, &readCloudAccountsResponse)
+	err = parseResponseBody(responseBody, &readCloudAccountsResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing ReadCloudAccounts JSON response: %s\n", err)
 	}
@@ -123,12 +123,12 @@ func (c *Client) UpdateCloudAccount(cloudAccountId string, cloudAccountIdData Re
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] DSF update CloudAccount JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var updateCloudAccountResponse ResourceWrapper
-	err = parseJSONResponse(responseBody, &updateCloudAccountResponse)
+	err = parseResponseBody(responseBody, &updateCloudAccountResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing update CloudAccount JSON response for cloudAccountId: %s | err: %s\n", cloudAccountId, err)
 	}
@@ -153,12 +153,12 @@ func (c *Client) DeleteCloudAccount(cloudAccountId string) (*ResourceResponse, e
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] DSF delete CloudAccount with JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var deleteCloudAccountResponse ResourceResponse
-	err = parseJSONResponse(responseBody, &deleteCloudAccountResponse)
+	err = parseResponseBody(responseBody, &deleteCloudAccountResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing delete CloudAccount JSON response for cloudAccountId: %s, %s\n", cloudAccountId, err)
 	}

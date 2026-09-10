@@ -30,12 +30,12 @@ func (c *Client) CreateLogAggregator(logAggregator ResourceWrapper) (*ResourceWr
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] Add LogAggregator JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var createLogAggregatorResponse ResourceWrapper
-	err = parseJSONResponse(responseBody, &createLogAggregatorResponse)
+	err = parseResponseBody(responseBody, &createLogAggregatorResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing add LogAggregator JSON response serverType: %s and gatewayID: %s | err: %s\n", logAggregator.Data.ServerType, logAggregator.Data.GatewayID, err)
 	}
@@ -59,12 +59,12 @@ func (c *Client) ReadLogAggregator(logAggregatorId string) (*ResourceWrapper, er
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] ReadLogAggregator JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var readLogAggregatorResponse ResourceWrapper
-	err = parseJSONResponse(responseBody, &readLogAggregatorResponse)
+	err = parseResponseBody(responseBody, &readLogAggregatorResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing LogAggregator JSON response for logAggregatorId: %s | err: %s\n", logAggregatorId, err)
 	}
@@ -88,12 +88,12 @@ func (c *Client) ReadLogAggregators() (*ResourcesWrapper, error) {
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] ReadLogAggregators JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var readLogAggregatorsResponse ResourcesWrapper
-	err = parseJSONResponse(responseBody, &readLogAggregatorsResponse)
+	err = parseResponseBody(responseBody, &readLogAggregatorsResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing LogAggregators JSON response: %s\n", err)
 	}
@@ -124,12 +124,12 @@ func (c *Client) UpdateLogAggregator(logAggregatorId string, logAggregatorData R
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] DSF update LogAggregator JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var updateLogAggregatorResponse ResourceWrapper
-	err = parseJSONResponse(responseBody, &updateLogAggregatorResponse)
+	err = parseResponseBody(responseBody, &updateLogAggregatorResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing update LogAggregator JSON response for LogAggregatorId: %s | err: %s\n", logAggregatorId, err)
 	}
@@ -154,12 +154,12 @@ func (c *Client) DeleteLogAggregator(logAggregatorId string) (*ResourceResponse,
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] DSF delete LogAggregator with JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var deleteLogAggregatorResponse ResourceResponse
-	err = parseJSONResponse(responseBody, &deleteLogAggregatorResponse)
+	err = parseResponseBody(responseBody, &deleteLogAggregatorResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing delete LogAggregator JSON response for logAggregatorId: %s, %s\n", logAggregatorId, err)
 	}
