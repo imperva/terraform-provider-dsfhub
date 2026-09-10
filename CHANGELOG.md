@@ -1,6 +1,17 @@
-## 1.4.0 (Unreleased)
+## 1.4.1 (Sep X, 2026)
+ENHANCEMENTS:
+
+* all clients: parse plaintext and HTML response bodies for easier debugging
+
+BUG FIXES:
+
+* wrong description for dsfhub_token was being displayed in provider block
+* wrong resource names referenced in registry documentation import blocks
+
+## 1.4.0 (Dec 3, 2025)
 
 ENHANCEMENTS:
+
 * Updated docs and README.md
 * resource/log_aggregator: added the following asset_connection attributes: cache_file, db_role, external, extra_kinit_parameters, kerberos_kdc, kerberos_service_kdc, kerberos_service_realm, kerberos_spn, keytab_file, kinit_program_path, passphrase, password, principal, ssl_server_cert, use_keytab, user_identity_client_id
 * resource/log_aggregator: added the following attributes: audit_data_type, audit_info, ca_certs_file, ca_file, consumer_group, consumer_group_workers, consumer_worker_prefix, database_name, db_engine, endpoint, logstore, logs_destination_asset_id, max_concurrent_conn, project, pull_type, sdm_enabled
@@ -11,6 +22,7 @@ ENHANCEMENTS:
 * resource/data_source: added support for AWS RDS DB2, CLICKHOUSE, DRUID CLUSTER, DRUID, GAUSSDB, GCP FIRESTORE, GEMFIRE, GRAINITE, GRIDGAIN IGNITE, MAPR FS, MAPR HBASE, SAP IQ, SINGLESTORE, TIGERGRAPH, VERTICA server types
 
 BUG FIXES:
+
 * all resources: deprecated asset_connection.base_dn, asset_connection.credential_fields, access_method, credential_expiry, smtp_timeout, ntlm, page_size fields
 * all resources: fixed aws_proxy_config and service_endpoints hash functions
 * all resources: fixed asset_connection fields SSL, DN, DNS SRV, Thrift Transport, Hive Server Type, SID, kerberos_host_FQDN, transportMode
