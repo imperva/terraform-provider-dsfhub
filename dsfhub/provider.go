@@ -25,7 +25,7 @@ func init() {
 		"sync_type": "Determines whether to sync asset creation/update operations with the Agentless gateways. Available values:\n" +
 			"SYNC_GW_BLOCKING: The operation is synchronous and blocks until all gateways have been updated. This means that, if syncing the assets to Agentless Gateways fails, the provider will throw an error and not continue. This may result in a difference between the state of which Terraform is aware and the assets that were actually imported.\n" +
 			"SYNC_GW_NON_BLOCKING: The operation is asynchronous and returns immediately.\n" +
-			"DO_NOT_SYNC_GW: The operation is synchronous and does not update the gateways.\n" +
+			"DO_NOT_SYNC_GW: The operation is synchronous and does not update the gateways. Note that this does not impact the next scheduled run of the Sync Assets and Connections playbook.\n" +
 			"Default: SYNC_GW_BLOCKING",
 	}
 }
@@ -57,7 +57,7 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("DSFHUB_HOST", ""),
-				Description: descriptions["dsfhub_token"],
+				Description: descriptions["dsfhub_host"],
 			},
 			"insecure_ssl": {
 				Type:        schema.TypeBool,

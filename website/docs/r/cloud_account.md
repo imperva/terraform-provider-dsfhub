@@ -252,7 +252,6 @@ The following arguments are optional, however some are only supported for certai
 - `aws_proxy_config` - (Block) An `aws_proxy_config` block as defined below for an AWS proxy configuration.
 - `credentials_endpoint` - (String) A specific sts endpoint to use.
 - `criticality` - (Number) The asset's importance to the business. These values are measured on a scale from "Most critical" (1) to "Least critical" (4). Allowed values: 1, 2, 3, 4.
-- `gateway_service` - (String) `gateway-aws@<DB type>.service` Not necessary to be set manually on the asset. Will be set by the Connect Gateway playbook.
 - `jsonar_uid` - (String) Unique identifier (UID) attached to the Agentless Gateway controlling the asset.
 - `location` - (String) Current human-readable description of the physical location of the asset, or region.
 - `managed_by` - (String) Email of the person who maintains the asset; can be different from the owner specified in the owned_by field. Defaults to admin_email.

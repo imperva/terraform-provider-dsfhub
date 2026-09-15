@@ -89,6 +89,52 @@ func TestClientAddDSFDataSourceBadJSON(t *testing.T) {
 	}
 }
 
+func TestClientAddDSFDataSourcePlainTextErrorResponse(t *testing.T) {
+	log.Printf("======================== BEGIN TEST ========================")
+	log.Printf("[INFO] Running test TestClientAddDSFDataSourcePlainTextErrorResponse \n")
+	DSFHUBToken := "foo"
+	endpoint := fmt.Sprintf(baseAPIPrefix + endpointDsfDataSource)
+	plainTextError := "Invalid service name  : Invalid API Url : //api/v2/data-sources: timestamp=2026-09-09T09:29:01.197-0700"
+
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		if req.URL.String() != endpoint {
+			t.Errorf("Should have have hit %s endpoint. Got: %s", endpoint, req.URL.String())
+		}
+		rw.Write([]byte(plainTextError))
+	}))
+	defer server.Close()
+
+	config := &Config{DSFHUBToken: DSFHUBToken, DSFHUBHost: server.URL}
+	client := &Client{config: config, httpClient: &http.Client{}}
+
+	dsfDataSource := ResourceWrapper{
+		Data: ResourceData{
+			ServerType: testDSServerType,
+			GatewayID:  testGatewayId,
+			AssetData: AssetData{
+				AdminEmail:       testAdminEmail,
+				Arn:              testArn,
+				AssetDisplayName: testAssetDisplayName,
+				ServerHostName:   testServerHostName,
+			},
+		},
+	}
+
+	createDSFDataSourceResponse, err := client.CreateDSFDataSource(dsfDataSource)
+	if err == nil {
+		t.Errorf("Should have received an error")
+	}
+	if !strings.HasPrefix(err.Error(), fmt.Sprintf("error parsing add DSFDataSource JSON response serverType: %s and gatewayId: %s", testDSServerType, testGatewayId)) {
+		t.Errorf("Should have received a JSON parse error, got: %s", err)
+	}
+	if !strings.Contains(err.Error(), plainTextError) {
+		t.Errorf("Should have included the raw response body in the error, got: %s", err)
+	}
+	if createDSFDataSourceResponse != nil {
+		t.Errorf("Should have received a nil createDSFDataSourceResponse instance")
+	}
+}
+
 func TestClientAddDSFDataSourceInvalidDSFDataSource(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientAddDSFDataSourceInvalidDSFDataSource \n")

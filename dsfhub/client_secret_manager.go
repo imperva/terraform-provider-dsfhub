@@ -31,12 +31,12 @@ func (c *Client) CreateSecretManager(secretManager ResourceWrapper) (*ResourceWr
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] Add DSF SecretManager JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var createSecretManagerResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &createSecretManagerResponse)
+	err = parseResponseBody(responseBody, &createSecretManagerResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing add SecretManager JSON response serverType: %s and gatewayID: %s | err: %s\n", secretManager.Data.ServerType, secretManager.Data.GatewayID, err)
 	}
@@ -60,14 +60,14 @@ func (c *Client) ReadSecretManager(secretManagerId string) (*ResourceWrapper, er
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] DSF SecretManager JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var readSecretManagerResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &readSecretManagerResponse)
+	err = parseResponseBody(responseBody, &readSecretManagerResponse)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing SecretManager JSON response for secretManagerId: %s | secretManager: %s err: %s\n", secretManagerId, responseBody, err)
+		return nil, fmt.Errorf("error parsing SecretManager JSON response for secretManagerId: %s | err: %s\n", secretManagerId, err)
 	}
 	if readSecretManagerResponse.Errors != nil {
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
@@ -89,14 +89,14 @@ func (c *Client) ReadSecretManagers() (*ResourcesWrapper, error) {
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] DSF SecretManagers JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var readSecretManagersResponse ResourcesWrapper
-	err = json.Unmarshal([]byte(responseBody), &readSecretManagersResponse)
+	err = parseResponseBody(responseBody, &readSecretManagersResponse)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing SecretManagers JSON response: %s err: %s\n", responseBody, err)
+		return nil, fmt.Errorf("error parsing SecretManagers JSON response: %s\n", err)
 	}
 	if readSecretManagersResponse.Errors != nil {
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)
@@ -125,12 +125,12 @@ func (c *Client) UpdateSecretManager(secretManagerId string, secretManager Resou
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] DSF update SecretManager JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var updateSecretManagerResponse ResourceWrapper
-	err = json.Unmarshal([]byte(responseBody), &updateSecretManagerResponse)
+	err = parseResponseBody(responseBody, &updateSecretManagerResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing update SecretManager JSON response for secretManagerId: %s | err: %s\n", secretManagerId, err)
 	}
@@ -155,14 +155,14 @@ func (c *Client) DeleteSecretManager(secretManagerId string) (*ResourceResponse,
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	// Dump JSON
+	// Dump response body
 	log.Printf("[DEBUG] DSF delete SecretManager with JSON response: %s\n", string(responseBody))
 
 	// Parse the JSON
 	var deleteSecretManagerResponse ResourceResponse
-	err = json.Unmarshal([]byte(responseBody), &deleteSecretManagerResponse)
+	err = parseResponseBody(responseBody, &deleteSecretManagerResponse)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing delete SecretManager JSON response for dataSourceId: %s, %s\n", secretManagerId, err)
+		return nil, fmt.Errorf("error parsing delete SecretManager JSON response for secretManagerId: %s, %s\n", secretManagerId, err)
 	}
 	if deleteSecretManagerResponse.Errors != nil {
 		return nil, fmt.Errorf("errors found in json response: %s", responseBody)

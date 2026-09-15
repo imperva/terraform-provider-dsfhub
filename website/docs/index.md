@@ -7,7 +7,7 @@ description: |-
 
 # DSFHUB Provider
 
-The DSFHUB provider is used to interact with Data Security Fabric Hub structured resources supported by Thales Group. The provider needs to be configured with your DSF Hub endpoint and authentication token before it can be used.
+The DSFHUB provider is used to interact with Data Security Fabric Hub structured resources supported by Thales Group. The provider needs to be configured with your DSF Hub endpoint and authentication token before it can be used. See the [Terraform Provisioning and Integration](https://docs-cybersec.thalesgroup.com/bundle/onboarding-databases-to-sonar-reference-guide/page/Terraform-Provisioning-and-Integration_228360774.html) documentation for more information.
 
 Use the navigation to the left to read about the available resources and data sources. For integrated examples with cloud resource configuration and audit setup, please see the [DSFHub Agentless-Onboarding modules](https://github.com/imperva/terraform-dsfhub-agentless-onboarding).
 

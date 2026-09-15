@@ -89,6 +89,52 @@ func TestClientAddLogAggregatorBadJSON(t *testing.T) {
 	}
 }
 
+func TestClientAddLogAggregatorPlainTextErrorResponse(t *testing.T) {
+	log.Printf("======================== BEGIN TEST ========================")
+	log.Printf("[INFO] Running test TestClientAddLogAggregatorPlainTextErrorResponse \n")
+	DSFHUBToken := "foo"
+	endpoint := fmt.Sprintf(baseAPIPrefix + endpointLogAggregators)
+	plainTextError := "Invalid service name  : Invalid API Url : //api/v2/log-aggregators: timestamp=2026-09-09T09:29:01.197-0700"
+
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		if req.URL.String() != endpoint {
+			t.Errorf("Should have have hit %s endpoint. Got: %s", endpoint, req.URL.String())
+		}
+		rw.Write([]byte(plainTextError))
+	}))
+	defer server.Close()
+
+	config := &Config{DSFHUBToken: DSFHUBToken, DSFHUBHost: server.URL}
+	client := &Client{config: config, httpClient: &http.Client{}}
+
+	logAggregator := ResourceWrapper{
+		Data: ResourceData{
+			ServerType: testDSServerType,
+			GatewayID:  testGatewayId,
+			AssetData: AssetData{
+				AdminEmail:       testAdminEmail,
+				Arn:              testArn,
+				AssetDisplayName: testAssetDisplayName,
+				ServerHostName:   testServerHostName,
+			},
+		},
+	}
+
+	createLogAggregatorResponse, err := client.CreateLogAggregator(logAggregator)
+	if err == nil {
+		t.Errorf("Should have received an error")
+	}
+	if !strings.HasPrefix(err.Error(), fmt.Sprintf("error parsing add LogAggregator JSON response serverType: %s and gatewayID: %s", testDSServerType, testGatewayId)) {
+		t.Errorf("Should have received a JSON parse error, got: %s", err)
+	}
+	if !strings.Contains(err.Error(), plainTextError) {
+		t.Errorf("Should have included the raw response body in the error, got: %s", err)
+	}
+	if createLogAggregatorResponse != nil {
+		t.Errorf("Should have received a nil createLogAggregatorResponse instance")
+	}
+}
+
 func TestClientAddLogAggregatorInvalidLogAggregator(t *testing.T) {
 	log.Printf("======================== BEGIN TEST ========================")
 	log.Printf("[INFO] Running test TestClientAddLogAggregatorInvalidLogAggregator \n")

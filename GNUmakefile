@@ -5,7 +5,7 @@ HOSTNAME=registry.terraform.io
 NAMESPACE=terraform-providers
 PKG_NAME=dsfhub
 BINARY=terraform-provider-${PKG_NAME}
-VERSION=1.4.0
+VERSION=1.4.1
 OS_ARCH=darwin_amd64
 
 default: install
@@ -15,7 +15,8 @@ build: fmtcheck
 
 install: build
 	mkdir -p ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${PKG_NAME}/${VERSION}/${OS_ARCH}
-	mv ${BINARY} ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${PKG_NAME}/${VERSION}/${OS_ARCH}
+	cp ${BINARY} ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${PKG_NAME}/${VERSION}/${OS_ARCH}
+	mv ${BINARY} $(GOPATH)/bin
 
 test: fmtcheck
 	go test -i $(TEST) || exit 1

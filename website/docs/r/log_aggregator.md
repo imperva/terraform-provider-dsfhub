@@ -473,7 +473,7 @@ In Terraform v1.5.0 and later, use an import block to import Log Aggregators usi
 
 ```
 import {
-  to = dsf_log_aggregator.example_aws_log_group
+  to = dsfhub_log_aggregator.example_aws_log_group
   id = "arn:aws:logs:us-east-2:123456789012:log-group:/aws/rds/instance/my-database/audit:*"
 }
 ```
@@ -481,7 +481,7 @@ import {
 Using terraform import, import Log Aggregators using the `asset_id`. For example:
 
 ```
-$ terraform import dsf_log_aggregator.example_aws_log_group "arn:aws:logs:us-east-2:123456789012:log-group:/aws/rds/instance/my-database/audit:*"
+$ terraform import dsfhub_log_aggregator.example_aws_log_group "arn:aws:logs:us-east-2:123456789012:log-group:/aws/rds/instance/my-database/audit:*"
 ```
 
 For detailed instructions on onboarding existing cloud resources to DSF using Terraform's import functionality, see [Importing and Onboarding Existing Data Sources with Terraform](https://docs-cybersec.thalesgroup.com/bundle/onboarding-databases-to-sonar-reference-guide/page/Importing-and-Onboarding-Existing-Data-Sources-with-Terraform_784990209.html).
